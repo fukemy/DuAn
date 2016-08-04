@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <item
+        android:id="@+id/enter_road_name"
+        android:icon="@mipmap/ic_launcher"
+        android:orderInCategory="4"
+        android:title="@string/enter_road_name"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/select_road_type"
+        android:orderInCategory="5"
+        android:title="@string/multi_select"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/done"
+        android:orderInCategory="3"
+        android:title="Done"
+        app:showAsAction="ifRoom|collapseActionView|withText" />
+
+    <!--<item-->
+        <!--android:id="@+id/camera"-->
+        <!--android:icon="@mipmap/camera"-->
+        <!--android:orderInCategory="2"-->
+        <!--android:title="Camera"-->
+        <!--android:visible="false"-->
+        <!--app:showAsAction="ifRoom|collapseActionView|withText" />-->
+</menu>

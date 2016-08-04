@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:layout_marginBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:background="@color/grayColor" />
+
+    <EditText
+        android:id="@+id/edtInput"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/border_disable"
+        android:gravity="top|left"
+        android:hint="@string/report"
+        android:maxLines="5"
+        android:minHeight="60dp"
+        android:minLines="5"
+        android:lines="5"
+        android:padding="5dp"
+        android:tag="information"
+        android:textColor="@android:color/black"
+        android:textSize="13sp" />
+
+    <LinearLayout
+        android:id="@+id/imagelist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="15dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="15dp">
+
+        <ImageView
+            android:id="@+id/imgCamera"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:padding="2dp"
+            android:src="@mipmap/camera_black"
+            android:tag="camera" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:layout_weight="1"
+            android:gravity="right">
+
+            <ImageView
+                android:id="@+id/imgAddRoadName"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="20dp"
+                android:padding="2dp"
+                android:src="@mipmap/add_black"
+                android:tag="add" />
+
+            <ImageView
+                android:id="@+id/imgEditRoadName"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="24dp"
+                android:padding="2dp"
+                android:src="@mipmap/edit_black"
+                android:tag="edit" />
+
+            <ImageView
+                android:id="@+id/imgDeleteRoadName"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="24dp"
+                android:padding="2dp"
+                android:src="@mipmap/delete_black"
+                android:tag="delete" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

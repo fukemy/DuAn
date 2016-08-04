@@ -16,17 +16,18 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.EditText;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.macos.adapter.MainScreenAdapter;
+import com.example.macos.database.DatabaseHelper;
+import com.example.macos.database.Item;
+import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnMainCatalogItem;
 import com.example.macos.entities.EnWorkList;
@@ -45,21 +46,23 @@ import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
+import com.google.gson.Gson;
+import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainScreen extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private final String CURRENT_FRAGMENT = "Current Fragment";
+    ViewPager viewPager;
+    TabLayout tabLayout;
+    MainScreenAdapter adapter;
+    private Gson gson;
     private Menu menu;
     private EnWorkList enWorkLists;
-    private List<EnMainCatalogItem> dataList;
-    private String ROAD_NAME = "";
     public String ACTION_TYPE = "";
     private SharedPreferenceManager pref;
-    public String getRoadName(){
-        return ROAD_NAME;
-    }
     boolean IS_SYNC_NOW = false;
     @Override
     protected void onNewIntent(Intent intent) {
@@ -75,8 +78,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         setContentView(R.layout.main_screen);
 
         pref = new SharedPreferenceManager(MainScreen.this);
-
-//        FunctionUtils.setAlarm(this);
+        gson = new Gson();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -127,16 +129,23 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         builder.setTitle(getResources().getString(R.string.road_name));
         LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
         View dialogRoadNameInput = inflater.inflate(R.layout.edittext_input, null, false);
-        final EditText chooseRoadName = (EditText) dialogRoadNameInput.findViewById(R.id.edt);
-        //FunctionUtils.setupKeyboard(chooseRoadName, MainScreen.this);
+        final MaterialBetterSpinner chooseRoadName = (MaterialBetterSpinner) dialogRoadNameInput.findViewById(R.id.edt);
 
+        final List<RoadInformation> list = DatabaseHelper.getRoadInformationList();
+        final HashMap<String, RoadInformation> listRoadName = new HashMap<String, RoadInformation>();
+        for(RoadInformation road: list){
+            listRoadName.put(road.getTenDuong(), road);
+        }
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainScreen.this,
+                android.R.layout.simple_dropdown_item_1line, listRoadName.keySet().toArray(new String[listRoadName.size()]));
+        chooseRoadName.setAdapter(adapter);
         builder.setView(dialogRoadNameInput);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                ROAD_NAME = chooseRoadName.getText().toString().trim();
-                //Toast.makeText(MainScreen.this, "ROAD_NAME: " + ROAD_NAME, Toast.LENGTH_SHORT).show();
-                pref.saveString(GlobalParams.ROAD_NAME, ROAD_NAME);
+                String ROAD_NAME = chooseRoadName.getText().toString().trim();
+                pref.saveString(GlobalParams.ROAD_CHOOSEN, gson.toJson(listRoadName.get(ROAD_NAME)));
             }
         });
 
@@ -146,43 +155,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 dialog.dismiss();
             }
         });
-        final AlertDialog alertDialog = builder.show();
-        chooseRoadName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(actionId == EditorInfo.IME_ACTION_DONE){
-                    ROAD_NAME = chooseRoadName.getText().toString().trim();
-                    //Toast.makeText(MainScreen.this, "ROAD_NAME: " + ROAD_NAME, Toast.LENGTH_SHORT).show();
-                    pref.saveString(GlobalParams.ROAD_NAME, ROAD_NAME);
-                    alertDialog.dismiss();
-                    return true;
-                }
-                return false;
-            }
-        });
+        builder.show();
     }
 
-    ViewPager viewPager;
-    TabLayout tabLayout;
-    MainScreenAdapter adapter;
-
     private void initReportScreen(){
-        //adapter = new MainScreenAdapter(getSupportFragmentManager());
         ReportScreenAdapter adapter = new ReportScreenAdapter(getSupportFragmentManager());
-        /*
-        // init data
-        FragmentReportDiary mainDataScreen = new FragmentReportDiary();
-        mainDataScreen.setInterface(swap);
-        adapter.addFragment(mainDataScreen, getResources().getString(R.string.NhatKy));
-
-        FragmentReportStatus status = new FragmentReportStatus();
-        status.setInterface(swap);
-        adapter.addFragment(status, getResources().getString(R.string.Tinhtrang));
-
-        FragmentReportMap map = new FragmentReportMap();
-        map.setInterface(swap);
-        adapter.addFragment(map, getResources().getString(R.string.map));
-        */
 
         // set data
         viewPager.setAdapter(null);
@@ -198,20 +175,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                /*
-                switch (tab.getPosition()){
-                    case 0:
-                        spinFilter.setVisibility(View.GONE);
-                        break;
-                    case 1:
-                        spinFilter.setVisibility(View.GONE);
-                        break;
-                    case 2:
-                        spinFilter.setVisibility(View.GONE);
-                        break;
-                }
-                */
-
             }
 
             @Override
@@ -226,23 +189,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     }
 
     private void initUploadScreen(){
-        //adapter = new MainScreenAdapter(getSupportFragmentManager());
         viewPager = (ViewPager)findViewById(R.id.viewpager);
         ReportScreenAdapter adapter = new ReportScreenAdapter(getSupportFragmentManager());
-        /*
-        // init data
-        FragmentReportDiary mainDataScreen = new FragmentReportDiary();
-        mainDataScreen.setInterface(swap);
-        adapter.addFragment(mainDataScreen, getResources().getString(R.string.NhatKy));
-
-        FragmentReportStatus status = new FragmentReportStatus();
-        status.setInterface(swap);
-        adapter.addFragment(status, getResources().getString(R.string.Tinhtrang));
-
-        FragmentReportMap map = new FragmentReportMap();
-        map.setInterface(swap);
-        adapter.addFragment(map, getResources().getString(R.string.map));
-        */
 
         // set data
         viewPager.setAdapter(null);
@@ -395,7 +343,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         });
         FunctionUtils.hideMenu(menu, true);
 
-        ROAD_NAME = pref.getString(GlobalParams.ROAD_NAME, "");
+        String ROAD_NAME = pref.getString(GlobalParams.ROAD_CHOOSEN, "");
+        if(ROAD_NAME != "") {
+            ROAD_NAME =  gson.fromJson(ROAD_NAME, RoadInformation.class).getTenDuong();
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Warning");
@@ -445,11 +396,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         //for single work
         @Override
         public void doListWork(EnMainCatalogItem en) {
+            Logger.error("choose item: " + en.getItem().toString());
             Intent in = new Intent(MainScreen.this, AcInput.class);
-            List<String> temp = new ArrayList<>();
-            temp.add(en.getName());
-            enWorkLists = new EnWorkList(temp);
-            in.putExtra(GlobalParams.ROAD_NAME, ROAD_NAME);
+            List<Item> itemList = new ArrayList<>();
+            itemList.add(en.getItem());
+            enWorkLists = new EnWorkList(itemList);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
             startActivity(in);
@@ -459,7 +410,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         @Override
         public void doListWorks() {
             Intent in = new Intent(MainScreen.this, AcInput.class);
-            in.putExtra(GlobalParams.ROAD_NAME, ROAD_NAME);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
             startActivity(in);
@@ -514,7 +464,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         }
         if (id == R.id.select_road_type){
 
-            if(ROAD_NAME.equals("")){
+            if(pref.getString(GlobalParams.ROAD_CHOOSEN,"").equals("")){
                 FunctionUtils.showErrorDialog(getResources().getString(R.string.bancanchontenduongtruoctien), MainScreen.this, dialogInterface);
             }
 
@@ -539,11 +489,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 // collec checked item first
                 List<EnMainCatalogItem> listMainData =  ((FragmentMainDataScreen)adapter.getmFragmentList().get(viewPager.getCurrentItem())).collectSelectedItem();
                 if(listMainData.size() != 0) {
-                    List<String> temp = new ArrayList<>();
+                    List<Item> itemList = new ArrayList<>();
                     for(EnMainCatalogItem str : listMainData){
-                        temp.add(str.getName());
+                        itemList.add(str.getItem());
                     }
-                    enWorkLists = new EnWorkList(temp);
+                    enWorkLists = new EnWorkList(itemList);
                     swap.doListWorks();
                 }else{
                     ((FragmentMainDataScreen) adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(false);

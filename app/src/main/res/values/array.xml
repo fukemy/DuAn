@@ -1,0 +1,564 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //mat duong
+    <string-array name="road_surface_list">
+        <item name="lunvetbanhxe">1.Lún vệt bánh xe\u0020</item>
+        <item name="vetnut">2.Vết nứt\u0020</item>
+        <item name="lundocgonson">3.Lún dọc, lún gợn sóng\u0020</item>
+        <item name="oga">4.Ổ gà\u0020</item>
+        <item name="khanangkhangtruot">5.Khả nắng kháng trượt\u0020</item>
+        <item name="gongang">6.Gờ ngang (Độ êm thuận)</item>
+        <item name="bongbatmatduong">7.Bong bật mật đường\u0020</item>
+        <item name="tinhhuogbatthuong">8.Tình huống bất thường\u0020</item>
+    </string-array>
+
+    <string-array name="road_surface_status_list">
+        <item name="huhongnhe">Hư hỏng nhẹ</item>
+        <item name="huhongnang">Hư hỏng nặng</item>
+        <item name="cansuachua">Cần sửa chữa</item>
+        <item name="canthaythe">Cần thay thế</item>
+        <item name="cannangcap">Cần nâng cấp</item>
+        <item name="thaythengay">Thay thế ngay</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+    //nen duong
+    <string-array name="nenduong">
+        <item name="kichthuochinhhoc">1.Kích thước hình học của nền dường</item>
+        <item name="vitringap">2.Vị trí ngập</item>
+        <item name="doondinhcuanenduong">3.Độ ổn định của nền đường\u0020</item>
+        <item name="congtrinhbaovemaidoc">4.Công trình bảo vệ mái dốc\u0020</item>
+        <item name="maitaluy">5.Mái taluy\u0020</item>
+    </string-array>
+
+    <string-array name="doondinhcuanenduong">
+        <item name="lun">Lún</item>
+        <item name="sut">Sụt</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="congtrinhbaovemaidocnenduong">
+        <item name="xoiLo">Xói lở</item>
+        <item name="sutlun">Sụt lún</item>
+        <item name="kichthuoc">Kích thước</item>
+        <item name="nutvo">Nứt vỡ</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="maitaluynenduong">
+        <item name="nut">Nứt</item>
+        <item name="vitringap">Xói lở</item>
+        <item name="doondinhcuanenduong">Mất ổn định</item>
+        <item name="congtrinhbaovemaidoc">Cây xanh</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+    // dai phan cach
+    <string-array name="daiphancach">
+    <item name="huhongdoxevaquet">1.Hư hỏng do xe va quệt\u0020</item>
+    <item name="vesinhsachsecactamphanquang">2.Vệ sinh sạch sẽ các tấm phản quang gắn trên dải phân cách (nếu có)</item>
+    <item name="sonkelaicacvachsontrendaiphancachbimo">3.Sơn kẻ lại các vạch sơn trên dải phân cách bị mờ</item>
+    </string-array>
+
+    <string-array name="huhongdoxevaquet">
+        <item name="huhongnhe">Hư hỏng nhẹ</item>
+        <item name="huhongnang">Hư hỏng nặng</item>
+        <item name="cansuachua">Cần sửa chữa</item>
+        <item name="canthaythe">Cần thay thế</item>
+        <item name="cannangcap">Cần nâng cấp</item>
+        <item name="thaythengay">Thay thế ngay</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+
+    // cong chui dân sinh
+    <string-array name="congchuidansinh">
+        <item name="nuocthamnhap">1.Nước thâm nhập</item>
+        <item name="xoilonen">2.Xói lở nền</item>
+        <item name="huhongmoinoi">3.Hư hỏng mối nối</item>
+        <item name="hunghongketcaubetong">4.Hư hỏng kết cầu bê tông\u0020</item>
+        <item name="khuyettat">5.Khuyết tật\u0020</item>
+        <item name="xuongcap">6.Xuống cấp\u0020</item>
+        <item name="lunvadichchuyenngang">7.Lún và dịch chuyển ngang</item>
+        <item name="xoilovalodien">8.Xói lở và lộ diện</item>
+        <item name="matduongtrenketcaucong">9.Mặt đường trên kết cầu cống</item>
+        <item name="betongdoimau">10.Bê tông đổi mầu</item>
+        <item name="locotthepanmon">11.Lộ côt thép, ăn mòn</item>
+        <item name="dovongbiendang">12.Độ võng,biến dạng</item>
+        <item name="khecodan">13.Khe co giãn</item>
+        <item name="lancangochan">14.Lan can/gờ chắn</item>
+        <item name="thoatnuoc">15Thoát nước\u0020</item>
+    </string-array>
+
+    <string-array name="huhongketcaubetongcongchuidansinh">
+        <item name="nutvo">Nứt vỡ</item>
+        <item name="bongtroc">Bong tróc</item>
+        <item name="anmonbetong">Ăn mòn bê tông</item>
+        <item name="rorinuoc">Rò rỉ nước</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="khuyettatcongchuidansinh">
+        <item name="nut">Nứt</item>
+        <item name="Lorong">Lỗ rỗng</item>
+        <item name="Rotoong">Rỗ tổ ong</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="xuongcapcongchuidansinh">
+        <item name="chuacodulieu">Nứt</item>
+        <item name="chuacodulieu">Han gỉ</item>
+        <item name="chuacodulieu">Sùi rộp</item>
+        <item name="chuacodulieu">Bong tróc</item>
+        <item name="chuacodulieu">Vôi hóa</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="thoatnuoccongchuidansinh">
+        <item name="chuacodulieu">Đọng nước</item>
+        <item name="chuacodulieu">Tắc nghẽn</item>
+        <item name="chuacodulieu">Hư hỏng cổng thoát</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+    //cống hộp và cống bản thoát nước
+    <string-array name="conghopvacongbanthoatnuoc">
+        <item name="lun">1.Lún</item>
+        <item name="nuocthamnhap">2.Nước thâm nhập</item>
+        <item name="xoilonen">3.Xói lở nền</item>
+        <item name="huhongmoinoi">4.Hư hỏng mối nối</item>
+        <item name="hunghongketcaubetong">5.Hư hỏng kết cầu bê tông\u0020</item>
+        <item name="khuyettat">6.Khuyết tật\u0020</item>
+        <item name="xuongcap">7.Xuống cấp\u0020</item>
+        <item name="lunvadichchuyenngang">8.Lún và dịch chuyển ngang</item>
+        <item name="xoilovalodien">9.Xói lở và lộ diện</item>
+        <item name="matduongtrenketcaucong">10.Mặt đường trên kết cầu cống</item>
+        <item name="betongdoimau">11.Bê tông đổi mầu</item>
+        <item name="locotthepanmon">12.Lộ côt thép, ăn mòn</item>
+        <item name="dovongbiendang">13.Độ võng,biến dạng</item>
+        <item name="khecodan">14.Khe co giãn</item>
+        <item name="lancangochan">15.Lan can/gờ chắn</item>
+        <item name="thoatnuoc">16.Thoát nước\u0020</item>
+        </string-array>
+
+    <string-array name="chuacodulieu">
+        <item name="chuacodulieu">Chưa có dữ liệu</item>
+    </string-array>
+
+    <string-array name="chuacapnhap">
+        <item name="chuacapnhap">Chưa cập nhập</item>
+    </string-array>
+
+
+
+
+
+    // cống tròn
+    <string-array name="congtron">
+        <item name="nuocthamnhap">1.Nước thâm nhập</item>
+        <item name="xoilonen">2.Xói lở nền</item>
+        <item name="huhongmoinoi">3.Hư hỏng mối nối</item>
+        <item name="hunghongketcaubetong">4.Hư hỏng kết cầu bê tông\u0020</item>
+        <item name="khuyettat">5.Khuyết tật\u0020</item>
+        <item name="xuongcap">6.Xuống cấp\u0020</item>
+        <item name="lunvadichchuyenngang">7.Lún và dịch chuyển ngang</item>
+        <item name="xoilovalodien">8.Xói lở và lộ diện</item>
+        <item name="matduongtrenketcaucong">9.Mặt đường trên kết cầu cống</item>
+        <item name="betongdoimau">10.Bê tông đổi mầu</item>
+        <item name="locotthepanmon">11.Lộ côt thép, ăn mòn</item>
+        <item name="dovongbiendang">12.Độ võng,biến dạng</item>
+        <item name="khecodan">13.Khe co giãn</item>
+        <item name="lancangochan">14.Lan can/gờ chắn</item>
+        <item name="thoatnuoc">15Thoát nước\u0020</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+    // mái dốc
+    <string-array name="maidoc">
+        <item name="hinhdangkichthuoc">1.Hình dạng, kích thước</item>
+        <item name="xoilosutlundichchuyencuatuongchan">2.Xói lở, sụt lún, dịch chuyển của tường chắn</item>
+        <item name="khanangthoatnuoc">3.Khả năng thoát nước\u0020</item>
+        <item name="cayxanh">4.Cây xanh</item>
+        <item name="caccongtrinhbaovemaidoc">5.Các công trình bảo vệ mái dốc\u0020</item>
+    </string-array>
+
+
+    <string-array name="khanangthoatnuocmaidoc">
+        <item name="tacnghen">Tắc nghẽn</item>
+        <item name="vatlieuchen">Vật liệu chèn</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+    <string-array name="caccongtrinhbaovemaidoc">
+        <item name="lunsutvanutvo">lún sụt và nứt vỡ</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // tường chắn
+    <string-array name="tuongchan">
+        <item name="doluntuongchan">1.Độ lún</item>
+        <item name="chuyenvingangtuongchan">2.Chuyển vị ngang</item>
+        <item name="khanangthoatnuoctuongchan">3.Khả năng thoát nước</item>
+        <item name="hinhdangkichthuoctuongchan">4.Hình dạng, kích thước</item>
+        <item name="bemat">5.Bề mặt\u0020</item>
+        <item name="nuttuongchan">6.Nứt</item>
+        <item name="reumoctuongchan">7.Rêu mốc</item>
+        <item name="loahoabetongtuongchan">8.Lõa hóa bê tông</item>
+    </string-array>
+
+    <string-array name="bemattuongchan">
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Biến đổi</item>
+    </string-array>
+
+
+
+
+
+
+
+    // hàng rào bảo vệ
+    <string-array name="hangraobaove">
+        <item name="doluntuongchan">1.Hư hỏng, biến dạng</item>
+        <item name="doluntuongchan">2.Han gỉ</item>
+        <item name="doluntuongchan">3.Trụ đỡ bị hư hỏng, han gỉ</item>
+        <item name="doluntuongchan">4.Cây xanh che khuất</item>
+    </string-array>
+
+
+
+
+
+
+
+    //hệ thống chiếu sáng
+    <string-array name="hethongchieusangduong">
+        <item name="doluntuongchan">1.Thân cột\u0020</item>
+        <item name="doluntuongchan">2.Móng của cột</item>
+        <item name="doluntuongchan">3.Trụ đỡ bị hư hỏng, han gỉ</item>
+        <item name="doluntuongchan">4.Bulong và đai ốc\u0020</item>
+        <item name="doluntuongchan">5.Bóng đèn\u0020</item>
+        <item name="doluntuongchan">6.Tình trạng cột</item>
+        <item name="doluntuongchan">7.Các dây neo cột</item>
+    </string-array>
+
+
+    <string-array name="thancothethongchieusangduong">
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Bụi bẩn</item>
+        <item name="doluntuongchan">Tình trạng lắp đặt</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="bulongvadaiochethongchieusangduong">
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Mất</item>
+        <item name="doluntuongchan">Bụi bẩn</item>
+        <item name="doluntuongchan">Han gỉ</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="bongdenhethongchieusangduong">
+        <item name="doluntuongchan">Loại</item>
+        <item name="doluntuongchan">Số lượng</item>
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Bụi bẩn</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+    // biển báo
+    <string-array name="bienbaoduong">
+        <item name="doluntuongchan">1.Hư hỏng, bụi bẩn\u0020</item>
+        <item name="doluntuongchan">2.Mất</item>
+        <item name="doluntuongchan">3.Cây xanh che khuất</item>
+    </string-array>
+
+    <string-array name="huhongbuibanbienbaoduong">
+        <item name="doluntuongchan">Nghiêng</item>
+        <item name="doluntuongchan">Đổ</item>
+        <item name="doluntuongchan">Gãy</item>
+        <item name="doluntuongchan">Lệch vị trí</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+
+    // vạch sơn đường
+    <string-array name="vachsonduong">
+        <item name="doluntuongchan">1.Vạch sơn bị mờ</item>
+        <item name="doluntuongchan">2.Vạch sơ bị cát bụi che mất</item>
+        <item name="doluntuongchan">3.Vạch sơn bị hỏng do mặt đường hỏng</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+    // cột km
+    <string-array name="cotkm">
+        <item name="doluntuongchan">1.Vị trí</item>
+        <item name="doluntuongchan">2.Hư hỏng, biến dạng</item>
+        <item name="doluntuongchan">3.Mất</item>
+        <item name="doluntuongchan">4.Cây xanh che khuất hoặc chướng ngại vật</item>
+    </string-array>
+
+
+
+
+
+
+
+    // cầu
+    <string-array name="cau">
+        <item name="doluntuongchan">1.Gối cầu\u0020</item>
+        <item name="doluntuongchan">2.Khe co giãn\u0020</item>
+        <item name="doluntuongchan">3.Lan can/rào chắn\u0020</item>
+        <item name="doluntuongchan">4.Thoát nước\u0020</item>
+        <item name="doluntuongchan">5.Kết cấu bê tông phần trên\u0020</item>
+        <item name="doluntuongchan">6.Kết câu bê tông phần dưới\u0020</item>
+        <item name="doluntuongchan">7.Mặt đường trên cầu\u0020</item>
+        <item name="doluntuongchan">8.Dải phân cách giữa cầu\u0020</item>
+        <item name="doluntuongchan">9.Biển báo trên cầu\u0020</item>
+    </string-array>
+
+    <string-array name="goicau">
+        <item name="doluntuongchan">Hướng dịch chuyển</item>
+        <item name="doluntuongchan">Độ dịch chuyển</item>
+        <item name="doluntuongchan">Ăn mòn</item>
+        <item name="doluntuongchan">Lực</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+    <string-array name="khecodancau">
+        <item name="doluntuongchan">Rò rỉ nước</item>
+        <item name="doluntuongchan">Chênh caoc</item>
+        <item name="doluntuongchan">Vật liệu chèn</item>
+        <item name="doluntuongchan">Bulong neo</item>
+        <item name="doluntuongchan">Nắp đậy</item>
+        <item name="doluntuongchan">Ăn mòn, Hư hỏng răng lược</item>
+        <item name="doluntuongchan">Hư hỏng răng lược</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="lancanraochancau">
+        <item name="doluntuongchan">Biến dạng</item>
+        <item name="doluntuongchan">Ăn mòn</item>
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Lộ cốt thép</item>
+        <item name="doluntuongchan">Nứt vỡ</item>
+        <item name="doluntuongchan">Rò rỉ nước</item>
+        <item name="doluntuongchan">Sùi rộp</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="thoatnuoccau">
+        <item name="doluntuongchan">Cửa thu nước (biến dạng)</item>
+        <item name="doluntuongchan">Cửa thu nước (hư hỏng)</item>
+        <item name="doluntuongchan">Cửa thu nước (tắc nghẽn)</item>
+        <item name="doluntuongchan">Ống thoát nước</item>
+        <item name="doluntuongchan">Cút nối liên kết</item>
+        <item name="doluntuongchan">Lực</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="ketcaucuabetongphantrencau">
+        <item name="doluntuongchan">Vết nứt</item>
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Khuyết tật</item>
+        <item name="doluntuongchan">Xuống cấp</item>
+        <item name="doluntuongchan">Thấm đọng nước,…</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="ketcaucuabetongphanduoicau">
+        <item name="doluntuongchan">Xói lở</item>
+        <item name="doluntuongchan">Lộ diện</item>
+        <item name="doluntuongchan">Rò rỉ nước</item>
+        <item name="doluntuongchan">Lún</item>
+        <item name="doluntuongchan">Xuống cấp</item>
+        <item name="doluntuongchan">Khuyết tật</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="matduongtrencau">
+        <item name="doluntuongchan">Độ võng</item>
+        <item name="doluntuongchan">Biến dạng</item>
+        <item name="doluntuongchan">Khe có giãn</item>
+        <item name="doluntuongchan">Thoát nước</item>
+        <item name="doluntuongchan">Lan can</item>
+        <item name="doluntuongchan">Rào chắc,…</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="daiphancachgiuacau">
+        <item name="doluntuongchan">vị trí</item>
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Biến dạng</item>
+        <item name="doluntuongchan">Vệ sinh</item>
+        <item name="doluntuongchan">Tầm nhìn</item>
+        <item name="khac">Khác</item>
+    </string-array>
+    <string-array name="bienbaotrencau">
+        <item name="doluntuongchan">vị trí</item>
+        <item name="doluntuongchan">Hư hỏng</item>
+        <item name="doluntuongchan">Biến dạng</item>
+        <item name="doluntuongchan">Vệ sinh</item>
+        <item name="doluntuongchan">Tầm nhìn</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+    // cọc tiêu
+    <string-array name="coctieu">
+        <item name="doluntuongchan">1.Vị trí</item>
+        <item name="doluntuongchan">2.Hư hỏng, biến dạng\u0020</item>
+        <item name="doluntuongchan">3.Mất</item>
+        <item name="doluntuongchan">4.Cây xanh che khuất hoặc chướng ngại vật</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+    <string-array name="huhongbiendangcoctieu">
+        <item name="doluntuongchan">Nghiêng</item>
+        <item name="doluntuongchan">Lệch</item>
+        <item name="doluntuongchan">Đổ</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+
+
+
+
+
+
+    // hố ga hố thu
+    <string-array name="hogahothu">
+        <item name="doluntuongchan">1.Vị trí</item>
+        <item name="doluntuongchan">2.Hư hỏng, biến dạng\u0020</item>
+        <item name="doluntuongchan">3.Nứt vỡ lộ cốt thép</item>
+        <item name="khac">4.Mất nắp đậy</item>
+        <item name="khac">5.Khả năng thoát nước</item>
+        <item name="khac">6.Khả năng thu nước</item>
+        <item name="khac">7.Khác</item>
+    </string-array>
+
+    <string-array name="huhongbiendanghogahothu">
+        <item name="doluntuongchan">Nứt vỡ</item>
+        <item name="doluntuongchan">Sụt lún</item>
+        <item name="doluntuongchan">Xói lở</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+    // rãnh dọc rãnh biên
+    <string-array name="ranhdocranhbien">
+        <item name="doluntuongchan">1.Vị trí</item>
+        <item name="doluntuongchan">2.Hư hỏng, biến dạng\u0020</item>
+        <item name="khac">3.Khả năng thoát nước</item>
+        <item name="khac">4.Khả năng thu nước</item>
+        <item name="khac">5.Khác</item>
+    </string-array>
+
+    <string-array name="huhongbiendangranhdocranhbien">
+        <item name="doluntuongchan">Sụt lún</item>
+        <item name="doluntuongchan">Xói lở</item>
+        <item name="khac">Khác</item>
+    </string-array>
+
+
+
+
+
+
+    // cống dọc
+    <string-array name="congdoc">
+        <item name="doluntuongchan">1.Vị trí</item>
+        <item name="doluntuongchan">2.Hư hỏng, biến dạng\u0020</item>
+        <item name="doluntuongchan">3.Nứt vỡ lộ cốt thép</item>
+        <item name="khac">4.Mất nắp đậy</item>
+        <item name="khac">5.Khả năng thoát nước</item>
+        <item name="khac">6.Khả năng thu nước</item>
+        <item name="khac">7.Khác</item>
+    </string-array>
+
+    <string-array name="huhongbiendangcongdoc">
+        <item name="doluntuongchan">Nứt vỡ</item>
+        <item name="doluntuongchan">Sụt lún</item>
+        <item name="doluntuongchan">Xói lở</item>
+        <item name="khac">Khác</item>
+    </string-array>
+</resources>
