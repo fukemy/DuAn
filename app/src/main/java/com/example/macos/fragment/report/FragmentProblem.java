@@ -28,14 +28,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.macos.activities.MainScreen;
+import com.example.macos.database.DataTypeItem;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
-import com.example.macos.entities.EnInputItem;
+import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.EnLocationItem;
-import com.example.macos.entities.EnMainInputItem;
+import com.example.macos.entities.ImageModel;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iListWork;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -298,7 +300,6 @@ public class FragmentProblem  extends CustomFragment {
                         gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                             @Override
                             public boolean onMyLocationButtonClick() {
-                                Toast.makeText(getActivity(), "catched", Toast.LENGTH_SHORT).show();
                                 IS_FIRST_INIT_MAP = false;
                                 return false;
                             }
@@ -354,47 +355,51 @@ public class FragmentProblem  extends CustomFragment {
         }
     };
 
-    List<String> imgData;
-    EnInputItem en;
+    DataTypeItem dataTypeItem;
+    ImageModel imgModal;
+    List<ImageModel> imgModalList;
+
     private void collectData(){
         Gson gson = new Gson();
+        if(locationItem == null)
+            locationItem = new EnLocationItem();
         SharedPreferenceManager pref = new SharedPreferenceManager(getActivity());
         String ROAD_NAME = pref.getString(GlobalParams.ROAD_CHOOSEN, "");
         if(ROAD_NAME != "") {
             ROAD_NAME =  gson.fromJson(ROAD_NAME, RoadInformation.class).getTenDuong();
         }
 
-        LinearLayout lnlAll = (LinearLayout) rootView.findViewById(R.id.lnlAll);
-        List<EnInputItem> finalData = new ArrayList<>();
-        for (int i = 0; i < lnlAll.getChildCount(); i++) {
-            imgData = new ArrayList<>();
-            en = new EnInputItem();
 
+        LinearLayout lnlAll = (LinearLayout) rootView.findViewById(R.id.lnlAll);
+        for (int i = 0; i < lnlAll.getChildCount(); i++) {
+            dataTypeItem = new DataTypeItem();
+            dataTypeItem.setAction(getResources().getString(R.string.problem));
+            dataTypeItem.setLocationItem(locationItem);
+            dataTypeItem.setTenDuong(ROAD_NAME);
+            dataTypeItem.setDataName(getResources().getString(R.string.problem));
+            dataTypeItem.setThoiGianNhap("" + System.currentTimeMillis());
+            dataTypeItem.setKinhDo("" + (locationItem.getLocation() != null ? locationItem.getLocation().getLongitude() : ""));
+            dataTypeItem.setViDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getLatitude() : ""));
+            dataTypeItem.setMaDuong(99);
+            dataTypeItem.setDataType(99);
+            dataTypeItem.setCaoDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getAltitude() : ""));
+            dataTypeItem.setTuyenSo(99);
+            dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME,"User"));
+            dataTypeItem.setDataID((long)99);
+
+            imgModalList = new ArrayList<>();
             LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);
-            en.setImgUri(imgData);
             collectNestedData(lnl);
-            if (en != null) {
-                finalData.add(en);
-                System.out.println("add input: " + en.toString());
-            }
-            en.setImgUri(uriStringList);
-            en.setStatus("Chưa cập nhập!");
-            en.setPromptItem(getResources().getString(R.string.problem));
+
+            EnDataModel enDataModel = new EnDataModel();
+            enDataModel.setDaValue(dataTypeItem);
+            enDataModel.setListImageData(imgModalList);
+            Logger.error("problem saved: " + enDataModel.toString());
+            DatabaseHelper.insertData(gson.toJson(enDataModel));
         }
 
-        List<EnInputItem> enList = new ArrayList<>();
-        enList.add(en);
 
-        EnMainInputItem main = new EnMainInputItem();
-        main.setAction(((MainScreen) getActivity()).getAction());
-        main.setRoadName(ROAD_NAME);
-        main.setCatalog(getResources().getString(R.string.problem));
-        main.setLocation(locationItem);
-        main.setInput(enList);
-        main.setSummary("Chưa cập nhập tổng kết!");
-        main.setTime("" + System.currentTimeMillis());
 
-        DatabaseHelper.insertData(gson.toJson(main));
         ((MainScreen) getActivity()).initLayoutAndData();
     }
 
@@ -408,15 +413,21 @@ public class FragmentProblem  extends CustomFragment {
                     String text = ((EditText) lnl.getChildAt(j)).getText().toString();
                     if (tag.equals("information")) {     // for edittext
                         System.out.println("information" + ((EditText) lnl.getChildAt(j)).getText());
-                        en.setInformation(text);
+                        dataTypeItem.setMoTaTinhTrang(text);
                     }
                 }
 
                 if (lnl.getChildAt(j) instanceof ImageView) {
                     ImageView img = (ImageView) lnl.getChildAt(j);
                     if (img.getTag() != null) {
-                        if (img.getTag().toString().length() > 10)
-                            imgData.add(lnl.getChildAt(j).getTag().toString());
+                        if (img.getTag().toString().length() > 10) {
+                            Logger.error("found image: " + img.getTag().toString());
+                            imgModal = new ImageModel();
+                            imgModal.setImageName(System.currentTimeMillis() + img.getTag().toString().substring(img.getTag().toString().lastIndexOf(".")));
+                            imgModal.setImagePath(lnl.getChildAt(j).getTag().toString()); // set path first
+                            imgModal.setImageDataByte("");
+                            imgModalList.add(imgModal);
+                        }
                     }
                 }
 
@@ -426,7 +437,6 @@ public class FragmentProblem  extends CustomFragment {
                 }
             }catch (Exception e){
                 System.out.println("Wrong data");
-                en = null;
             }
         }
     }
@@ -501,6 +511,7 @@ public class FragmentProblem  extends CustomFragment {
                                 Bitmap b = FunctionUtils.scaleBitmap(bitmap, rootView.findViewById(R.id.mapp).getWidth() / 3, rootView.findViewById(R.id.mapp).getWidth() / 3);
                                 ImageView img = new ImageView(getActivity());
                                 img.setImageBitmap(b);
+                                img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);
                                 uriStringList.add(selectedImage.toString());
                             } catch (Exception e) {

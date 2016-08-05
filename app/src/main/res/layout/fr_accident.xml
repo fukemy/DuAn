@@ -27,7 +27,6 @@
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
-                android:layout_alignParentTop="true"
                 android:layout_gravity="top"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"/>

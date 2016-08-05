@@ -121,8 +121,9 @@ public class FragmentViewFullReportDiary extends DialogFragment {
         tvRoadName.setText(tvRoadName.getText().toString() + " : " + data.getDaValue().getTenDuong());
 //        tvSummary.setText(tvSummary.getText().toString() + " : " + (data.getDaValue().getSummary().equals("") ? "Chưa cập nhập!" :data.getSummary()));
         tvSummary.setText("");
-        if (data.getDaValue().getLocationItem().getLocation() != null)
-            tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : " + data.getDaValue().getLocationItem().getAddress());
+        if (data.getDaValue().getLocationItem() != null)
+            if(data.getDaValue().getLocationItem().getLocation() != null)
+                tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : " + data.getDaValue().getLocationItem().getAddress());
         else
             tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : Chưa cập nhập!");
 
@@ -140,17 +141,17 @@ public class FragmentViewFullReportDiary extends DialogFragment {
         try {
             tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + (data.getDaValue().getDataTypeName().equals("") ? "Chưa cập nhập!" : data.getDaValue().getDataTypeName()));
         } catch (Exception e) {
-            tvPromptItem.setText("Chưa cập nhập!");
+            tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa cập nhập!");
         }
         try {
             tvStatus.setText(tvStatus.getText().toString() + " : " + (data.getDaValue().getThangDanhGia().equals("") ? "Chưa cập nhập!" : data.getDaValue().getThangDanhGia()));
         } catch (Exception e) {
-            tvStatus.setText("Chưa cập nhập!");
+            tvStatus.setText(tvStatus.getText().toString() + " : " + "Chưa cập nhập!");
         }
         try {
             tvComment.setText(tvComment.getText().toString() + " : " + (data.getDaValue().getMoTaTinhTrang().equals("") ? "Chưa cập nhập!" : data.getDaValue().getMoTaTinhTrang()));
         } catch (Exception e) {
-            tvComment.setText("Chưa cập nhập!");
+            tvComment.setText(tvComment.getText().toString() + " : " + "Chưa cập nhập!");
         }
 
 

@@ -334,9 +334,7 @@ public class AcInput extends FragmentActivity {
                 if (lnl.getChildAt(j) instanceof ImageView) {
                     ImageView img = (ImageView) lnl.getChildAt(j);
                     if (img.getTag() != null) {
-                        if (img.getTag().toString().length() > 10) {
-                            //imgData.add(img.getTag().toString());
-                            imgModal = new ImageModel();
+                        if (img.getTag().toString().length() > 10) {imgModal = new ImageModel();
                             imgModal.setImageName(System.currentTimeMillis() + img.getTag().toString().substring(img.getTag().toString().lastIndexOf(".")));
                             imgModal.setImagePath(lnl.getChildAt(j).getTag().toString()); // set path first
                             imgModal.setImageDataByte("");

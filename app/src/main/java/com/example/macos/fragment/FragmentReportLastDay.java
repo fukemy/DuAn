@@ -26,13 +26,15 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.macos.activities.MainScreen;
+import com.example.macos.database.DataTypeItem;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
-import com.example.macos.entities.EnInputItem;
-import com.example.macos.entities.EnMainInputItem;
+import com.example.macos.entities.EnDataModel;
+import com.example.macos.entities.ImageModel;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iListWork;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -266,9 +268,10 @@ public class FragmentReportLastDay extends CustomFragment {
             }
         }
     }
+    DataTypeItem dataTypeItem;
+    ImageModel imgModal;
+    List<ImageModel> imgModalList;
 
-    List<String> imgData;
-    EnInputItem en;
     private void collectData(){
         Gson gson = new Gson();
         SharedPreferenceManager pref = new SharedPreferenceManager(getActivity());
@@ -277,37 +280,34 @@ public class FragmentReportLastDay extends CustomFragment {
             ROAD_NAME =  gson.fromJson(ROAD_NAME, RoadInformation.class).getTenDuong();
         }
 
-        LinearLayout lnlAll = (LinearLayout) rootView.findViewById(R.id.lnlAll);
-        List<EnInputItem> finalData = new ArrayList<>();
-        for (int i = 0; i < lnlAll.getChildCount(); i++) {
-            imgData = new ArrayList<>();
-            en = new EnInputItem();
 
+        LinearLayout lnlAll = (LinearLayout) rootView.findViewById(R.id.lnlAll);
+        for (int i = 0; i < lnlAll.getChildCount(); i++) {
+            dataTypeItem = new DataTypeItem();
+            dataTypeItem.setAction(getResources().getString(R.string.lastday));
+            dataTypeItem.setLocationItem(null);
+            dataTypeItem.setTenDuong(ROAD_NAME);
+            dataTypeItem.setDataName(getResources().getString(R.string.lastday));
+            dataTypeItem.setThoiGianNhap("" + System.currentTimeMillis());
+            dataTypeItem.setKinhDo(null);
+            dataTypeItem.setViDo(null);
+            dataTypeItem.setMaDuong(99);
+            dataTypeItem.setCaoDo(null);
+            dataTypeItem.setTuyenSo(99);
+            dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME,"User"));
+            dataTypeItem.setDataID((long)99);
+
+            imgModalList = new ArrayList<>();
             LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);
-            en.setImgUri(imgData);
             collectNestedData(lnl);
-            if (en != null) {
-                finalData.add(en);
-                System.out.println("add input: " + en.toString());
-            }
-            en.setImgUri(uriStringList);
-            en.setStatus("Chưa cập nhập!");
-            en.setPromptItem(getResources().getString(R.string.lastday));
         }
 
-        List<EnInputItem> enList = new ArrayList<>();
-        enList.add(en);
+        EnDataModel enDataModel = new EnDataModel();
+        enDataModel.setDaValue(dataTypeItem);
+        enDataModel.setListImageData(imgModalList);
+        DatabaseHelper.insertData(gson.toJson(enDataModel));
 
-        EnMainInputItem main = new EnMainInputItem();
-        main.setAction(((MainScreen) getActivity()).getAction());
-        main.setRoadName(ROAD_NAME);
-        main.setCatalog(getResources().getString(R.string.lastday));
-        main.setLocation(null);
-        main.setInput(enList);
-        main.setSummary("Chưa cập nhập tổng kết!");
-        main.setTime("" + System.currentTimeMillis());
-
-        DatabaseHelper.insertData(gson.toJson(main));
+        Logger.error("lastday vaved: " + enDataModel.toString());
         ((MainScreen) getActivity()).initLayoutAndData();
     }
 
@@ -321,15 +321,20 @@ public class FragmentReportLastDay extends CustomFragment {
                     String text = ((EditText) lnl.getChildAt(j)).getText().toString();
                     if (tag.equals("information")) {     // for edittext
                         System.out.println("information" + ((EditText) lnl.getChildAt(j)).getText());
-                        en.setInformation(text);
+                        dataTypeItem.setMoTaTinhTrang(text);
                     }
                 }
 
                 if (lnl.getChildAt(j) instanceof ImageView) {
                     ImageView img = (ImageView) lnl.getChildAt(j);
                     if (img.getTag() != null) {
-                        if (img.getTag().toString().length() > 10)
-                            imgData.add(lnl.getChildAt(j).getTag().toString());
+                        if (img.getTag().toString().length() > 10) {
+                            imgModal = new ImageModel();
+                            imgModal.setImageName(System.currentTimeMillis() + img.getTag().toString().substring(img.getTag().toString().lastIndexOf(".")));
+                            imgModal.setImagePath(lnl.getChildAt(j).getTag().toString()); // set path first
+                            imgModal.setImageDataByte("");
+                            imgModalList.add(imgModal);
+                        }
                     }
                 }
 
@@ -339,7 +344,6 @@ public class FragmentReportLastDay extends CustomFragment {
                 }
             }catch (Exception e){
                 System.out.println("Wrong data");
-                en = null;
             }
         }
     }
@@ -399,7 +403,7 @@ public class FragmentReportLastDay extends CustomFragment {
                             i++;
                             if(i == 1){
                                 lnlHorizontal = new LinearLayout(getActivity());
-                                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(rootView.findViewById(R.id.mapp).getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
+                                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(dm.widthPixels - 20, LinearLayout.LayoutParams.WRAP_CONTENT);
                                 lParams.gravity = Gravity.CENTER_HORIZONTAL;
                                 lnlHorizontal.setLayoutParams(lParams);
                                 ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.imagelist)).addView(lnlHorizontal);
@@ -411,9 +415,10 @@ public class FragmentReportLastDay extends CustomFragment {
                             try {
                                 bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, selectedImage);
                                 //resize image
-                                Bitmap b = FunctionUtils.scaleBitmap(bitmap, rootView.findViewById(R.id.mapp).getWidth() / 3, rootView.findViewById(R.id.mapp).getWidth() / 3);
+                                Bitmap b = FunctionUtils.scaleBitmap(bitmap, (dm.widthPixels - 20) / 3, (dm.widthPixels - 20) / 3);
                                 ImageView img = new ImageView(getActivity());
                                 img.setImageBitmap(b);
+                                img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);
                                 uriStringList.add(selectedImage.toString());
                             } catch (Exception e) {
