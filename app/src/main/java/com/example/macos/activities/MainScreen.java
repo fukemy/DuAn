@@ -100,16 +100,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         TextView tvUserInfor = (TextView)hView.findViewById(R.id.tvInformation);
         ImageView imageView = (ImageView)hView.findViewById(R.id.imageView);
 
-        String LOGIN_METHOD = pref.getString(GlobalParams.LOGGED_ON_METHOD, "normal");
         tvUserInfor.setText("geotech@thehegeo.com");
-
-        if(LOGIN_METHOD.equals("facebook")) {
-            String avatarString = pref.getString(GlobalParams.FB_AVATAR, "");
-            imageView.setImageBitmap(FunctionUtils.StringToBitMap(avatarString));
-            tvUserFullname.setText(pref.getString(GlobalParams.FB_USERNAME, "User"));
-        }else{
-            tvUserFullname.setText(pref.getString(GlobalParams.USERNAME, "User"));
-        }
+        tvUserFullname.setText(pref.getString(GlobalParams.USERNAME, "User"));
 
         ACTION_TYPE = getResources().getString(R.string.road_test);
 
@@ -541,7 +533,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                         pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
                         pref.saveString(GlobalParams.USERNAME, "");
                         pref.saveLong(GlobalParams.LAST_LOGIN, 0);
-                        pref.saveBoolean(GlobalParams.FACEBOOK_LOGED_IN, false);
 
                         startActivity(new Intent(MainScreen.this, SprashScreen.class));
                         finish();

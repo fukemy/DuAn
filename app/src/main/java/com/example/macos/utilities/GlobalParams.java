@@ -23,13 +23,9 @@ public class GlobalParams {
     public static final String TYPE_OFFLINE = "type offline";
     public static final String ACTION_TYPE = "action type";
     public static final String IS_REINPUT_ROADNAME = "re-input roadname";
-    public static final String FB_USERNAME = "fb username";
-    public static final String FB_AVATAR = "fb avatar";
     public static final String IS_ALARM = "is alarm";
     public static final String IS_WORKED_TODAY = "is worked today";
     public static final String IS_SYNC_TODAY = "is sync today";
-    public static final String LOGGED_ON_METHOD = "logged on method";
-    public static final String FACEBOOK_LOGED_IN = "fb logged in";
     public static final String BASED_URL = "http://khaosatdiachat.com:8887/api";
     public static final String USER_TOKEN = "";
     public static final String BASED_LOGIN_URL = "http://khaosatdiachat.com:8887/api/users/login/thangdv/123456";

@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.fragment.FragmentViewFullReport;
@@ -132,13 +131,6 @@ public class RoadStatusReportAdapter extends BaseExpandableListAdapter {
             }
         });
 
-        convertView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                DatabaseHelper.clearData();
-                return false;
-            }
-        });
         return convertView;
     }
 

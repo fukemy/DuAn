@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -25,7 +24,6 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -44,14 +42,6 @@ import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.GraphRequest;
-import com.facebook.GraphResponse;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -72,22 +62,20 @@ public class SprashScreen extends AppCompatActivity {
 
     private final int SPRASH_TIME = 3000;
     private final int LOGIN_TIME = 1000;
-    private ImageView imgLogo,logoFbLogin;
+    private ImageView imgLogo;
     private LinearLayout lnlLogin;
     private ProgressBar progressBar, prLogin;
     private TextInputLayout inputUsername, inputPassword;
-    private Button btLogin,btnRegister,btnFacebookFace;
     private EditText edtUsername,edtPassword;
     private SharedPreferenceManager pref;
     private RelativeLayout rootView;
-    private LoginButton btnFbLogin;
-    boolean IS_LOGGED_ON = false,FACEBOOK_LOGED_IN;
+    private LinearLayout btLogin,lnlRegister;
+    boolean IS_LOGGED_ON = false;
     long LAST_LOGIN = 0;
     int currentDiffheight = 0;
     String USER_TOKEN = "";
     int CENTER_OF_SCREEN = 0;
     DisplayMetrics dm;
-    CallbackManager mCallbackManager;
     ProgressDialog progressFbDialog;
 
     @Override
@@ -95,8 +83,6 @@ public class SprashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_sprash_screen);
         pref = new SharedPreferenceManager(SprashScreen.this);
-        IS_LOGGED_ON = pref.getBoolean(GlobalParams.IS_LOGGED_ON, false);
-        FACEBOOK_LOGED_IN = pref.getBoolean(GlobalParams.FACEBOOK_LOGED_IN, false);
 
         initLayout();
 
@@ -117,48 +103,10 @@ public class SprashScreen extends AppCompatActivity {
             }
         });
 
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-           btLogin.setBackgroundColor(getResources().getColor(R.color.mainColor80));
-           btnRegister.setBackgroundColor(getResources().getColor(R.color.mainColor80));
-        }
-
-        if(FACEBOOK_LOGED_IN){
-            btnFacebookFace.setText("Đăng nhập với tư cách " + pref.getString(GlobalParams.FB_USERNAME, ""));
-            btnFacebookFace.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    prLogin.setVisibility(View.VISIBLE);
-                    pref.saveBoolean(GlobalParams.IS_LOGGED_ON, true);
-                    pref.saveBoolean(GlobalParams.FACEBOOK_LOGED_IN, true);
-                    pref.saveString(GlobalParams.LOGGED_ON_METHOD, "facebook");
-                    pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
-
-                    Intent in = new Intent(SprashScreen.this, MainScreen.class);
-                    startActivity(in);
-                    finish();
-                }
-            });
-        }else{
-            btnFacebookFace.setText("Đăng nhập bằng facebook.");
-            /*
-            try {
-                PackageInfo info = getPackageManager().getPackageInfo(
-                        "com.facebook.samples.loginhowto", PackageManager.GET_SIGNATURES);
-                for (Signature signature : info.signatures){
-                    MessageDigest md = MessageDigest.getInstance("SHA");
-                    md.update(signature.toByteArray());
-                    Log.d("KeyHash:", Base64.encodeToString(md.digest(), Base64.DEFAULT));
-                }
-            } catch (Exception e) {
-            }
-            */
-            btnFacebookFace.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    btnFbLogin.performClick();
-                }
-            });
-        }
+//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+//           btLogin.setBackgroundColor(getResources().getColor(R.color.mainColor80));
+//            lnlRegister.setBackgroundColor(getResources().getColor(R.color.mainColor80));
+//        }
 
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -182,48 +130,6 @@ public class SprashScreen extends AppCompatActivity {
             }
         });
 
-        FacebookSdk.sdkInitialize(this.getApplicationContext());
-        mCallbackManager = CallbackManager.Factory.create();
-        btnFbLogin.registerCallback(mCallbackManager,
-                new FacebookCallback<LoginResult>() {
-                    @Override
-                    public void onSuccess(LoginResult loginResult) {
-                        // App code
-                        progressFbDialog = new ProgressDialog(SprashScreen.this);
-                        progressFbDialog.setMessage("Đang tải dữ liệu...!");
-                        progressFbDialog.show();
-                        String accessToken = loginResult.getAccessToken().getToken();
-
-                        GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
-
-                            @Override
-                            public void onCompleted(JSONObject object, GraphResponse response) {
-                                progressFbDialog.dismiss();
-                                Log.i("LoginActivity", response.toString());
-                                Bundle bundle = getFacebookData(object);
-                                if(bundle != null) {
-                                   new LoadingUserFbAsynctask(bundle).execute(bundle.get("profile_pic").toString());
-                                }
-                            }
-                        });
-
-                        Bundle parameters = new Bundle();
-                        parameters.putString("fields", "id, first_name, last_name, email,gender, birthday, location");
-                        request.setParameters(parameters);
-                        request.executeAsync();
-                    }
-
-                    @Override
-                    public void onCancel() {
-                    }
-
-                    @Override
-                    public void onError(FacebookException exception) {
-                        // App code
-                        Toast.makeText(SprashScreen.this, "Error", Toast.LENGTH_SHORT).show();
-                    }
-                });
-        
 
         final Thread thread = new Thread(){
             public void run(){
@@ -268,15 +174,13 @@ public class SprashScreen extends AppCompatActivity {
 
     private void initLayout(){
         imgLogo = (ImageView) findViewById(R.id.imgLogo);
-        logoFbLogin = (ImageView) findViewById(R.id.logoFbLogin);
         lnlLogin = (LinearLayout)findViewById(R.id.lnlLogin);
         rootView = (RelativeLayout) findViewById(R.id.rootView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        btnFbLogin = (LoginButton) findViewById(R.id.btnFbLogin);
         prLogin = (ProgressBar) findViewById(R.id.prLogin);
-        btLogin = (Button) findViewById(R.id.btLogin);
-        btnRegister = (Button) findViewById(R.id.btnRegister);
-        btnFacebookFace = (Button) findViewById(R.id.btnFacebookFace);
+        btLogin = (LinearLayout) findViewById(R.id.lnlLogin);
+        lnlRegister = (LinearLayout) findViewById(R.id.lnlRegister);
+//        lnlRegister.setBackgroundColor(getResources().getColor(R.color.mainColor));
         inputUsername = (TextInputLayout) findViewById(R.id.inputUsername);
         inputPassword = (TextInputLayout) findViewById(R.id.inputPassword);
         edtUsername = (EditText) findViewById(R.id.edtUsername);
@@ -289,7 +193,7 @@ public class SprashScreen extends AppCompatActivity {
             }
         });
 
-        btnRegister.setOnClickListener(new View.OnClickListener() {
+        lnlRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(SprashScreen.this, "Chưa cập nhập chức năng đăng ký!", Toast.LENGTH_SHORT).show();
@@ -357,7 +261,7 @@ public class SprashScreen extends AppCompatActivity {
                         @Override
                         public void run() {
                             btLogin.setEnabled(false);
-                            btnRegister.setEnabled(false);
+                            lnlRegister.setEnabled(false);
                         }
                     });
                     login(GlobalParams.BASED_LOGIN_URL);
@@ -462,7 +366,7 @@ public class SprashScreen extends AppCompatActivity {
                     @Override
                     public void onAnimationEnd(Animation animation) {
                         lnlLogin.setVisibility(View.VISIBLE);
-                        btnRegister.setVisibility(View.VISIBLE);
+                        lnlRegister.setVisibility(View.VISIBLE);
                         AnimationControl.AppearIcon(lnlLogin);
                     }
                 });
@@ -573,13 +477,9 @@ public class SprashScreen extends AppCompatActivity {
                 @Override
                 public void run() {
                     try{
-                        pref.saveString(GlobalParams.FB_USERNAME, (bundle.get("first_name").toString() + " " + bundle.get("last_name").toString()));
                         pref.saveBoolean(GlobalParams.IS_LOGGED_ON, true);
-                        pref.saveBoolean(GlobalParams.FACEBOOK_LOGED_IN, true);
-                        pref.saveString(GlobalParams.LOGGED_ON_METHOD, "facebook");
                         pref.saveString(GlobalParams.USERNAME, edtUsername.getText().toString().trim());
                         pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
-                        pref.saveString(GlobalParams.FB_AVATAR, FunctionUtils.BitMapToString(result));
                     }catch(Exception e){
 
                     }finally {
@@ -599,14 +499,6 @@ public class SprashScreen extends AppCompatActivity {
 
         }
     }
-
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        mCallbackManager.onActivityResult(requestCode, resultCode, data);
-    }
-
 
 
     public void login(String url)
@@ -714,7 +606,6 @@ public class SprashScreen extends AppCompatActivity {
                 Logger.error("catalog: " + e.toString());
 
             pref.saveBoolean(GlobalParams.IS_LOGGED_ON, true);
-            pref.saveString(GlobalParams.LOGGED_ON_METHOD, "normal");
             pref.saveString(GlobalParams.USERNAME, edtUsername.getText().toString().trim());
             pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
             pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
