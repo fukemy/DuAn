@@ -21,6 +21,10 @@ public class DatabaseHelper {
         return dao.queryBuilder().list();
     }
 
+    public static void updateData(Data d){
+        DataDao dao = Application.getInstance().daoSession.getDataDao();
+        dao.updateInTx(d);
+    }
     public static void clearData(){
         DataDao dao = Application.getInstance().daoSession.getDataDao();
         dao.deleteAll();

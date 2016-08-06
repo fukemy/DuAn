@@ -23,6 +23,7 @@ public class DataDao extends AbstractDao<Data, Long> {
     public static class Properties {
         public final static Property ID = new Property(0, Long.class, "ID", true, "ID");
         public final static Property Input = new Property(1, String.class, "input", false, "INPUT");
+        public final static Property IsUploaded = new Property(2, Boolean.class, "isUploaded", false, "IS_UPLOADED");
     };
 
 
@@ -39,7 +40,8 @@ public class DataDao extends AbstractDao<Data, Long> {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"DATA\" (" + //
                 "\"ID\" INTEGER PRIMARY KEY AUTOINCREMENT ," + // 0: ID
-                "\"INPUT\" TEXT);"); // 1: input
+                "\"INPUT\" TEXT," + // 1: input
+                "\"IS_UPLOADED\" INTEGER);"); // 2: isUploaded
     }
 
     /** Drops the underlying database table. */
@@ -62,6 +64,11 @@ public class DataDao extends AbstractDao<Data, Long> {
         if (input != null) {
             stmt.bindString(2, input);
         }
+ 
+        Boolean isUploaded = entity.getIsUploaded();
+        if (isUploaded != null) {
+            stmt.bindLong(3, isUploaded ? 1L: 0L);
+        }
     }
 
     /** @inheritdoc */
@@ -75,7 +82,8 @@ public class DataDao extends AbstractDao<Data, Long> {
     public Data readEntity(Cursor cursor, int offset) {
         Data entity = new Data( //
             cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // ID
-            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1) // input
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // input
+            cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0 // isUploaded
         );
         return entity;
     }
@@ -85,6 +93,7 @@ public class DataDao extends AbstractDao<Data, Long> {
     public void readEntity(Cursor cursor, Data entity, int offset) {
         entity.setID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
         entity.setInput(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setIsUploaded(cursor.isNull(offset + 2) ? null : cursor.getShort(offset + 2) != 0);
      }
     
     /** @inheritdoc */

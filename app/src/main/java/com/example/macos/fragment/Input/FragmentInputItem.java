@@ -167,6 +167,7 @@ public class FragmentInputItem extends CustomFragment{
         imgDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FunctionUtils.hideSoftInput(rootView, getActivity());
                 FunctionUtils.showConfirmDialog(getResources().getString(R.string.bancochacchandanhapdayduthongtin), getActivity(), dialogAction);
             }
         });
@@ -207,7 +208,8 @@ public class FragmentInputItem extends CustomFragment{
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
         final TextView tvRoadName = (TextView) container.findViewById(R.id.tvRoadName);
-        tvRoadName.setText(tvRoadName.getText().toString() + (listData.size() + 1) + ".");
+//        tvRoadName.setText(tvRoadName.getText().toString() + (listData.size() + 1) + ".");
+        tvRoadName.setText("");
         edtInformation.clearFocus();
         FunctionUtils.setupEdittext(edtInformation, getActivity());
         edtInformation.clearFocus();
@@ -219,7 +221,7 @@ public class FragmentInputItem extends CustomFragment{
 
         spinPromtCatalog.setHint(getResources().getString(R.string.prompt_item));
         list = getResources().getStringArray(FunctionUtils.getResouceFromCatalog(getActivity(), catalog));
-        arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, list);
+        arrayAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, list);
         spinPromtCatalog.setAdapter(arrayAdapter);
 
 
@@ -416,6 +418,10 @@ public class FragmentInputItem extends CustomFragment{
             case CHOOSEN_PICTURE:
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     ArrayList<Uri>  imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
+//                    if(imageUriList.size() > GlobalParams.MAX_UPLOAD_IMAGE_AMOUNT){
+//                        Toast.makeText(getActivity(), "Bạn không thể chọn nhiều hơn 3 bức ảnh!", Toast.LENGTH_SHORT).show();
+//                        return;
+//                    }
                     LinearLayout lnlHorizontal = null;
                     int i = 0;
                     if(imageUriList.size() > 0)

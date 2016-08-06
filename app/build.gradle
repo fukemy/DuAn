@@ -35,4 +35,5 @@ dependencies {
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1@aar' //for viewpager indicator
     compile 'com.google.code.gson:gson:2.2.+'
     compile 'com.facebook.android:facebook-android-sdk:[4,5)'
+    compile 'com.mcxiaoke.volley:library-aar:1.0.0'
 }

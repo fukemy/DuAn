@@ -2,9 +2,11 @@ package com.example.macos.activities;
 
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -32,7 +34,6 @@ import com.example.macos.entities.EnWorkList;
 import com.example.macos.entities.ImageModel;
 import com.example.macos.fragment.Input.FragmentInputItem;
 import com.example.macos.interfaces.iDialogAction;
-import com.example.macos.interfaces.iListWork;
 import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -48,10 +49,10 @@ import com.viewpagerindicator.TitlePageIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class AcInput extends FragmentActivity {
-
-    private iListWork swapInterface;
+    private final int ENABLE_LOCATION = 1234;
     private GoogleMap gMap;
     private ViewPager viewPager;
     private EnWorkList dataViewList;
@@ -78,21 +79,88 @@ public class AcInput extends FragmentActivity {
         roadInformation = gson.fromJson(pref.getString(GlobalParams.ROAD_CHOOSEN, ""), RoadInformation.class);
         dataViewList = (EnWorkList) getIntent().getExtras().getSerializable(GlobalParams.LIST_WORKING_NAME);
         ACTION_TYPE = getIntent().getStringExtra(GlobalParams.ACTION_TYPE);
-        initLayout();
 
-        findViewById(R.id.backButton).bringToFront();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            viewPager.setNestedScrollingEnabled(true);
+
+        if(checkLocationEnabled()) {
+            initLayout();
+            locationItem = new EnLocationItem();
+            dialog = new ProgressDialog(AcInput.this);
+            dialog.setMessage("Đang tìm vị trí hiện tại...");
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setCanceledOnTouchOutside(false);
+            dialog.show();
         }
-
-        locationItem = new EnLocationItem();
-        dialog = new ProgressDialog(this);
-        dialog.setMessage("Đang tìm vị trí hiện tại...");
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
     }
 
+
+    private boolean checkLocationEnabled(){
+        final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+           return true;
+        }else{
+            buildAlertMessageNoGps();
+            return false;
+        }
+    }
+
+    private void buildAlertMessageNoGps() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Dịch vụ vị trí chưa được bật, bạn có muốn bật lên?")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog,  final int id) {
+                        startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), ENABLE_LOCATION);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                        Intent in = new Intent(AcInput.this, MainScreen.class);
+                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        finish();
+                        startActivity(in);
+
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == ENABLE_LOCATION){
+            final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
+            if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+                initLayout();
+                locationItem = new EnLocationItem();
+                dialog = new ProgressDialog(AcInput.this);
+                dialog.setMessage("Đang tìm vị trí hiện tại...");
+                dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                dialog.setCanceledOnTouchOutside(false);
+                dialog.show();
+            }else{
+                final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Bật dịch vụ vị trí thất bại, hãy chú ý đợi từ 4 đến 6 giây ở màn hình kích hoạt vị trí để"
+                        + " vị trí được kích hoạt trước khi trở lại màn hình nhập. Đồng thời phải đảm bảo đường truyền mạng của bạn là ổn định!")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog,  final int id) {
+                                dialog.cancel();
+                                Intent in = new Intent(AcInput.this, MainScreen.class);
+                                in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                finish();
+                                startActivity(in);
+                            }
+                        });
+                final AlertDialog alert = builder.create();
+                alert.show();
+            }
+        }
+    }
 
     public String getACTION_TYPE() {
         return ACTION_TYPE;
@@ -239,6 +307,11 @@ public class AcInput extends FragmentActivity {
 
         }
 
+        findViewById(R.id.backButton).bringToFront();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            viewPager.setNestedScrollingEnabled(true);
+        }
+
         List<Item> list = dataViewList.getDataList();
         final MainScreenAdapter adapter = new MainScreenAdapter(getSupportFragmentManager());
 
@@ -334,8 +407,15 @@ public class AcInput extends FragmentActivity {
                 if (lnl.getChildAt(j) instanceof ImageView) {
                     ImageView img = (ImageView) lnl.getChildAt(j);
                     if (img.getTag() != null) {
-                        if (img.getTag().toString().length() > 10) {imgModal = new ImageModel();
-                            imgModal.setImageName(System.currentTimeMillis() + img.getTag().toString().substring(img.getTag().toString().lastIndexOf(".")));
+                        if (img.getTag().toString().length() > 10) {
+                            String temp = "" +  new Random().nextInt(20);
+                            imgModal = new ImageModel();
+                            String type = img.getTag().toString().substring(img.getTag().toString().lastIndexOf("."));
+                            String name = img.getTag().toString().replace(type, "").replace("-","").replace(".","").replace("_","").replace("/","");
+                            imgModal.setImageName("" + System.currentTimeMillis()
+                                    + temp
+                                    + name.substring(name.length() - 8, name.length() - 1)
+                                    + type);
                             imgModal.setImagePath(lnl.getChildAt(j).getTag().toString()); // set path first
                             imgModal.setImageDataByte("");
                             imgModalList.add(imgModal);

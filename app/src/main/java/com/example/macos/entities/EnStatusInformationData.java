@@ -1,5 +1,6 @@
 package com.example.macos.entities;
 
+import com.example.macos.database.DataTypeItem;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -27,24 +28,8 @@ public class EnStatusInformationData {
     @SerializedName("ThoiGianNhap")
     private String ThoiGianNhap;
     @SerializedName("ThangDanhGia")
-    private Integer ThangDanhGia;
+    private String ThangDanhGia;
 
-    @Override
-    public String toString() {
-        return "\n{" +
-                "\n\"DataID\":" + DataID +
-                ", \n\"DataType\":" + DataType +
-                ", \n\"MaDuong\":" + MaDuong +
-                ", \n\"TuyenSo\":" + TuyenSo +
-                ", \n\"MoTaTinhTrang\":\"" + MoTaTinhTrang + "\"" +
-                ", \n\"KinhDo\":\"" + KinhDo + "\"" +
-                ", \n\"ViDo\":\"" + ViDo + "\"" +
-                ", \n\"CaoDo\":\"" + CaoDo + "\"" +
-                ", \n\"NguoiNhap\":\"" + NguoiNhap + "\"" +
-                ", \n\"ThoiGianNhap\":\"" + ThoiGianNhap + "\""+
-                ", \n\"ThangDanhGia\":" + ThangDanhGia +
-                "\n}";
-    }
 
     public int getDataID() {
         return DataID;
@@ -126,15 +111,15 @@ public class EnStatusInformationData {
         ThoiGianNhap = thoiGianNhap;
     }
 
-    public Integer getThangDanhGia() {
+    public String getThangDanhGia() {
         return ThangDanhGia;
     }
 
-    public void setThangDanhGia(Integer thangDanhGia) {
+    public void setThangDanhGia(String thangDanhGia) {
         ThangDanhGia = thangDanhGia;
     }
 
-    public EnStatusInformationData(int dataID, int dataType, int maDuong, Integer tuyenSo, String moTaTinhTrang, String kinhDo, String viDo, String caoDo, String nguoiNhap, String thoiGianNhap, Integer thangDanhGia) {
+    public EnStatusInformationData(int dataID, int dataType, int maDuong, Integer tuyenSo, String moTaTinhTrang, String kinhDo, String viDo, String caoDo, String nguoiNhap, String thoiGianNhap, String thangDanhGia) {
         DataID = dataID;
         DataType = dataType;
         MaDuong = maDuong;
@@ -150,5 +135,19 @@ public class EnStatusInformationData {
 
     public EnStatusInformationData() {
 
+    }
+
+    public EnStatusInformationData(DataTypeItem item) {
+        setViDo(item.getViDo());
+        setKinhDo(item.getKinhDo());
+        setTuyenSo(item.getTuyenSo());
+        setNguoiNhap(item.getNguoiNhap());
+        setCaoDo(item.getCaoDo());
+        setDataID((int)(long)item.getDataID());
+        setDataType(item.getDataType());
+        setMoTaTinhTrang(item.getMoTaTinhTrang());
+        setThoiGianNhap(item.getThoiGianNhap());
+        setThangDanhGia(item.getThangDanhGia());
+        setNguoiNhap(item.getNguoiNhap());
     }
 }

@@ -16,6 +16,7 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnMainCatalogItem;
 import com.example.macos.fragment.Input.FragmentInputItem;
 import com.example.macos.interfaces.iListWork;
+import com.example.macos.libraries.Logger;
 import com.example.macos.main.Application;
 import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.CustomFragment;
@@ -102,15 +103,15 @@ public class FragmentMainDataScreen extends CustomFragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (!IS_SELECT_MULTI) {
-                    int pos = (int) id;
-                    if(pos >= 11) {
-                        AnimationControl.zoomImageFromThumb(gridView.getChildAt(pos - 3)
-                                , list.get(pos).getImg(), rootView, swapInterface,
-                                list.get(pos));
+                    Logger.error("select pos: " + position + ", id:" + id);
+                    if(position >= 11) {
+                        AnimationControl.zoomImageFromThumb(adapter.getViewAt(position - 3)
+                                , list.get(position).getImg(), rootView, swapInterface,
+                                list.get(position));
                     }else{
-                        AnimationControl.zoomImageFromThumb(gridView.getChildAt(pos)
-                                , list.get(pos).getImg(), rootView, swapInterface,
-                                list.get(pos));
+                        AnimationControl.zoomImageFromThumb(adapter.getViewAt(position)
+                                , list.get(position).getImg(), rootView, swapInterface,
+                                list.get(position));
                     }
                 } else {
                     list.get(position).setChecked(!list.get(position).isChecked());

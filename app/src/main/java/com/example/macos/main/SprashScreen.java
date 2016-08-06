@@ -353,10 +353,15 @@ public class SprashScreen extends AppCompatActivity {
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }finally {
-//                    DownloadWebPageTask task = new DownloadWebPageTask();
-//                    task.execute(new String[] { GlobalParams.BASED_LOGIN_URL });
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            btLogin.setEnabled(false);
+                            btnRegister.setEnabled(false);
+                        }
+                    });
                     login(GlobalParams.BASED_LOGIN_URL);
-                    }
+                }
 
                 }
             };
@@ -606,6 +611,7 @@ public class SprashScreen extends AppCompatActivity {
 
     public void login(String url)
     {
+        FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
         HttpResponse response;
@@ -620,6 +626,7 @@ public class SprashScreen extends AppCompatActivity {
                 USER_TOKEN = result;
                 instream.close();
                 loadRoadName();
+            }else{
             }
         } catch (Exception e) {
             e.printStackTrace();

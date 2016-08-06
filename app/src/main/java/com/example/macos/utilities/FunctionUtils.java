@@ -66,7 +66,6 @@ public class FunctionUtils {
         Matrix m = new Matrix();
         m.setScale((float) wantedWidth / bitmap.getWidth(), (float) wantedHeight / bitmap.getHeight());
         canvas.drawBitmap(bitmap, m, new Paint());
-
         return output;
     }
 
@@ -214,41 +213,41 @@ public class FunctionUtils {
     }
 
     public static int getResouceFromCatalog(Context mContext, String catalog){
-        if (catalog.equals(mContext.getResources().getString(R.string.road_surface)))
+        if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.road_surface).toLowerCase()))
             return  R.array.road_surface_list;
-        else if (catalog.equals(mContext.getResources().getString(R.string.roadbed)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.roadbed).toLowerCase()))
             return  R.array.nenduong;
-        else if (catalog.equals(mContext.getResources().getString(R.string.divider)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.divider).toLowerCase()))
             return  R.array.daiphancach;
-        else if (catalog.equals(mContext.getResources().getString(R.string.underground_drain_people)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.underground_drain_people).toLowerCase()))
             return  R.array.congchuidansinh;
-        else if (catalog.equals(mContext.getResources().getString(R.string.drainage_box_culvert)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.drainage_box_culvert).toLowerCase()))
             return  R.array.conghopvacongbanthoatnuoc;
-        else if (catalog.equals(mContext.getResources().getString(R.string.culverts)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.culverts).toLowerCase()))
             return  R.array.congtron;
-        else if (catalog.equals(mContext.getResources().getString(R.string.slopes)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.slopes).toLowerCase()))
             return  R.array.maidoc;
-        else if (catalog.equals(mContext.getResources().getString(R.string.retaining_walls)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.retaining_walls).toLowerCase()))
             return  R.array.tuongchan;
-        else if (catalog.equals(mContext.getResources().getString(R.string.protective_barrier)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.protective_barrier).toLowerCase()))
             return  R.array.hangraobaove;
-        else if (catalog.equals(mContext.getResources().getString(R.string.lighting_Systems)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.lighting_Systems).toLowerCase()))
             return  R.array.hethongchieusangduong;
-        else if (catalog.equals(mContext.getResources().getString(R.string.notice_board)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.notice_board).toLowerCase()))
             return  R.array.bienbaoduong;
-        else if (catalog.equals(mContext.getResources().getString(R.string.road_markings)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.road_markings).toLowerCase()))
             return  R.array.vachsonduong;
-        else if (catalog.equals(mContext.getResources().getString(R.string.column_Km)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.column_Km).toLowerCase()))
             return  R.array.cotkm;
-        else if (catalog.equals(mContext.getResources().getString(R.string.bridge)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.bridge).toLowerCase()))
             return  R.array.cau;
-        else if (catalog.equals(mContext.getResources().getString(R.string.marker)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.marker).toLowerCase()))
             return  R.array.coctieu;
-        else if (catalog.equals(mContext.getResources().getString(R.string.manhole_sumps)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.manhole_sumps).toLowerCase()))
             return  R.array.hogahothu;
-        else if (catalog.equals(mContext.getResources().getString(R.string.longitudinal_grooves_groove_Border)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.longitudinal_grooves_groove_Border).toLowerCase()))
             return  R.array.ranhdocranhbien;
-        else if (catalog.equals(mContext.getResources().getString(R.string.vertical_drain)))
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.vertical_drain).toLowerCase()))
             return  R.array.congdoc;
         else
                 return R.array.nenduong;
@@ -554,11 +553,8 @@ public class FunctionUtils {
     public static String encodeTobase64(Bitmap image) {
         Bitmap immage = image;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        immage.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        immage.compress(Bitmap.CompressFormat.JPEG, 100, baos);
         byte[] b = baos.toByteArray();
-        String imageEncoded = Base64.encodeToString(b, Base64.NO_WRAP);
-
-//        Logger.error("1:" + imageEncoded);
         return Base64.encodeToString(b, Base64.DEFAULT);
     }
 
@@ -575,7 +571,7 @@ public class FunctionUtils {
 
     public static String BitMapToString(Bitmap bitmap){
         ByteArrayOutputStream baos=new  ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         byte [] b=baos.toByteArray();
         String temp=Base64.encodeToString(b, Base64.DEFAULT);
         return temp;
@@ -697,5 +693,74 @@ public class FunctionUtils {
                 return 120;
         }
         return id;
+    }
+
+    public static String convertBitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos = new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+        byte[] b = baos.toByteArray();
+        String temp = null;
+        try{
+            temp=Base64.encodeToString(b, Base64.DEFAULT);
+        }catch(Exception e){
+            Logger.error("exception bitmap: " + e.getMessage());
+            e.printStackTrace();
+        }catch(OutOfMemoryError e){
+            baos = new  ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG,30, baos);
+            b=baos.toByteArray();
+            temp=Base64.encodeToString(b, Base64.DEFAULT);
+            Logger.error("EWN", "Out of memory error catched");
+        }finally {
+        }
+        return temp;
+    }
+
+    public static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            // Calculate ratios of height and width to requested height and width
+            final int heightRatio = Math.round((float) height / (float) reqHeight);
+            final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+            // Choose the smallest ratio as inSampleSize value, this will guarantee
+            // a final image with both dimensions larger than or equal to the
+            // requested height and width.
+            inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+        }
+
+        return inSampleSize;
+    }
+
+    public static Bitmap decodeSampledBitmapFromFile(String path,int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+//        options.inJustDecodeBounds = true;
+        options.inPreferredConfig = Bitmap.Config.RGB_565;
+//        options.inPreferredConfig = Bitmap.Config.ARGB_8888 ;
+        options.inDither = true;
+        BitmapFactory.decodeFile(path, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(path,options);
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
+    public static int sizeOf(Bitmap data) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1) {
+            return data.getRowBytes() * data.getHeight();
+        } else {
+            return data.getByteCount();
+        }
     }
 }

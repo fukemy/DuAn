@@ -93,6 +93,7 @@ public class FragmentReportLastDay extends CustomFragment {
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FunctionUtils.hideSoftInput(rootView, getActivity());
                 FunctionUtils.showConfirmDialog(getResources().getString(R.string.bancochacchandanhapdayduthongtin), getActivity(), dialogAction);
             }
         });

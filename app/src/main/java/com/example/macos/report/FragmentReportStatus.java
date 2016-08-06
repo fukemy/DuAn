@@ -2,7 +2,10 @@ package com.example.macos.report;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +13,7 @@ import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,19 +61,19 @@ public class FragmentReportStatus extends CustomFragment {
     List<String> listHeader ;
     private FloatingActionButton fab;
     private SharedPreferenceManager pref;
-    List<EnDataModel> enDataModelList, failUploadData;
-    List<Integer> failUploadOrder;
+    List<EnDataModel>  failUploadData;
     ProgressDialog dialog;
     Gson gson;
     String USER_TOKEN = "";
+    private DisplayMetrics dm;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fr_report_status, container, false);
         pref = new SharedPreferenceManager(getActivity());
-        enDataModelList = new ArrayList<>();
         gson = new Gson();
+        dm = getResources().getDisplayMetrics();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
@@ -100,32 +104,37 @@ public class FragmentReportStatus extends CustomFragment {
         if(listData!= null) {
             if (listData.size() != 0) {
                 List<EnDataModel> enList = new ArrayList<>();
+                syncData = new ArrayList<>();
+
                 for (Data d : listData) {
-                    enList.add(gson.fromJson(d.getInput(), EnDataModel.class));
+                    EnDataModel en = gson.fromJson(d.getInput(), EnDataModel.class);
+                    enList.add(en);
+                    if(!d.getIsUploaded())
+                        syncData.add(en);
                 }
+
                 summaryData(enList);
 
                 RoadStatusReportAdapter adapter = new RoadStatusReportAdapter(getChildFragmentManager(), listHeader, hashMap, getActivity());
                 lv.setAdapter(adapter);
 
-                syncData = new ArrayList<>();
-                for (EnDataModel enDataModel : enList) {
-                    if(!enDataModel.isUploaded())
-                        syncData.add(enDataModel);
-                }
                 if(syncData.size() == 0){
                     fab.setVisibility(View.GONE);
                 }else{
                     fab.setVisibility(View.VISIBLE);
                 }
 
+            }else{
+                fab.setVisibility(View.GONE);
             }
         }
     }
 
 
     private void uploadData(){
-        if(pref.getString(GlobalParams.USER_ONLY_TYPE, GlobalParams.TYPE_OFFLINE).equals(GlobalParams.TYPE_OFFLINE)){
+        ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setMessage("Bạn cần kết nối internet trước khi upload dữ liệu!");
             builder.setPositiveButton("ok", null);
@@ -134,7 +143,6 @@ public class FragmentReportStatus extends CustomFragment {
         }
         failUploadData = new ArrayList<>();
         syncData = new ArrayList<>();
-        failUploadOrder = new ArrayList<>();
         dialog= new ProgressDialog(getActivity());
         dialog.setMessage("Đang chuyển đổi dữ liệu trước khi upload...");
         dialog.setCanceledOnTouchOutside(false);
@@ -145,11 +153,10 @@ public class FragmentReportStatus extends CustomFragment {
             if (listData.size() != 0) {
                 List<EnDataModel> enList = new ArrayList<>();
                 for (Data d : listData) {
-                    enList.add(gson.fromJson(d.getInput(), EnDataModel.class));
-                }
-                for (EnDataModel enDataModel : enList) {
-                    if(!enDataModel.isUploaded())
-                        syncData.add(enDataModel);
+                    EnDataModel en = gson.fromJson(d.getInput(), EnDataModel.class);
+                    enList.add(en);
+                    if(!d.getIsUploaded())
+                        syncData.add(en);
                 }
             }
         }
@@ -160,40 +167,38 @@ public class FragmentReportStatus extends CustomFragment {
                 Logger.error("size upload : " + syncData.size());
                 try{
                     ContentResolver cr = getActivity().getContentResolver();
-
                     if(syncData.size() == 0){
                         isAcceptUpload = false;
                         return;
                     }else {
                         Logger.error("sync size: " + syncData.size());
-                        for (EnDataModel en : syncData) {
-                            for (ImageModel imgUri : en.getListImageData()) {
-                                Uri uri = Uri.parse(imgUri.getImagePath());
-                                try {
-                                    Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
-
-                                    Bitmap b = FunctionUtils.scaleBitmap(bitmap, 1000, 1000);
-                                    String base64value = FunctionUtils.encodeTobase64(b);
-
-                                    imgUri.setImageDataByte(base64value);
-                                } catch (Exception e) {
-                                    Logger.error("Exception get Image: " + e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            }
-                            enDataModelList.add(en);
-                        }
+//                        for (EnDataModel en : syncData) {
+//                            for (ImageModel imgUri : en.getListImageData()) {
+//                                Uri uri = Uri.parse(imgUri.getImagePath());
+//                                try {
+//                                    Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
+//                                            Bitmap b = FunctionUtils.scaleBitmap(bitmap, 1000, 1000);
+//                                    String base64value = FunctionUtils.encodeTobase64(b);
+////                                    String base64value = FunctionUtils.convertBitMapToString(bitmap);
+//                                    imgUri.setImageDataByte(base64value);
+//                                } catch (Exception e) {
+//                                    Logger.error("Exception get Image: " + e.getMessage());
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                            enDataModelList.add(en);
+//                        }
                     }
                 }catch(Exception e){
                     e.printStackTrace();
                 }finally {
                     if(isAcceptUpload) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                dialog.setMessage("Đang lấy token...");
-                            }
-                        });
+//                        getActivity().runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                dialog.setMessage("Đang lấy token...");
+//                            }
+//                        });
                         getToken();
 //                        new UploadData().execute();
                     }else{
@@ -231,33 +236,87 @@ public class FragmentReportStatus extends CustomFragment {
                 USER_TOKEN = result;
                 pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
                 instream.close();
-                new UploadData().execute();
+
+//                new UploadData().execute();
+                syncAndUploadData();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private void syncAndUploadData(){
+        if(order > syncData.size() - 1)
+            return;
+
+        final EnDataModel uploadData = syncData.get(order);
+
+        final Thread thread = new Thread() {
+            public void run() {
+                try {
+//                    ContentResolver cr = getActivity().getContentResolver();
+                    for (ImageModel imgUri : uploadData.getListImageData()) {
+                        Uri uri = Uri.parse(imgUri.getImagePath());
+                        try {
+//                            Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
+//                            Bitmap b = FunctionUtils.scaleBitmap(bitmap, 200, 200);
+//                            String base64value = FunctionUtils.convertBitMapToString(b);
+//                            Bitmap bitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(), dm.widthPixels, dm.widthPixels);
+                            Bitmap bitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(), 800, 1100);
+                            Logger.error("decode size: " + FunctionUtils.sizeOf(bitmap));
+                            String base64value = FunctionUtils.convertBitMapToString(bitmap);
+                            imgUri.setImageDataByte(base64value);
+                            bitmap = null;
+                        } catch (Exception e) {
+                            Logger.error("Exception get Image: " + e.getMessage());
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (Exception e) {
+                    Logger.error("Error sync data: " + e.toString());
+                    e.printStackTrace();
+                } finally {
+                    new UploadData(uploadData).execute();
+                }
+            }
+        };
+
+        final Thread threadSleep = new Thread() {
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                }catch(Exception e){
+                }finally {
+                    thread.start();
+                }
+            }
+        };
+        threadSleep.start();
+    }
+
     int order;
     boolean IS_UPLOAD_SUSSCESS = true;
     private class UploadData extends AsyncTask<Void, Void, String> {
         String url;
+        EnDataModel uploadData;
 
-        public UploadData(){
+        public UploadData(EnDataModel uploadData){
             url = FunctionUtils.encodeUrl(GlobalParams.BASED_POST_URL + USER_TOKEN);
-//            url = "http://192.168.1.34:8080/UploadSample/Upload";
+//            url = "http://192.168.1.142:8080/UploadSample/Upload";
+//            url = "http://10.0.2.2:8080/UploadSample/Upload";
             Logger.error("Url: " + url);
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    dialog.setMessage("Đang upload dữ liệu thứ " + order + "...");
-                }
-            });
+            this.uploadData = uploadData;
         }
 
         @Override
         protected void onPreExecute() {
-            Logger.error("Order: " + order + " in size: " + enDataModelList.size());
+            Logger.error("Order: " + order + " in size: " + syncData.size());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.setMessage("Đang upload dữ liệu thứ " + (order + 1) + "...");
+                }
+            });
         }
 
         @Override
@@ -265,11 +324,15 @@ public class FragmentReportStatus extends CustomFragment {
             String responseResult = "";
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost post = new HttpPost(url);
+            post.setHeader("Content-Type", "application/json; charset=utf-8");
             post.setHeader("Accept","application/json");
-            post.setHeader("Content-Type","application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity(enDataModelList.get(order).toString(), HTTP.UTF_8);
+                StringEntity entityData = new StringEntity(uploadData.toString(), HTTP.UTF_8);
+//                EnDataModelUpload enDataModelUpload = new EnDataModelUpload(uploadData);
+//                StringEntity entityData = new StringEntity(gson.toJson(enDataModelUpload), HTTP.UTF_8);
+//                Logger.error("push: " + gson.toJson(enDataModelUpload));
+//                StringEntity entityData = new StringEntity(uploadData.toString(), HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());
@@ -288,37 +351,33 @@ public class FragmentReportStatus extends CustomFragment {
         }
 
         @Override
-        protected void onPostExecute(String result) {
+        protected void onPostExecute(final String result) {
             Logger.error("response: " + result);
             if(!result.contains("Successfull")){
-                failUploadData.add(enDataModelList.get(order));
-                failUploadOrder.add(order);
+                uploadData = null;
                 IS_UPLOAD_SUSSCESS = false;
+            }else{
+                syncDataOffline(uploadData);
             }
-            enDataModelList.get(order).setUploaded(true);
-            if(order < enDataModelList.size() - 1){
+            if (order < syncData.size() - 1) {
                 order = order + 1;
-                new UploadData().execute();
-            }else if(order == enDataModelList.size() - 1) {
-                if (IS_UPLOAD_SUSSCESS) {
-                    Toast.makeText(getActivity(), "Upload thành công!", Toast.LENGTH_SHORT).show();
-                    enDataModelList.clear();
-                    pref.saveBoolean(GlobalParams.IS_SYNC_TODAY, true);
-                } else {
-                    Toast.makeText(getActivity(), "Có lỗi xảy ra trong quá trình upload!", Toast.LENGTH_SHORT).show();
-                }
+                syncAndUploadData();
+            } else{
+//                    Toast.makeText(getActivity(), "Đã upload xong dữ liệu cuối cùng mới nhất!", Toast.LENGTH_SHORT).show();
+                pref.saveBoolean(GlobalParams.IS_SYNC_TODAY, true);
 
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        dialog.setMessage("Đang đồng bộ lại dữ liệu...");
-                    }
-                });
+//                getActivity().runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        dialog.setMessage("Đang đồng bộ lại dữ liệu...");
+//                    }
+//                });
+
 
                 final Thread thread = new Thread() {
                     public void run() {
                         try {
-                            syncDataOffline();
+                            //syncDataOffline();
                         } catch (Exception e) {
                             Logger.error("Error sync data: " + e.toString());
                             e.printStackTrace();
@@ -331,13 +390,12 @@ public class FragmentReportStatus extends CustomFragment {
                                 public void run() {
                                     fab.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.fab_hide));
                                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                    builder.setMessage("Upload dữ liệu thành công!");
+                                    builder.setTitle("Đã upload xong dữ liệu!");
+                                    builder.setMessage("Kết quả trả về: \n \"" + result.replace("\"","").replace(",","").trim() + "\"");
                                     builder.setPositiveButton("ok", null);
                                     builder.show();
                                 }
                             });
-
-
                         }
                     }
                 };
@@ -346,23 +404,33 @@ public class FragmentReportStatus extends CustomFragment {
         }
     }
 
-    private void syncDataOffline(){
+    private void syncDataOffline(EnDataModel dataModel){
+        Logger.error("syncDataOffline");
         List<Data> listData = DatabaseHelper.getData();
-        List<EnDataModel> dataList = new ArrayList<>();
         if(listData!= null) {
             if (listData.size() != 0) {
+                Logger.error("syncDataOffline");
                 for (Data d : listData) {
+
                     EnDataModel e = gson.fromJson(d.getInput(), EnDataModel.class);
-                    e.setUploaded(true);
-                    dataList.add(e);
+                    if(e.getDaValue().getDataID().equals(dataModel.getDaValue().getDataID())
+                            && e.getDaValue().getMaDuong().equals(dataModel.getDaValue().getMaDuong())
+                            && e.getDaValue().getThangDanhGia().equals(dataModel.getDaValue().getThangDanhGia())
+                            && e.getDaValue().getTuyenSo().equals(dataModel.getDaValue().getTuyenSo())
+                            && e.getDaValue().getDataType().equals(dataModel.getDaValue().getDataType())) {
+                        Logger.error("found data id:" + d.getID());
+                        d.setIsUploaded(true);
+//                        dataList.add(e);
+                        DatabaseHelper.updateData(d);
+                    }
                 }
             }
         }
 
-        DatabaseHelper.clearData();
-        for(EnDataModel e : dataList){
-            DatabaseHelper.insertData(gson.toJson(e));
-        }
+//        DatabaseHelper.clearData();
+//        for(EnDataModel e : dataList){
+//            DatabaseHelper.insertData(gson.toJson(e));
+//        }
     }
 
     private void summaryData(List<EnDataModel> data){

@@ -8,6 +8,7 @@ public class GlobalParams {
         NORMAL, FACEBOOK
     }
     public static final String LIST_WORKING_NAME = "list working name";
+    public static final int MAX_UPLOAD_IMAGE_AMOUNT = 3;
     public static final String LIST_DATATYE = "list datatype name";
     public static final String ROAD_CHOOSEN = "road choosen";
     public static final String MA_DUONG = "ma duong";

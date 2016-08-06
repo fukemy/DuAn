@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnMainCatalogItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,7 @@ public class categoryAdapter extends BaseAdapter {
     private List<EnMainCatalogItem> data;
     private Context mContext;
     private DisplayMetrics dm;
-    private ViewHolder[] listHolder;
+    private List<ViewHolder> listHolder;
     private boolean IS_SELECT_MULTI = false;
     private Typeface custom_font;
 
@@ -32,9 +33,8 @@ public class categoryAdapter extends BaseAdapter {
         this.data = data;
         this.mContext = ctx;
         dm = mContext.getResources().getDisplayMetrics();
-        listHolder = new ViewHolder[data.size()];
+        listHolder = new ArrayList<>();
         custom_font = Typeface.createFromAsset(mContext.getAssets(),  "fonts/thinfont.ttf");
-
     }
 
     public void setMultiSelect(boolean multiSelect)
@@ -44,11 +44,15 @@ public class categoryAdapter extends BaseAdapter {
 
     public class ViewHolder{
         boolean isCreated = false;
+        private View convertView;
         private ImageView imgView;
         private TextView textView;
         private CheckBox checkBox;
     }
 
+    public View getViewAt(int pos){
+        return listHolder.get(pos).convertView;
+    }
     @Override
     public int getCount() {
         return data.size();
@@ -73,7 +77,9 @@ public class categoryAdapter extends BaseAdapter {
             holder.imgView = (ImageView) convertView.findViewById(R.id.imgCategory);
             holder.textView = (TextView) convertView.findViewById(R.id.tvCategory);
             holder.checkBox = (CheckBox) convertView.findViewById(R.id.checkbox);
+            holder.convertView = convertView;
             convertView.setTag(holder);
+            listHolder.add(holder);
         }else{
             holder = (ViewHolder) convertView.getTag();
         }

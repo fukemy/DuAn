@@ -353,18 +353,27 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         if(!ROAD_NAME.equals("")) {
             builder.setMessage("Tên đường trước đó bạn đã nhập là '" + ROAD_NAME +"'"
                     + ", " + getResources().getString(R.string.bancomuonchonlaitenduongchu));
+            builder.setCancelable(true);
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showDialog();
+                }
+            });
+            builder.setNegativeButton("Cancel", null);
+
         }else{
             builder.setMessage("Bạn chưa chọn tên đường, ấn OK để nhập!");
+            builder.setCancelable(false);
+            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    showDialog();
+                }
+            });
+
         }
 
-        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                showDialog();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", null);
         builder.show();
     }
 
@@ -409,6 +418,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         //for multi works
         @Override
         public void doListWorks() {
+            Logger.error("choose items: " + enWorkLists.toString());
             Intent in = new Intent(MainScreen.this, AcInput.class);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
@@ -505,44 +515,47 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         return super.onOptionsItemSelected(item);
     }
 
+    int currrentID = 0;
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         final String title = item.getTitle().toString();
+        if(id != currrentID) {
+            if (id == R.id.nav_input) {
+                getSupportActionBar().setTitle(title);
+                initLayoutAndData();
+                FunctionUtils.hideMenu(menu, true);
+            } else if (id == R.id.nav_report) {
+                getSupportActionBar().setTitle(title);
+                initReportScreen();
+                FunctionUtils.hideMenu(menu, false);
+            } else if (id == R.id.nav_logout) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
+                builder.setTitle("Warning");
+                builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
 
-        if (id == R.id.nav_input) {
-            getSupportActionBar().setTitle(title);
-            initLayoutAndData();
-            FunctionUtils.hideMenu(menu, true);
-        }  else if (id == R.id.nav_report) {
-            getSupportActionBar().setTitle(title);
-            initReportScreen();
-            FunctionUtils.hideMenu(menu, false);
-        }  else if (id == R.id.nav_logout) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
-            builder.setTitle("Warning");
-            builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
+                        pref.saveString(GlobalParams.USERNAME, "");
+                        pref.saveLong(GlobalParams.LAST_LOGIN, 0);
+                        pref.saveBoolean(GlobalParams.FACEBOOK_LOGED_IN, false);
 
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
-                    pref.saveString(GlobalParams.USERNAME, "");
-                    pref.saveLong(GlobalParams.LAST_LOGIN, 0);
-                    pref.saveBoolean(GlobalParams.FACEBOOK_LOGED_IN, false);
+                        startActivity(new Intent(MainScreen.this, SprashScreen.class));
+                        finish();
+                    }
+                });
 
-                    startActivity(new Intent(MainScreen.this, SprashScreen.class));
-                    finish();
-                }
-            });
+                builder.setNegativeButton("Cancel", null);
+                builder.show();
+            }
 
-            builder.setNegativeButton("Cancel", null);
-            builder.show();
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            drawer.closeDrawer(GravityCompat.START);
         }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        currrentID = id;
         return true;
     }
 }

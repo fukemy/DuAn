@@ -15,7 +15,7 @@ public class GreendaoGeneratorClass {
 
     public static void createDatabase(){
         Schema schema = new Schema(1, "com.example.macos.database.new");
-        addDataTypeItemDb(schema);
+        addInputDb(schema);
         try{
             new DaoGenerator().generateAll(schema, PROJECT_DIR + "//app//src//main//java");
             System.out.println(PROJECT_DIR + "//app//src//main//java");
@@ -36,6 +36,7 @@ public class GreendaoGeneratorClass {
         Entity en = schema.addEntity("Data");
         en.addLongProperty("ID").primaryKey().autoincrement();
         en.addStringProperty("input");
+        en.addBooleanProperty("isUploaded");
     }
 
     public static void addItemDb(Schema schema)
