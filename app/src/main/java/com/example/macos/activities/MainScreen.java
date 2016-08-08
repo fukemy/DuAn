@@ -21,10 +21,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.example.macos.adapter.ChooseRoadNameAdapter;
 import com.example.macos.adapter.MainScreenAdapter;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.Item;
@@ -32,23 +33,22 @@ import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnMainCatalogItem;
 import com.example.macos.entities.EnWorkList;
-import com.example.macos.fragment.FragmentAccident;
-import com.example.macos.fragment.FragmentReportLastDay;
 import com.example.macos.fragment.mainscreen.FragmentMainDataScreen;
+import com.example.macos.fragment.report.FragmentAccident;
 import com.example.macos.fragment.report.FragmentProblem;
+import com.example.macos.fragment.report.FragmentReportDiary;
+import com.example.macos.fragment.report.FragmentReportLastDay;
+import com.example.macos.fragment.report.FragmentReportMap;
+import com.example.macos.fragment.report.FragmentReportStatus;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iListWork;
 import com.example.macos.libraries.Logger;
 import com.example.macos.main.SprashScreen;
-import com.example.macos.report.FragmentReportDiary;
-import com.example.macos.report.FragmentReportMap;
-import com.example.macos.report.FragmentReportStatus;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.gson.Gson;
-import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -125,7 +125,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         builder.setTitle(getResources().getString(R.string.road_name));
         LayoutInflater inflater = LayoutInflater.from(getApplicationContext());
         View dialogRoadNameInput = inflater.inflate(R.layout.edittext_input, null, false);
-        final MaterialBetterSpinner chooseRoadName = (MaterialBetterSpinner) dialogRoadNameInput.findViewById(R.id.edt);
+        final AutoCompleteTextView chooseRoadName = (AutoCompleteTextView) dialogRoadNameInput.findViewById(R.id.edt);
 
         final List<RoadInformation> list = DatabaseHelper.getRoadInformationList();
         final HashMap<String, RoadInformation> listRoadName = new HashMap<String, RoadInformation>();
@@ -133,9 +133,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             listRoadName.put(road.getTenDuong(), road);
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainScreen.this,
-                android.R.layout.simple_dropdown_item_1line, listRoadName.keySet().toArray(new String[listRoadName.size()]));
+        ChooseRoadNameAdapter adapter = new ChooseRoadNameAdapter(MainScreen.this, android.R.layout.simple_dropdown_item_1line,
+                listRoadName.keySet().toArray(new String[listRoadName.size()]));
         chooseRoadName.setAdapter(adapter);
+        chooseRoadName.setThreshold(1);
         builder.setView(dialogRoadNameInput);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override

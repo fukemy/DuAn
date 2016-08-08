@@ -1,4 +1,4 @@
-package com.example.macos.report;
+package com.example.macos.fragment.report;
 
 import android.app.ProgressDialog;
 import android.graphics.Color;
@@ -18,7 +18,7 @@ import com.example.macos.database.Data;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
-import com.example.macos.fragment.FragmentViewFullReport;
+import com.example.macos.information.FragmentViewFullReport;
 import com.example.macos.interfaces.iListWork;
 import com.example.macos.utilities.CustomFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -49,6 +49,7 @@ public class FragmentReportMap extends CustomFragment{
     private ProgressDialog dialog;
     private boolean IS_FIRST_INIT_MAP = false;
     private HashMap<Marker, EnDataModel> listMarkerData;
+    LinearLayout infoWindow;
 
     public void setInterface(iListWork swapInterface) {
         this.swapInterface = swapInterface;
@@ -202,8 +203,6 @@ public class FragmentReportMap extends CustomFragment{
                     System.out.println("data :" + e.getDaValue().getDataTypeName());
                 }
                 gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-
-                    @Override
                     public View getInfoWindow(Marker arg0) {
                         return null;
                     }
@@ -211,8 +210,8 @@ public class FragmentReportMap extends CustomFragment{
                     @Override
                     public View getInfoContents(Marker marker) {
 
-                        LinearLayout info = new LinearLayout(getActivity());
-                        info.setOrientation(LinearLayout.VERTICAL);
+                        infoWindow = new LinearLayout(getActivity());
+                        infoWindow.setOrientation(LinearLayout.VERTICAL);
 
                         TextView title = new TextView(getActivity());
                         title.setTextColor(Color.BLACK);
@@ -224,26 +223,46 @@ public class FragmentReportMap extends CustomFragment{
                         snippet.setTextColor(Color.GRAY);
                         snippet.setText(marker.getSnippet());
 
-                        info.addView(title);
-                        info.addView(snippet);
-
-                        return info;
+                        infoWindow.addView(title);
+                        infoWindow.addView(snippet);
+                        return infoWindow;
                     }
                 });
             }
             gMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
                 @Override
-                public void onInfoWindowClick(Marker marker) {
+                public void onInfoWindowClick(final Marker marker) {
                     Iterator myVeryOwnIterator = listMarkerData.keySet().iterator();
                     while(myVeryOwnIterator.hasNext()) {
                         Marker markerKey = (Marker) myVeryOwnIterator.next();
                         if(markerKey.getTitle().trim().equals(marker.getTitle().trim())
                             && markerKey.getTitle().trim().equals(marker.getTitle().trim())) {
                             System.out.println("marker found: -----------");
-                            EnDataModel statusData = (EnDataModel) listMarkerData.get(markerKey);
+                            EnDataModel statusData = listMarkerData.get(markerKey);
                             FragmentViewFullReport reportInformation = new FragmentViewFullReport();
                             reportInformation.setData(statusData);
+
                             reportInformation.show(getChildFragmentManager(), "test");
+//
+//                            final Intent in = new Intent(getActivity(), DiaryReportContent.class);
+//                            Gson gson = new Gson();
+//                            in.putExtra("data",  gson.toJson(statusData));
+//                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                                Handler handler = new Handler();
+//                                handler.postDelayed(new Runnable() {
+//                                    @Override
+//                                    public void run() {
+//                                        ActivityOptionsCompat options =
+//                                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), infoWindow ,
+//                                                        getActivity().getResources().getString(R.string.show_map));
+//                                        getActivity().startActivity(in, options.toBundle());
+//                                    }
+//                                }, 100);
+//
+//                            }else{
+//                                getActivity().startActivity(in);
+//                            }
+
                         }
                     }
                 }

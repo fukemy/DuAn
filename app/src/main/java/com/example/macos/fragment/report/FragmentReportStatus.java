@@ -1,4 +1,4 @@
-package com.example.macos.report;
+package com.example.macos.fragment.report;
 
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -184,8 +184,9 @@ public class FragmentReportStatus extends CustomFragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                isShowFab = !isShowFab;
-                showFabButton(isShowFab);
+//                isShowFab = !isShowFab;
+//                showFabButton(isShowFab);
+                uploadData();
             }
         });
 

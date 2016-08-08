@@ -1,4 +1,4 @@
-package com.example.macos.report;
+package com.example.macos.fragment.report;
 
 import android.os.Build;
 import android.os.Bundle;

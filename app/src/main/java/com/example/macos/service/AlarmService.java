@@ -1,4 +1,4 @@
-package com.example.macos.activities;
+package com.example.macos.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 
+import com.example.macos.activities.MainScreen;
 import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.GlobalParams;

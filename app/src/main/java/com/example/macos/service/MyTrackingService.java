@@ -1,4 +1,4 @@
-package com.example.macos.activities;
+package com.example.macos.service;
 
 import android.app.Service;
 import android.content.Intent;

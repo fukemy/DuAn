@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import com.example.macos.activities.AlarmService;
+import com.example.macos.service.AlarmService;
 import com.example.macos.libraries.Logger;
 
 /**

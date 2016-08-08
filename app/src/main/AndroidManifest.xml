@@ -77,7 +77,7 @@
             android:theme="@style/AppTheme" />
 
         <service
-            android:name="com.example.macos.activities.MyTrackingService"
+            android:name="com.example.macos.service.MyTrackingService"
             android:label="My Service" />
 
         <receiver

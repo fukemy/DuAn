@@ -1,4 +1,4 @@
-package com.example.macos.fragment;
+package com.example.macos.fragment.report;
 
 import android.annotation.TargetApi;
 import android.app.Activity;

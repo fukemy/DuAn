@@ -90,12 +90,6 @@ public class DiaryReportContent extends AppCompatActivity {
     }
 
     @Override
-    public void finish() {
-        super.finish();
-    }
-
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
     }
