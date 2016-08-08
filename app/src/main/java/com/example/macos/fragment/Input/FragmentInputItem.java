@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
@@ -33,6 +34,7 @@ import com.example.macos.activities.AcInput;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
+import com.example.macos.information.FragmentViewImageInformation;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.libraries.LinearLayoutThatDetectsSoftKeyboard;
 import com.example.macos.utilities.CustomFragment;
@@ -444,6 +446,13 @@ public class FragmentInputItem extends CustomFragment{
                                 img.setImageBitmap(b);
                                 img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);
+                                ViewCompat.setTransitionName(img, "viewimage");
+                                img.setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        showImage(img);
+                                    }
+                                });
                             } catch (Exception e) {
                                 Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
@@ -454,6 +463,16 @@ public class FragmentInputItem extends CustomFragment{
                 }
                 break;
         }
+    }
+
+    private void showImage(ImageView img){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        }
+        getChildFragmentManager().beginTransaction()
+                .addSharedElement(img, "viewimage")
+                .show(new FragmentViewImageInformation())
+                .addToBackStack(null)
+                .commit();
     }
 
     private void checkContainerInput(LinearLayout lnl){
