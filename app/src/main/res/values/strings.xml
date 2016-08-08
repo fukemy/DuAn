@@ -80,4 +80,5 @@
     <string name="enter_road_name">Nhập tên đường</string>
 
     <string name="facebook_app_id">1665126547145281</string>
+    <string name="title_activity_diary_report_content">DiaryReportContent</string>
 </resources>

@@ -71,10 +71,10 @@ public class FragmentInputItem extends CustomFragment{
         ACTION_BUTTON_ITEM = s;
     }
     boolean isExpand = true;
+
     public String getCatalog(){
         return catalog;
     }
-    private int CURRENT_FOCUS_ROW = 0;
     public String getSummary(){
         return edtComment.getText().toString();
     }
@@ -82,7 +82,6 @@ public class FragmentInputItem extends CustomFragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fr_road_surface, container, false);
-
         initLayout();
 
         LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams)bottomView.getLayoutParams();
@@ -208,8 +207,7 @@ public class FragmentInputItem extends CustomFragment{
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
         final TextView tvRoadName = (TextView) container.findViewById(R.id.tvRoadName);
-//        tvRoadName.setText(tvRoadName.getText().toString() + (listData.size() + 1) + ".");
-        tvRoadName.setText("");
+        tvRoadName.setVisibility(View.GONE);
         edtInformation.clearFocus();
         FunctionUtils.setupEdittext(edtInformation, getActivity());
         edtInformation.clearFocus();
@@ -229,7 +227,6 @@ public class FragmentInputItem extends CustomFragment{
             @Override
             public void onClick(View v) {
                 if(container.getTag() != null)
-                    CURRENT_FOCUS_ROW = Integer.parseInt(container.getTag().toString());
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
                     if(isExpand) {
                         isExpand = !isExpand;
@@ -443,7 +440,7 @@ public class FragmentInputItem extends CustomFragment{
                                 bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, selectedImage);
                                 //resize image
                                 Bitmap b = FunctionUtils.scaleBitmap(bitmap, rootView.findViewById(R.id.viewNull).getWidth() / 3, rootView.findViewById(R.id.viewNull).getWidth() / 3);
-                                ImageView img = new ImageView(getActivity());
+                                final ImageView img = new ImageView(getActivity());
                                 img.setImageBitmap(b);
                                 img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);

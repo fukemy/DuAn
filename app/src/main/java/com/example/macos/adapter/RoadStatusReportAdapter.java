@@ -1,16 +1,22 @@
 package com.example.macos.adapter;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
-import com.example.macos.fragment.FragmentViewFullReport;
+import com.example.macos.libraries.AnimatedExpandableListview;
+import com.example.macos.report.DiaryReportContent;
+import com.google.gson.Gson;
 
 import java.util.HashMap;
 import java.util.List;
@@ -18,15 +24,14 @@ import java.util.List;
 /**
  * Created by macos on 6/27/16.
  */
-public class RoadStatusReportAdapter extends BaseExpandableListAdapter {
-    private Context mContext;
+public class RoadStatusReportAdapter extends AnimatedExpandableListview.AnimatedExpandableListAdapter {
+    private Activity mContext;
     private HashMap<String, List<EnDataModel>> listChild;
     List<String> listHeader;
     LayoutInflater inflater;
     FragmentManager manager;
 
-    //HashMap<String, List<EnMainInputItem>>
-    public RoadStatusReportAdapter(FragmentManager manager, List<String> listHeader, HashMap<String, List<EnDataModel>>data, Context mContext) {
+    public RoadStatusReportAdapter(FragmentManager manager, List<String> listHeader, HashMap<String, List<EnDataModel>>data, Activity mContext) {
         this.listChild = data;
         this.listHeader = listHeader;
         this.mContext = mContext;
@@ -40,7 +45,7 @@ public class RoadStatusReportAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public int getChildrenCount(int groupPosition) {
+    public int getRealChildrenCount(int groupPosition) {
         return listChild.get(listHeader.get(groupPosition)).size();
 
     }
@@ -66,68 +71,84 @@ public class RoadStatusReportAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public boolean hasStableIds() {
-        return false;
-    }
-
-    @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
         if(convertView == null)
             convertView = inflater.inflate(R.layout.expandable_list_group, parent, false);
 
         TextView tvCatalog= (TextView) convertView.findViewById(R.id.tvCatalog);
-        TextView tvRoadname= (TextView) convertView.findViewById(R.id.tvRoadName);
-        TextView tvSummary= (TextView) convertView.findViewById(R.id.tvSummary);
 
-        tvCatalog.setText(getGroup(groupPosition).equals("") ? "Chưa có dữ liệu!" : getGroup(groupPosition));
+        tvCatalog.setText((getGroup(groupPosition) == null || getGroup(groupPosition).equals(""))
+                ? "Chưa có dữ liệu!" : getGroup(groupPosition));
         return convertView;
     }
 
+
     @Override
-    public View getChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
+    public View getRealChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
         if(convertView == null)
             convertView = inflater.inflate(R.layout.expandable_list_item, parent, false);
 
+        LinearLayout lnlHeader = (LinearLayout) convertView.findViewById(R.id.lnlHeader);
         TextView tvPromptitem = (TextView) convertView.findViewById(R.id.tvPromptItem);
         TextView tvStatus = (TextView) convertView.findViewById(R.id.tvStatus);
         TextView tvInformation = (TextView) convertView.findViewById(R.id.tvInformation);
         TextView tvRoadName = (TextView) convertView.findViewById(R.id.tvRoadName);
 
+        if(childPosition == 0)
+            lnlHeader.setVisibility(View.VISIBLE);
+        else
+            lnlHeader.setVisibility(View.GONE);
 
         try {
-            tvPromptitem.setText(mContext.getResources().getString(R.string.dahhmuc) + ":\n" + (getChild(groupPosition, childPosition).getDaValue().getDataTypeName().equals("")?
+            tvPromptitem.setText((getChild(groupPosition, childPosition).getDaValue().getDataTypeName().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getDataTypeName()));
         }catch(Exception e){
-            tvPromptitem.setText(mContext.getResources().getString(R.string.dahhmuc) + ":\n" + "Chưa có dữ liệu!");
+            tvPromptitem.setText("Chưa có dữ liệu!");
         }
 
         try {
-            tvStatus.setText(mContext.getResources().getString(R.string.Tinhtrang) + ":\n" + (getChild(groupPosition, childPosition).getDaValue().getThangDanhGia().equals("")?
+            tvStatus.setText((getChild(groupPosition, childPosition).getDaValue().getThangDanhGia().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getThangDanhGia()));
         }catch(Exception e){
-            tvStatus.setText(mContext.getResources().getString(R.string.Tinhtrang) + ":\n" + "Chưa có dữ liệu!");
+            tvStatus.setText("Chưa có dữ liệu!");
         }
 
         try {
-            tvInformation.setText(mContext.getResources().getString(R.string.motachitet) + ":\n" + (getChild(groupPosition, childPosition).getDaValue().getMoTaTinhTrang().equals("")?
+            tvInformation.setText((getChild(groupPosition, childPosition).getDaValue().getMoTaTinhTrang().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getMoTaTinhTrang()));
         }catch(Exception e){
-            tvInformation.setText(mContext.getResources().getString(R.string.motachitet) + ":\n" + "Chưa có dữ liệu!");
+            tvInformation.setText("Chưa có dữ liệu!");
         }
 
         try {
-            tvRoadName.setText(mContext.getResources().getString(R.string.road_name) + ":\n" + (getChild(groupPosition, childPosition).getDaValue().getTenDuong().equals("")?
+            tvRoadName.setText((getChild(groupPosition, childPosition).getDaValue().getTenDuong().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getTenDuong()));
         }catch(Exception e){
-            tvRoadName.setText(mContext.getResources().getString(R.string.road_name) + ":\n" + "Chưa có dữ liệu!");
+            tvRoadName.setText("Chưa có dữ liệu!");
         }
 
-        convertView.setOnClickListener(new View.OnClickListener() {
+        final LinearLayout animatedView = (LinearLayout) convertView.findViewById(R.id.lnlData);
+        animatedView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentViewFullReport reportInformation = new FragmentViewFullReport();
-                reportInformation.setData(getChild(groupPosition, childPosition));
-                reportInformation.show(manager, "test");
+                final Intent in = new Intent(mContext, DiaryReportContent.class);
+                Gson gson = new Gson();
+                in.putExtra("data",  gson.toJson(getChild(groupPosition, childPosition)));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ActivityOptionsCompat options =
+                                    ActivityOptionsCompat.makeSceneTransitionAnimation(mContext, animatedView,
+                                            mContext.getResources().getString(R.string.show_map));
+                            mContext.startActivity(in, options.toBundle());
+                        }
+                    }, 100);
+
+                }else{
+                    mContext.startActivity(in);
+                }
             }
         });
 
@@ -135,7 +156,12 @@ public class RoadStatusReportAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
+    public boolean hasStableIds() {
+        return true;
+    }
+
+    @Override
     public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return false;
+        return true;
     }
 }

@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationSet;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
@@ -27,17 +28,19 @@ public class AnimationControl {
     public static Animator mCurrentAnimatorEffect;
     public static int mShortAnimationDurationEffect = 200;
 
-    public static void AppearIcon(View v){
-        ScaleAnimation scale = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f
-                                                , Animation.RELATIVE_TO_SELF, 0.5f);
-        scale.setDuration(mShortAnimationDurationEffect);
-        scale.setFillAfter(true);
-        scale.setInterpolator(new LinearInterpolator());
-//        v.startAnimation(scale);
+    public static void appearLoginForm(View v){
+        final AnimationSet set = new AnimationSet(true);
+        set.setInterpolator(new LinearInterpolator());
 
+        TranslateAnimation tran = new TranslateAnimation(0, 0, v.getHeight() / 2 ,0);
+        set.setDuration(500);
         AlphaAnimation alpha = new AlphaAnimation(0f, 1f);
-        scale.setDuration(mShortAnimationDurationEffect);
-        v.startAnimation(alpha);
+        set.setDuration(350);
+
+        set.addAnimation(tran);
+        set.addAnimation(alpha);
+
+        v.startAnimation(set);
     }
 
     public static void hideIcon(View v){

@@ -32,7 +32,6 @@ public class DatabaseHelper {
 
     public static void insertListRoadInformation(List<RoadInformation> informations){
         RoadInformationDao dao = Application.getInstance().daoSession.getRoadInformationDao();
-        dao.deleteAll();
         dao.insertOrReplaceInTx(informations);
     }
 

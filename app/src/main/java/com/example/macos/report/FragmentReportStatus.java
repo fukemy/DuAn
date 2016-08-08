@@ -8,17 +8,21 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.macos.adapter.RoadStatusReportAdapter;
@@ -27,6 +31,7 @@ import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
+import com.example.macos.libraries.AnimatedExpandableListview;
 import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
@@ -55,47 +60,132 @@ import java.util.List;
 public class FragmentReportStatus extends CustomFragment {
 
     private View rootView;
-    private ExpandableListView lv;
+    private AnimatedExpandableListview lv;
     private List<EnDataModel> syncData;
     HashMap<String, List<EnDataModel>> hashMap;
     List<String> listHeader ;
     private FloatingActionButton fab;
     private SharedPreferenceManager pref;
     List<EnDataModel>  failUploadData;
+    private LinearLayout lnlOptions;
+    boolean isShowFab = true;
     ProgressDialog dialog;
     Gson gson;
     String USER_TOKEN = "";
-    private DisplayMetrics dm;
-
+    private int previousGroup=-1;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fr_report_status, container, false);
         pref = new SharedPreferenceManager(getActivity());
         gson = new Gson();
-        dm = getResources().getDisplayMetrics();
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
         initLayoutAndData();
-        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           //  lv.setNestedScrollingEnabled(true);
-        //}
+        }
+
+        lv.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
+
+            @Override
+            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
+                // We call collapseGroupWithAnimation(int) and
+                // expandGroupWithAnimation(int) to animate group
+                // expansion/collapse.
+                if (lv.isGroupExpanded(groupPosition)) {
+                    lv.collapseGroupWithAnimation(groupPosition);
+                    previousGroup=-1;
+                } else {
+                    lv.expandGroupWithAnimation(groupPosition);
+                    if(previousGroup!=-1){
+                        lv.collapseGroupWithAnimation(previousGroup);
+                    }
+                    previousGroup=groupPosition;
+                }
+                return true;
+            }
+
+        });
 
         return rootView;
     }
 
+    private void showFabButton(final boolean isShow){
+        TranslateAnimation tran;
+        if(isShow)
+            tran = new TranslateAnimation(0, 0, lnlOptions.getHeight() * 2, 0);
+        else
+            tran = new TranslateAnimation(0, 0, 0, lnlOptions.getHeight() * 2);
+        tran.setDuration(400);
+        tran.setInterpolator(new LinearInterpolator());
+        tran.setStartOffset(150);
+        tran.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if(isShow)
+                    fab.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if(!isShow)
+                    fab.setVisibility(View.GONE);
+                showOption(isShow);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        fab.startAnimation(tran);
+    }
+    private void showOption(final boolean isShow){
+        TranslateAnimation tran;
+        if(!isShow)
+            tran = new TranslateAnimation(0, 0, lnlOptions.getHeight(), 0);
+        else
+            tran = new TranslateAnimation(0, 0, 0, lnlOptions.getHeight());
+        tran.setDuration(400);
+        tran.setInterpolator(new LinearInterpolator());
+        tran.setStartOffset(150);
+        tran.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+                if(!isShow)
+                    lnlOptions.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                if(isShow)
+                    lnlOptions.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+
+        lnlOptions.startAnimation(tran);
+    }
+
     private void initLayoutAndData(){
-        lv = (ExpandableListView) rootView.findViewById(R.id.lvExp);
+        lnlOptions = (LinearLayout) rootView.findViewById(R.id.lnlOption);
+        lv = (AnimatedExpandableListview) rootView.findViewById(R.id.lvExp);
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.bringToFront();
-
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                uploadData();
+                isShowFab = !isShowFab;
+                showFabButton(isShowFab);
             }
         });
 
@@ -172,35 +262,12 @@ public class FragmentReportStatus extends CustomFragment {
                         return;
                     }else {
                         Logger.error("sync size: " + syncData.size());
-//                        for (EnDataModel en : syncData) {
-//                            for (ImageModel imgUri : en.getListImageData()) {
-//                                Uri uri = Uri.parse(imgUri.getImagePath());
-//                                try {
-//                                    Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
-//                                            Bitmap b = FunctionUtils.scaleBitmap(bitmap, 1000, 1000);
-//                                    String base64value = FunctionUtils.encodeTobase64(b);
-////                                    String base64value = FunctionUtils.convertBitMapToString(bitmap);
-//                                    imgUri.setImageDataByte(base64value);
-//                                } catch (Exception e) {
-//                                    Logger.error("Exception get Image: " + e.getMessage());
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                            enDataModelList.add(en);
-//                        }
                     }
                 }catch(Exception e){
                     e.printStackTrace();
                 }finally {
                     if(isAcceptUpload) {
-//                        getActivity().runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                dialog.setMessage("Đang lấy token...");
-//                            }
-//                        });
                         getToken();
-//                        new UploadData().execute();
                     }else{
                         getActivity().runOnUiThread(new Runnable() {
                             @Override

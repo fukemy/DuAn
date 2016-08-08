@@ -2,8 +2,6 @@ package com.example.macos.main;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -50,11 +47,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONObject;
 
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Calendar;
 import java.util.List;
 
@@ -103,11 +97,6 @@ public class SprashScreen extends AppCompatActivity {
             }
         });
 
-//        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-//           btLogin.setBackgroundColor(getResources().getColor(R.color.mainColor80));
-//            lnlRegister.setBackgroundColor(getResources().getColor(R.color.mainColor80));
-//        }
-
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -144,8 +133,9 @@ public class SprashScreen extends AppCompatActivity {
                             progressBar.setVisibility(View.GONE);
                         }
                     });
+                    IS_LOGGED_ON = pref.getBoolean(GlobalParams.IS_LOGGED_ON, false);
                     if (!IS_LOGGED_ON) {
-                        System.out.println("IS_LOGGED_ON: " + IS_LOGGED_ON);
+                        Logger.error("IS_LOGGED_ON: " + IS_LOGGED_ON);
                         showLogin();
                     } else {
                         LAST_LOGIN = pref.getLong(GlobalParams.LAST_LOGIN, 0);
@@ -154,11 +144,24 @@ public class SprashScreen extends AppCompatActivity {
 
                         Calendar last = Calendar.getInstance();
                         last.setTimeInMillis(LAST_LOGIN);
-                        System.out.println("DIFF_LAST_LOGIN: " + (now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)));
+                        Logger.error("DIFF_LAST_LOGIN: " + (now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)));
                         if ((now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > 3) {
                             showLogin();
                         } else {
-                            Intent in = new Intent(SprashScreen.this, MainScreen.class);
+                            final Intent in = new Intent(SprashScreen.this, MainScreen.class);
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SprashScreen.this);
+//                                        startActivity(in, options.toBundle());
+//                                        finish();
+//                                    }else{
+//
+//                                    }
+//                                }
+//                            });
+
                             startActivity(in);
                             finish();
                         }
@@ -178,9 +181,8 @@ public class SprashScreen extends AppCompatActivity {
         rootView = (RelativeLayout) findViewById(R.id.rootView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         prLogin = (ProgressBar) findViewById(R.id.prLogin);
-        btLogin = (LinearLayout) findViewById(R.id.lnlLogin);
+        btLogin = (LinearLayout) findViewById(R.id.lnlLoginButton);
         lnlRegister = (LinearLayout) findViewById(R.id.lnlRegister);
-//        lnlRegister.setBackgroundColor(getResources().getColor(R.color.mainColor));
         inputUsername = (TextInputLayout) findViewById(R.id.inputUsername);
         inputPassword = (TextInputLayout) findViewById(R.id.inputPassword);
         edtUsername = (EditText) findViewById(R.id.edtUsername);
@@ -365,9 +367,15 @@ public class SprashScreen extends AppCompatActivity {
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
+                        Logger.error("visible lnlRegister");
                         lnlLogin.setVisibility(View.VISIBLE);
                         lnlRegister.setVisibility(View.VISIBLE);
-                        AnimationControl.AppearIcon(lnlLogin);
+                        AnimationControl.appearLoginForm(lnlLogin);
+
+                        TranslateAnimation showRegister = new TranslateAnimation(0, 0, lnlRegister.getHeight(), 0);
+                        showRegister.setInterpolator(new LinearInterpolator());
+                        showRegister.setDuration(450);
+                        lnlRegister.startAnimation(showRegister);
                     }
                 });
 
@@ -412,94 +420,6 @@ public class SprashScreen extends AppCompatActivity {
         }
     }
 
-    private Bundle getFacebookData(JSONObject object) {
-
-        try {
-            Bundle bundle = new Bundle();
-            String id = object.getString("id");
-
-            try {
-                URL profile_pic = new URL("https://graph.facebook.com/" + id + "/picture?width=200&height=150");
-                Log.i("profile_pic", profile_pic + "");
-                bundle.putString("profile_pic", profile_pic.toString());
-
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-                return null;
-            }
-
-            bundle.putString("idFacebook", id);
-            if (object.has("first_name"))
-                bundle.putString("first_name", object.getString("first_name"));
-            if (object.has("last_name"))
-                bundle.putString("last_name", object.getString("last_name"));
-            if (object.has("email"))
-                bundle.putString("email", object.getString("email"));
-            if (object.has("gender"))
-                bundle.putString("gender", object.getString("gender"));
-            if (object.has("birthday"))
-                bundle.putString("birthday", object.getString("birthday"));
-            if (object.has("location"))
-                bundle.putString("location", object.getJSONObject("location").getString("name"));
-
-            return bundle;
-        }catch (Exception e){
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    private class LoadingUserFbAsynctask extends AsyncTask<String, Void, Bitmap> {
-        Bundle bundle;
-        String URL;
-
-        public LoadingUserFbAsynctask(Bundle bundle) {
-            this.bundle = bundle;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(final Bitmap result) {
-
-            //imgLogo.setImageBitmap(result);
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try{
-                        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, true);
-                        pref.saveString(GlobalParams.USERNAME, edtUsername.getText().toString().trim());
-                        pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
-                    }catch(Exception e){
-
-                    }finally {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent in = new Intent(SprashScreen.this, MainScreen.class);
-                                startActivity(in);
-                                progressFbDialog.dismiss();
-                                finish();
-                            }
-                        });
-                    }
-                }
-            }).start();
-
-
-        }
-    }
-
 
     public void login(String url)
     {
@@ -509,12 +429,12 @@ public class SprashScreen extends AppCompatActivity {
         HttpResponse response;
         try {
             response = httpclient.execute(httpget);
-            System.out.println("login status:" + response.getStatusLine().toString());
+            Logger.error("login status:" + response.getStatusLine().toString());
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 InputStream instream = entity.getContent();
                 String result = FunctionUtils.convertStreamToString(instream).replace("\"","");
-                System.out.println("login response:" + result);
+                Logger.error("login response:" + result);
                 USER_TOKEN = result;
                 instream.close();
                 loadRoadName();
@@ -559,7 +479,6 @@ public class SprashScreen extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            System.out.println("Road json response:" + result);
             Gson gson = new Gson();
             List<RoadInformation> roadInformationList = gson.fromJson(result,new TypeToken<List<RoadInformation>>(){}.getType());
 
@@ -597,7 +516,6 @@ public class SprashScreen extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String result) {
-            Logger.error("Road item response:" + result);
             Gson gson = new Gson();
             List<Item> catalogList = gson.fromJson(result,new TypeToken<List<Item>>(){}.getType());
 

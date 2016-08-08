@@ -1,18 +1,21 @@
-package com.example.macos.fragment;
+package com.example.macos.report;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.transition.Explode;
+import android.transition.Fade;
+import android.transition.Transition;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,68 +34,97 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
 
-/**
- * Created by devil2010 on 7/9/16.
- */
-public class FragmentViewFullReportDiary extends DialogFragment {
+public class DiaryReportContent extends AppCompatActivity {
     private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary;
     LinearLayout lnlInput;
-    private View rootView;
     private EnDataModel data;
     private GoogleMap gMap;
+    private DisplayMetrics dm;
     SupportMapFragment mSupportMapFragment;
-
-    public void setData(EnDataModel en) {
-        data = en;
-    }
-
-
+    private Button btnBack;
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setStyle(DialogFragment.STYLE_NORMAL, android.R.style.Theme_Light_NoTitleBar_Fullscreen);
-
-    }
-
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.report_status_content, container, false);
+        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        setContentView(R.layout.report_status_content);
+        dm = getResources().getDisplayMetrics();
         initLayout();
         initData();
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            getDialog().getWindow().setEnterTransition(new Explode().setDuration(600));
-        return rootView;
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Transition transition = new Explode().setDuration(600);
+            transition.addListener(new Transition.TransitionListener() {
+                @Override
+                public void onTransitionStart(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionEnd(Transition transition) {
+                    initMap();
+                }
+
+                @Override
+                public void onTransitionCancel(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionPause(Transition transition) {
+
+                }
+
+                @Override
+                public void onTransitionResume(Transition transition) {
+
+                }
+            });
+            getWindow().setEnterTransition(transition);
+            getWindow().setSharedElementExitTransition(new Fade().setDuration(300));
+            getWindow().setExitTransition(new Fade().setDuration(300));
+        }else{
+            initMap();
+        }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private void initLayout() {
-        tvCalalog = (TextView) rootView.findViewById(R.id.tvCatalog);
-        tvRoadName = (TextView) rootView.findViewById(R.id.tvRoadName);
-        tvCurrentLocation = (TextView) rootView.findViewById(R.id.tvCurrentLocation);
-        tvTime = (TextView) rootView.findViewById(R.id.tvTime);
-        tvSummary = (TextView) rootView.findViewById(R.id.tvSummary);
+        btnBack = (Button) findViewById(R.id.btnBack);
+        tvCalalog = (TextView) findViewById(R.id.tvCatalog);
+        tvRoadName = (TextView) findViewById(R.id.tvRoadName);
+        tvCurrentLocation = (TextView) findViewById(R.id.tvCurrentLocation);
+        tvTime = (TextView) findViewById(R.id.tvTime);
+        tvSummary = (TextView) findViewById(R.id.tvSummary);
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onBackPressed();
+            }
+        });
 
 
-        /*
-        mSupportMapFragment = (SupportMapFragment) getActivity().getSupportFragmentManager().findFragmentById(R.id.mapp);
-        if (mSupportMapFragment == null) {
-            mSupportMapFragment = SupportMapFragment.newInstance();
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.mapp, mSupportMapFragment).commit();
-        }
-        */
+    }
+
+    private void initMap(){
         mSupportMapFragment = new SupportMapFragment();
-        FragmentTransaction trans = getChildFragmentManager().beginTransaction();
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         trans.add(R.id.mapp, mSupportMapFragment).commit();
         getFragmentManager().beginTransaction();
         gMap = mSupportMapFragment.getMap();
 
-
-    }
-
-    private void initData() {
-        System.out.println("data: " + data.toString());
         if (mSupportMapFragment != null) {
             mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
@@ -115,27 +147,34 @@ public class FragmentViewFullReportDiary extends DialogFragment {
                             options.icon(icon);
                             gMap.addMarker(options);
                         }else{
-                            Toast.makeText(getActivity(), "Có lỗi xảy ra khi hiển thị vị trí!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(DiaryReportContent.this, "Có lỗi xảy ra khi hiển thị vị trí!", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
             });
         }
+    }
+
+    private void initData() {
+        Gson gson = new Gson();
+        data = gson.fromJson(getIntent().getStringExtra("data"), EnDataModel.class);
+        System.out.println("data: " + data.toString());
+
         tvCalalog.setText(tvCalalog.getText().toString() + " : " + (data.getDaValue().getDataName().equals("") ? "Chưa cập nhập!" :data.getDaValue().getDataName()));
         tvRoadName.setText(tvRoadName.getText().toString() + " : " + data.getDaValue().getTenDuong());
-//        tvSummary.setText(tvSummary.getText().toString() + " : " + (data.getDaValue().getSummary().equals("") ? "Chưa cập nhập!" :data.getSummary()));
-        tvSummary.setText("");
+        tvSummary.setVisibility(View.GONE);
+
         if (data.getDaValue().getLocationItem() != null)
             if(data.getDaValue().getLocationItem().getLocation() != null)
-                tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : " + data.getDaValue().getLocationItem().getAddress());
-        else
-            tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : Chưa cập nhập!");
+                tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : " + data.getDaValue().getLocationItem().getAddress().replace("\n",". "));
+            else
+                tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : Chưa cập nhập!");
 
         tvTime.setText(tvTime.getText().toString() + ": " + FunctionUtils.timeStampToTime(Long.parseLong(data.getDaValue().getThoiGianNhap())));
 
-        lnlInput = (LinearLayout) rootView.findViewById(R.id.lnlInput);
+        lnlInput = (LinearLayout) findViewById(R.id.lnlInput);
 
-        LinearLayout container = (LinearLayout) LayoutInflater.from(getActivity()).inflate(R.layout.report_status_content_layout_include, null, false);
+        LinearLayout container = (LinearLayout) LayoutInflater.from(DiaryReportContent.this).inflate(R.layout.report_status_content_layout_include, null, false);
 
         TextView tvPromptItem = (TextView) container.findViewById(R.id.tvPromptItem);
         TextView tvStatus = (TextView) container.findViewById(R.id.tvStatus);
@@ -159,24 +198,37 @@ public class FragmentViewFullReportDiary extends DialogFragment {
         }
 
 
-        ContentResolver cr = getActivity().getContentResolver();
+        ContentResolver cr = DiaryReportContent.this.getContentResolver();
         DisplayMetrics dm = getResources().getDisplayMetrics();
 
-
+        LinearLayout lnlHorizontal = null;
+        int i = 0;
         for (ImageModel source : data.getListImageData()) {
             Uri uri = Uri.parse(source.getImagePath());
+            i++;
+            if(i == 1){
+                lnlHorizontal = new LinearLayout(DiaryReportContent.this);
+                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(dm.widthPixels, dm.widthPixels / 2);
+                lParams.gravity = Gravity.CENTER;
+                lnlHorizontal.setLayoutParams(lParams);
+                imgContainer.addView(lnlHorizontal);
+            }
             try {
                 Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
                 //resize image
                 Bitmap b = FunctionUtils.scaleBitmap(bitmap, dm.widthPixels / 2, dm.widthPixels / 2);
-                ImageView img = new ImageView(getActivity());
+                ImageView img = new ImageView(DiaryReportContent.this);
                 img.setImageBitmap(b);
-                imgContainer.addView(img);
+
+                lnlHorizontal.addView(img);
             } catch (Exception e) {
-                Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
+                Toast.makeText(DiaryReportContent.this, "Failed to load", Toast.LENGTH_SHORT).show();
                 e.printStackTrace();
             }
+            if(i == 2)
+                i = 0;
         }
         lnlInput.addView(container);
     }
+
 }

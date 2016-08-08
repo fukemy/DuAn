@@ -2,12 +2,13 @@ package com.example.macos.entities;
 
 import com.example.macos.database.DataTypeItem;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by devil2010 on 7/22/16.
  */
-public class EnDataModel {
+public class EnDataModel implements Serializable{
     private DataTypeItem DataValue;
     private List<ImageModel> ListImageData;
     private boolean isUploaded = false;

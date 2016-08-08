@@ -1,5 +1,6 @@
 package com.example.macos.activities;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -112,8 +113,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             viewPager.setNestedScrollingEnabled(true);
+//            getWindow().setEnterTransition(new Explode().setDuration(400));
         }else{
         }
+
+
     }
 
     private void showDialog(){
@@ -363,7 +367,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                     showDialog();
                 }
             });
-
         }
 
         builder.show();
@@ -398,23 +401,45 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         @Override
         public void doListWork(EnMainCatalogItem en) {
             Logger.error("choose item: " + en.getItem().toString());
-            Intent in = new Intent(MainScreen.this, AcInput.class);
+            final Intent in = new Intent(MainScreen.this, AcInput.class);
             List<Item> itemList = new ArrayList<>();
             itemList.add(en.getItem());
             enWorkLists = new EnWorkList(itemList);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
-            startActivity(in);
-        }
+
+
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainScreen.this);
+                        startActivity(in, options.toBundle());
+                    }else {
+                        startActivity(in);
+                    }
+                }
+            });
+        };
 
         //for multi works
         @Override
         public void doListWorks() {
             Logger.error("choose items: " + enWorkLists.toString());
-            Intent in = new Intent(MainScreen.this, AcInput.class);
+            final Intent in = new Intent(MainScreen.this, AcInput.class);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
-            startActivity(in);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainScreen.this);
+                        startActivity(in, options.toBundle());
+                    }else {
+                        startActivity(in);
+                    }
+                }
+            });
         }
     };
 

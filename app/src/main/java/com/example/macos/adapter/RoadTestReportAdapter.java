@@ -1,6 +1,10 @@
 package com.example.macos.adapter;
 
-import android.content.Context;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +15,7 @@ import android.widget.TextView;
 import com.example.macos.database.Data;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
-import com.example.macos.fragment.FragmentViewFullReportDiary;
+import com.example.macos.report.DiaryReportContent;
 import com.example.macos.utilities.FunctionUtils;
 import com.google.gson.Gson;
 
@@ -23,12 +27,12 @@ import java.util.List;
 public class RoadTestReportAdapter extends BaseAdapter {
 
     private List<Data> listData;
-    private Context mContext;
+    private Activity mContext;
     private Gson gson;
     LayoutInflater inflater;
     FragmentManager manager;
 
-    public RoadTestReportAdapter(FragmentManager manager,List<Data> listData, Context mContext){
+    public RoadTestReportAdapter(FragmentManager manager,List<Data> listData, Activity mContext){
         this.manager = manager;
         this.listData = listData;
         this.mContext = mContext;
@@ -66,12 +70,34 @@ public class RoadTestReportAdapter extends BaseAdapter {
         tvCategory.setText(en.getDaValue().getDataName());
         tvTime.setText(FunctionUtils.timeStampToTime(Long.parseLong(en.getDaValue().getThoiGianNhap())));
 
+
+        final View animatedView = convertView;
         convertView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentViewFullReportDiary reportInformation = new FragmentViewFullReportDiary();
-                reportInformation.setData(en);
-                reportInformation.show(manager, "test");
+//                FragmentViewFullReportDiary reportInformation = new FragmentViewFullReportDiary();
+//                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+//                    reportInformation.setSharedElementEnterTransition(new Explode());
+//                reportInformation.setData(en);
+//                reportInformation.show(manager, "test");
+
+                final Intent in = new Intent(mContext, DiaryReportContent.class);
+                Gson gson = new Gson();
+                in.putExtra("data",  gson.toJson(en));
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            ActivityOptionsCompat options =
+                                    ActivityOptionsCompat.makeSceneTransitionAnimation(mContext, animatedView,
+                                            mContext.getResources().getString(R.string.show_map));
+                            mContext.startActivity(in, options.toBundle());
+                        }
+                    }, 100);
+                }else{
+                    mContext.startActivity(in);
+                }
 
             }
         });
