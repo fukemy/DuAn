@@ -1,6 +1,5 @@
 package com.example.macos.activities;
 
-import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -17,10 +16,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -119,7 +122,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
 
     }
-
+    AlertDialog d;
     private void showDialog(){
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(getResources().getString(R.string.road_name));
@@ -137,6 +140,35 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 listRoadName.keySet().toArray(new String[listRoadName.size()]));
         chooseRoadName.setAdapter(adapter);
         chooseRoadName.setThreshold(1);
+
+        chooseRoadName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                d.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (TextUtils.isEmpty(s)) {
+                    d.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+                }
+            }
+        });
+
+        chooseRoadName.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Logger.error("selected item");
+                d.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+            }
+
+        });
+
         builder.setView(dialogRoadNameInput);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
@@ -152,7 +184,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 dialog.dismiss();
             }
         });
-        builder.show();
+        d = builder.show();
     }
 
     private void initReportScreen(){
@@ -408,19 +440,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             enWorkLists = new EnWorkList(itemList);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
-
-
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainScreen.this);
-                        startActivity(in, options.toBundle());
-                    }else {
-                        startActivity(in);
-                    }
-                }
-            });
+            startActivity(in);
         };
 
         //for multi works
@@ -430,17 +450,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             final Intent in = new Intent(MainScreen.this, AcInput.class);
             in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
             in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(MainScreen.this);
-                        startActivity(in, options.toBundle());
-                    }else {
-                        startActivity(in);
-                    }
-                }
-            });
+            startActivity(in);
         }
     };
 

@@ -1,5 +1,6 @@
 package com.example.macos.activities;
 
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,12 +10,17 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -68,6 +74,7 @@ public class AcInput extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ActivityCompat.postponeEnterTransition(this);
         setContentView(R.layout.ac_input);
 
         pref = new SharedPreferenceManager(AcInput.this);
@@ -76,11 +83,10 @@ public class AcInput extends FragmentActivity {
         roadInformation = gson.fromJson(pref.getString(GlobalParams.ROAD_CHOOSEN, ""), RoadInformation.class);
         dataViewList = (EnWorkList) getIntent().getExtras().getSerializable(GlobalParams.LIST_WORKING_NAME);
         ACTION_TYPE = getIntent().getStringExtra(GlobalParams.ACTION_TYPE);
-        initLayout();
+
 
         if(checkLocationEnabled()) {
-            IS_FOUND_LOCATION = true;
-            initMap();
+            initLayout();
             locationItem = new EnLocationItem();
             dialog = new ProgressDialog(AcInput.this);
             dialog.setMessage("Đang tìm vị trí hiện tại...");
@@ -95,7 +101,7 @@ public class AcInput extends FragmentActivity {
     private boolean checkLocationEnabled(){
         final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
         if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
-           return true;
+            return true;
         }else{
             buildAlertMessageNoGps();
             return false;
@@ -203,41 +209,47 @@ public class AcInput extends FragmentActivity {
         }
     };
 
-    private void initMap(){
-        mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp);
-        if (mSupportMapFragment == null) {
-            mSupportMapFragment = SupportMapFragment.newInstance();
-            getSupportFragmentManager().beginTransaction().replace(R.id.mapp, mSupportMapFragment).commit();
+    Thread t;
+    public void closeToolbar(final boolean isClose){
+        if(t != null) {
+            if (t.isAlive()) {
+            }
+            else
+                t = null;
         }
-
-        locationItem = new EnLocationItem();
-        dialog = new ProgressDialog(AcInput.this);
-        dialog.setMessage("Đang tìm vị trí hiện tại...");
-        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
-        if (mSupportMapFragment != null) {
-            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
+        if(t == null) {
+            t = new Thread(new Runnable() {
                 @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    if (googleMap != null) {
-                        gMap = googleMap;
-                        gMap.setMyLocationEnabled(true);
-                        gMap.setOnMyLocationChangeListener(myLocationChangeListener);
-
-                        gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                public void run() {
+                    CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+                    final AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+                    if (behavior != null) {
+                        final ValueAnimator valueAnimator = ValueAnimator.ofInt();
+                        valueAnimator.setInterpolator(new DecelerateInterpolator());
+                        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                             @Override
-                            public boolean onMyLocationButtonClick() {
-                                IS_FOUND_LOCATION = false;
-                                return false;
+                            public void onAnimationUpdate(ValueAnimator animation) {
+                                behavior.setTopAndBottomOffset((Integer) animation.getAnimatedValue());
+                                appBarLayout.requestLayout();
                             }
                         });
-                    }
+                        if (isClose)
+                            valueAnimator.setIntValues(0, -appBarLayout.getHeight());
+                        else
+                            valueAnimator.setIntValues(0, appBarLayout.getHeight() * 2);
 
+                        valueAnimator.setDuration(400);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                valueAnimator.start();
+                            }
+                        });
+
+                    }
                 }
             });
-
+            t.start();
         }
     }
 
@@ -267,6 +279,38 @@ public class AcInput extends FragmentActivity {
                 builder.show();
             }
         });
+        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
+        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
+
+
+        mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp);
+        if (mSupportMapFragment == null) {
+            mSupportMapFragment = SupportMapFragment.newInstance();
+            getSupportFragmentManager().beginTransaction().replace(R.id.mapp, mSupportMapFragment).commit();
+        }
+
+        if (mSupportMapFragment != null) {
+            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
+                @Override
+                public void onMapReady(GoogleMap googleMap) {
+                    if (googleMap != null) {
+                        gMap = googleMap;
+                        gMap.setMyLocationEnabled(true);
+                        gMap.setOnMyLocationChangeListener(myLocationChangeListener);
+
+                        gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                            @Override
+                            public boolean onMyLocationButtonClick() {
+                                IS_FOUND_LOCATION = false;
+                                return false;
+                            }
+                        });
+                    }
+
+                }
+            });
+
+        }
 
         findViewById(R.id.backButton).bringToFront();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -284,6 +328,9 @@ public class AcInput extends FragmentActivity {
                 f.setActionDone("Done");
             else
                 f.setActionDone("Next");
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                f.setEnterTransition(new Slide(Gravity.BOTTOM).addTarget(R.id.scroll));
+            }
             f.setCatalog(list.get(i).getItemName());
             adapter.addFragment(f, list.get(i).getItemName());
         }
@@ -323,7 +370,7 @@ public class AcInput extends FragmentActivity {
                 dialog.dismiss();
                 locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
                 ((FragmentInputItem)((MainScreenAdapter)viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
-                Logger.error("got location : " + locationItem.toString());
+                System.out.println("got location : " + locationItem.toString());
                 IS_FOUND_LOCATION = true;
                 CameraPosition cameraPosition = new CameraPosition.Builder()
                         .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user

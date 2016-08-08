@@ -473,7 +473,6 @@ public class FragmentReportStatus extends CustomFragment {
     }
 
     private void syncDataOffline(EnDataModel dataModel){
-        Logger.error("syncDataOffline");
         List<Data> listData = DatabaseHelper.getData();
         if(listData!= null) {
             if (listData.size() != 0) {
