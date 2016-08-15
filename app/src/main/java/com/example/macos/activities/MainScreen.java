@@ -141,6 +141,15 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         chooseRoadName.setAdapter(adapter);
         chooseRoadName.setThreshold(1);
 
+        chooseRoadName.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean isFocused) {
+                if(isFocused)
+                    chooseRoadName.showDropDown();
+
+            }
+        });
+
         chooseRoadName.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {

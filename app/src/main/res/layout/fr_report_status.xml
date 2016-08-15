@@ -19,7 +19,7 @@
         android:layout_gravity="bottom|right"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"
-        android:src="@mipmap/there_dots"
+        android:src="@mipmap/upload"
         app:layout_anchorGravity="bottom|right|end" />
 
     <LinearLayout
@@ -43,7 +43,7 @@
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/fab_margin"
                 android:clickable="true"
-                android:src="@android:drawable/ic_menu_send"
+                android:src="@mipmap/upload"
                 app:layout_anchorGravity="center" />
         </LinearLayout>
 
@@ -60,7 +60,7 @@
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/fab_margin"
                 android:clickable="true"
-                android:src="@android:drawable/ic_menu_send" />
+                android:src="@mipmap/upload" />
         </LinearLayout>
 
         <LinearLayout
@@ -76,7 +76,7 @@
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/fab_margin"
                 android:clickable="true"
-                android:src="@android:drawable/ic_menu_send" />
+                android:src="@mipmap/upload" />
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

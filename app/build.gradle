@@ -14,10 +14,10 @@ android {
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            manifestPlaceholders = [ mapsKey:"AIzaSyBQqhcqs7JvGBGM6qtBY9Tyjnn3tF-gOzQ"]
+            manifestPlaceholders = [ mapsKey:"AIzaSyA-hJ2mtKgLeXWH207GikPCT4wdkz2tOK8"]
         }
         debug {
-            manifestPlaceholders = [ mapsKey:"AIzaSyBQqhcqs7JvGBGM6qtBY9Tyjnn3tF-gOzQ"]
+            manifestPlaceholders = [ mapsKey:"AIzaSyA-hJ2mtKgLeXWH207GikPCT4wdkz2tOK8"]
         }
     }
 }

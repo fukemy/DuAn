@@ -1,10 +1,12 @@
 package com.example.macos.report;
 
 import android.content.ContentResolver;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Explode;
@@ -21,10 +23,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.macos.activities.AcImageInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
 import com.example.macos.utilities.FunctionUtils;
+import com.google.android.gms.internal.du;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -211,9 +215,15 @@ public class DiaryReportContent extends AppCompatActivity {
                 Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
                 //resize image
                 Bitmap b = FunctionUtils.scaleBitmap(bitmap, dm.widthPixels / 2, dm.widthPixels / 2);
-                ImageView img = new ImageView(DiaryReportContent.this);
+                final ImageView img = new ImageView(DiaryReportContent.this);
                 img.setImageBitmap(b);
-
+                img.setTag(uri.toString());
+                img.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        showImage(img);
+                    }
+                });
                 lnlHorizontal.addView(img);
             } catch (Exception e) {
                 Toast.makeText(DiaryReportContent.this, "Failed to load", Toast.LENGTH_SHORT).show();
@@ -225,4 +235,17 @@ public class DiaryReportContent extends AppCompatActivity {
         lnlInput.addView(container);
     }
 
+    private void showImage(ImageView img){
+        Intent in = new Intent(DiaryReportContent.this, AcImageInformation.class);
+        in.putExtra("imgRef", img.getTag().toString());
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+
+            ActivityOptionsCompat options =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(DiaryReportContent.this, img,
+                            "viewimage");
+            startActivity(in, options.toBundle());
+        }else{
+            startActivity(in);
+        }
+    }
 }

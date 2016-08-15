@@ -89,7 +89,7 @@
         </receiver>
 
         <activity android:name="com.example.macos.main.AcRegister" />
-
+        <activity android:name="com.example.macos.activities.AcImageInformation" />
         <receiver android:name="com.example.macos.receiver.AutoStart">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />

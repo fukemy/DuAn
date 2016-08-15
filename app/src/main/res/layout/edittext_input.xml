@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/anchor"
     android:background="@android:color/white"
     android:orientation="vertical">
 
@@ -15,5 +16,7 @@
         android:textColor="@android:color/black"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:dropDownAnchor="@id/anchor"
+        android:dropDownWidth="wrap_content"
         android:layout_margin="10dp" />
 </LinearLayout>
