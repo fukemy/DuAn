@@ -50,11 +50,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
-import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 
 /**
  * Created by macos on 6/29/16.
@@ -473,10 +473,10 @@ public class FragmentAccident extends CustomFragment{
 
     private void takePhoto(int pos){
         ORDER_CAMERA_POSITION = pos;
-        Config config = new Config();
+//        Config config = new Config();
         //config.setTabBackgroundColor(R.color.colorAccent);
         //config.setTabSelectionIndicatorColor(android.R.color.holo_orange_dark);
-        ImagePickerActivity.setConfig(config);
+//        ImagePickerActivity.setConfig(config);
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
         startActivityForResult(intent,CHOOSEN_PICTURE);

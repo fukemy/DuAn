@@ -31,6 +31,7 @@ import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
+import com.example.macos.interfaces.iRippleControl;
 import com.example.macos.libraries.AnimatedExpandableListview;
 import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.CustomFragment;
@@ -73,6 +74,7 @@ public class FragmentReportStatus extends CustomFragment {
     Gson gson;
     String USER_TOKEN = "";
     private int previousGroup=-1;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -112,6 +114,13 @@ public class FragmentReportStatus extends CustomFragment {
 
         return rootView;
     }
+
+    iRippleControl rippleInterface = new iRippleControl() {
+        @Override
+        public void disableView(View v) {
+            v.setEnabled(false);
+        }
+    };
 
     private void showFabButton(final boolean isShow){
         TranslateAnimation tran;
@@ -207,6 +216,7 @@ public class FragmentReportStatus extends CustomFragment {
                 summaryData(enList);
 
                 RoadStatusReportAdapter adapter = new RoadStatusReportAdapter(getChildFragmentManager(), listHeader, hashMap, getActivity());
+                adapter.setRippleControl(rippleInterface);
                 lv.setAdapter(adapter);
 
                 if(syncData.size() == 0){

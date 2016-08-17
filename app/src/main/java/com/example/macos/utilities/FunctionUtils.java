@@ -3,10 +3,12 @@ package com.example.macos.utilities;
 import android.annotation.TargetApi;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,7 +17,9 @@ import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.Layout;
@@ -755,6 +759,69 @@ public class FunctionUtils {
         return BitmapFactory.decodeFile(path,options);
     }
 
+    private static final int MAX_HEIGHT = 1024;
+    private static final int MAX_WIDTH = 1024;
+    private static Bitmap rotateImageIfRequired(Context context,Bitmap img, Uri selectedImage) {
+
+        // Detect rotation
+        int rotation=getRotation(context, selectedImage);
+        if(rotation!=0){
+            Matrix matrix = new Matrix();
+            matrix.postRotate(rotation);
+            Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+            img.recycle();
+            return rotatedImg;
+        }else{
+            return img;
+        }
+    }
+
+    /**
+     * Get the rotation of the last image added.
+     * @param context
+     * @param selectedImage
+     * @return
+     */
+    private static int getRotation(Context context,Uri selectedImage) {
+        int rotation =0;
+        ContentResolver content = context.getContentResolver();
+
+
+        Cursor mediaCursor = content.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                new String[] { "orientation", "date_added" },null, null,"date_added desc");
+
+        if (mediaCursor != null && mediaCursor.getCount() !=0 ) {
+            while(mediaCursor.moveToNext()){
+                rotation = mediaCursor.getInt(0);
+                break;
+            }
+        }
+        mediaCursor.close();
+        return rotation;
+    }
+
+    public static Bitmap decodeSampledBitmap(Context context, Uri selectedImage)
+            throws IOException {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        InputStream imageStream = context.getContentResolver().openInputStream(selectedImage);
+        BitmapFactory.decodeStream(imageStream, null, options);
+        imageStream.close();
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, MAX_WIDTH, MAX_HEIGHT);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        imageStream = context.getContentResolver().openInputStream(selectedImage);
+        Bitmap img = BitmapFactory.decodeStream(imageStream, null, options);
+
+        img = rotateImageIfRequired(context, img, selectedImage);
+        return img;
+    }
+
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR1)
     public static int sizeOf(Bitmap data) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB_MR1) {
@@ -763,4 +830,20 @@ public class FunctionUtils {
             return data.getByteCount();
         }
     }
+
+    public static String getRealPathFromUri(Context context, Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = { MediaStore.Images.Media.DATA };
+            cursor = context.getContentResolver().query(contentUri, proj, null, null, null);
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
 }

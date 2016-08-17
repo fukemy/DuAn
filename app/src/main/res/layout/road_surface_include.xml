@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -15,6 +14,8 @@
         android:paddingBottom="10dp">
 
         <LinearLayout
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:id="@+id/lnlFirstPlan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,52 +69,60 @@
 
 
                 <ImageView
-                    android:layout_marginLeft="5dp"
-                    android:id="@+id/imgCameraRoadName"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@mipmap/camera_black" />
+                    android:id="@+id/imgVoidRoadName"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginLeft="10dp"
+                    android:background="@mipmap/record_black" />
 
                 <ImageView
-                    android:id="@+id/imgVoidRoadName"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
+                    android:id="@+id/imgCameraRoadName"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_marginLeft="20dp"
-                    android:src="@mipmap/record_black" />
+                    android:background="@mipmap/camera_black"/>
+
+                <ImageView
+                    android:id="@+id/imgGaleryRoadName"
+                    android:layout_marginTop="2dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginLeft="28dp"
+                    android:background="@mipmap/galery"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_gravity="right|center_vertical"
                     android:layout_weight="1"
-                    android:gravity="right">
+                    android:gravity="right"
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:id="@+id/imgEditRoadName"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_marginLeft="24dp"
-                        android:src="@mipmap/edit_black"
+                        android:background="@mipmap/edit_black"
                         android:tag="edit"
                         android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/imgDeleteRoadName"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_marginLeft="24dp"
-                        android:src="@mipmap/delete_black"
+                        android:background="@mipmap/delete_black"
                         android:tag="delete"
                         android:visibility="gone" />
 
                     <ImageView
                         android:id="@+id/imgAddRoadName"
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:layout_marginRight="5dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_marginLeft="20dp"
-                        android:src="@mipmap/plus_green"
+                        android:layout_marginRight="5dp"
+                        android:background="@mipmap/plus_green"
                         android:tag="add" />
 
                 </LinearLayout>
@@ -139,6 +148,26 @@
                     android:singleLine="true"
                     android:tag="information" />
             </LinearLayout>
+
+            <HorizontalScrollView
+                android:id="@+id/scrImage"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:layout_marginRight="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:id="@+id/lnlImage"
+                    android:layout_width="match_parent"
+                    android:gravity="top|left"
+                    android:background="@drawable/image_ripple"
+                    android:clickable="true"
+                    android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
         </LinearLayout>
 
     </LinearLayout>

@@ -3,7 +3,6 @@ package com.example.macos.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import android.widget.TextView;
 
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
+import com.example.macos.interfaces.iRippleControl;
 import com.example.macos.libraries.AnimatedExpandableListview;
 import com.example.macos.report.DiaryReportContent;
 import com.google.gson.Gson;
@@ -30,6 +30,7 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
     List<String> listHeader;
     LayoutInflater inflater;
     FragmentManager manager;
+    private iRippleControl rippleControl;
 
     public RoadStatusReportAdapter(FragmentManager manager, List<String> listHeader, HashMap<String, List<EnDataModel>>data, Activity mContext) {
         this.listChild = data;
@@ -39,6 +40,9 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
         inflater = LayoutInflater.from(mContext);
     }
 
+    public void setRippleControl(iRippleControl rippleControl){
+        this.rippleControl = rippleControl;
+    }
     @Override
     public int getGroupCount() {
         return listHeader.size();
@@ -135,17 +139,12 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
                 Gson gson = new Gson();
                 in.putExtra("data",  gson.toJson(getChild(groupPosition, childPosition)));
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            ActivityOptionsCompat options =
-                                    ActivityOptionsCompat.makeSceneTransitionAnimation(mContext, animatedView,
-                                            mContext.getResources().getString(R.string.show_map));
-                            mContext.startActivity(in, options.toBundle());
-                        }
-                    }, 100);
-
+                    animatedView.setEnabled(false);
+                    ActivityOptionsCompat options =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(mContext, animatedView,
+                                    mContext.getResources().getString(R.string.show_map));
+                    mContext.startActivity(in, options.toBundle());
+                    animatedView.setEnabled(true);
                 }else{
                     mContext.startActivity(in);
                 }

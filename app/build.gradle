@@ -14,10 +14,10 @@ android {
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            manifestPlaceholders = [ mapsKey:"AIzaSyA-hJ2mtKgLeXWH207GikPCT4wdkz2tOK8"]
+            manifestPlaceholders = [ mapsKey:"AIzaSyCbee2MxY3noVIKenWbHyLOobYplT9xNRo"]
         }
         debug {
-            manifestPlaceholders = [ mapsKey:"AIzaSyA-hJ2mtKgLeXWH207GikPCT4wdkz2tOK8"]
+            manifestPlaceholders = [ mapsKey:"AIzaSyCbee2MxY3noVIKenWbHyLOobYplT9xNRo"]
         }
     }
 }
@@ -32,6 +32,8 @@ dependencies {
     compile 'com.google.android.gms:play-services:6.+'
     compile 'com.github.douglasjunior.BetterSpinner:library-material:bugfix-1.1.0-2'
     compile 'com.github.ParkSangGwon:TedPicker:v1.0.10' //for camera dialog
+    compile 'com.mlsdev.rximagepicker:library:1.2.1'
+    compile 'io.reactivex:rxjava:1.0.14'
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1@aar' //for viewpager indicator
     compile 'com.google.code.gson:gson:2.2.+'
 }

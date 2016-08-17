@@ -423,6 +423,13 @@ public class SprashScreen extends AppCompatActivity {
 
     public void login(String url)
     {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                btLogin.setEnabled(false);
+            }
+        });
+
         FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
@@ -442,6 +449,13 @@ public class SprashScreen extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    btLogin.setEnabled(true);
+                }
+            });
+
         }
     }
 

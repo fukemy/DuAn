@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:id="@+id/container"
+    android:background="@android:color/white"
     android:orientation="vertical">
 
-    <ImageView
+    <com.example.macos.libraries.TouchImageView
         android:id="@+id/imgInfo"
         android:layout_width="match_parent"
         android:transitionName="viewimage"
+        android:adjustViewBounds="true"
         android:layout_height="match_parent" />
 </LinearLayout>

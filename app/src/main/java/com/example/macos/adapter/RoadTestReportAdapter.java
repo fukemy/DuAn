@@ -3,7 +3,6 @@ package com.example.macos.adapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.os.Handler;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
@@ -85,16 +84,10 @@ public class RoadTestReportAdapter extends BaseAdapter {
                 Gson gson = new Gson();
                 in.putExtra("data",  gson.toJson(en));
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    Handler handler = new Handler();
-                    handler.postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            ActivityOptionsCompat options =
-                                    ActivityOptionsCompat.makeSceneTransitionAnimation(mContext, animatedView,
-                                            mContext.getResources().getString(R.string.show_map));
-                            mContext.startActivity(in, options.toBundle());
-                        }
-                    }, 100);
+                    ActivityOptionsCompat options =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(mContext, animatedView,
+                                    mContext.getResources().getString(R.string.show_map));
+                    mContext.startActivity(in, options.toBundle());
                 }else{
                     mContext.startActivity(in);
                 }

@@ -81,4 +81,10 @@
 
     <string name="facebook_app_id">1665126547145281</string>
     <string name="title_activity_diary_report_content">DiaryReportContent</string>
+    <string name="start_image_capture">Take a New Picture</string>
+    <string name="capture_image">Snap it!</string>
+    <string name="save_image">Save Picture</string>
+    <string name="recapture_image">Retake Picture</string>
+    <string name="capturing_image">Taking New Picture</string>
+    <string name="done">Done</string>
 </resources>

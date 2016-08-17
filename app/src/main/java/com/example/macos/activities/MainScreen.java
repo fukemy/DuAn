@@ -68,6 +68,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public String ACTION_TYPE = "";
     private SharedPreferenceManager pref;
     boolean IS_SYNC_NOW = false;
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -117,7 +118,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             viewPager.setNestedScrollingEnabled(true);
 //            getWindow().setEnterTransition(new Explode().setDuration(400));
-        }else{
         }
 
 
@@ -146,6 +146,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             public void onFocusChange(View view, boolean isFocused) {
                 if(isFocused)
                     chooseRoadName.showDropDown();
+
+                if(chooseRoadName.getText().toString().length() == 0)
+                    d.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
 
             }
         });
@@ -179,10 +182,12 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         });
 
         builder.setView(dialogRoadNameInput);
+        builder.setCancelable(false);
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String ROAD_NAME = chooseRoadName.getText().toString().trim();
+                Logger.error("Road choosen: " + gson.toJson(listRoadName.get(ROAD_NAME)));
                 pref.saveString(GlobalParams.ROAD_CHOOSEN, gson.toJson(listRoadName.get(ROAD_NAME)));
             }
         });
@@ -308,6 +313,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     }
 
     public void initLayoutAndData(){
+        Logger.error("initLayoutAndData");
         viewPager = (ViewPager)findViewById(R.id.viewpager);
         adapter = new MainScreenAdapter(getSupportFragmentManager());
 
@@ -383,24 +389,38 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         String ROAD_NAME = pref.getString(GlobalParams.ROAD_CHOOSEN, "");
         if(ROAD_NAME != "") {
-            ROAD_NAME =  gson.fromJson(ROAD_NAME, RoadInformation.class).getTenDuong();
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Warning");
-        if(!ROAD_NAME.equals("")) {
-            builder.setMessage("Tên đường trước đó bạn đã nhập là '" + ROAD_NAME +"'"
-                    + ", " + getResources().getString(R.string.bancomuonchonlaitenduongchu));
-            builder.setCancelable(true);
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    showDialog();
-                }
-            });
-            builder.setNegativeButton("Cancel", null);
-
+            if(gson == null)
+                gson = new Gson();
+            try {
+                ROAD_NAME = gson.fromJson(ROAD_NAME, RoadInformation.class).getTenDuong();
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Warning");
+                    builder.setMessage("Tên đường trước đó bạn đã nhập là '" + ROAD_NAME +"'"
+                            + ", " + getResources().getString(R.string.bancomuonchonlaitenduongchu));
+                    builder.setCancelable(true);
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            showDialog();
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+                builder.show();
+            }catch(Exception e){
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setMessage("Hệ thống không nhận diện được tên đường đã chọn, xin vui lòng chọn lại");
+                builder.setCancelable(true);
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showDialog();
+                    }
+                });
+                builder.setCancelable(false);
+                builder.show();
+            }
         }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setMessage("Bạn chưa chọn tên đường, ấn OK để nhập!");
             builder.setCancelable(false);
             builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
@@ -409,9 +429,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                     showDialog();
                 }
             });
+            builder.show();
         }
 
-        builder.show();
+
     }
 
 

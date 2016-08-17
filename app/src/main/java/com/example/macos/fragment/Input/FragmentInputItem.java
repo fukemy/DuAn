@@ -1,20 +1,23 @@
 package com.example.macos.fragment.Input;
 
 
+import android.animation.Animator;
+import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -23,7 +26,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -38,6 +41,7 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.libraries.LinearLayoutThatDetectsSoftKeyboard;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -45,11 +49,15 @@ import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.gson.Gson;
 import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
+import com.mlsdev.rximagepicker.RxImagePicker;
+import com.mlsdev.rximagepicker.Sources;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import rx.functions.Action1;
 
 public class FragmentInputItem extends CustomFragment{
     private View rootView;
@@ -74,7 +82,7 @@ public class FragmentInputItem extends CustomFragment{
         ACTION_BUTTON_ITEM = s;
     }
     boolean isExpand = true;
-
+    DisplayMetrics dm;
     public String getCatalog(){
         return catalog;
     }
@@ -86,6 +94,8 @@ public class FragmentInputItem extends CustomFragment{
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fr_road_surface, container, false);
         initLayout();
+
+        dm = getResources().getDisplayMetrics();
 
         LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams)bottomView.getLayoutParams();
         btmParams.bottomMargin = FunctionUtils.dpToPx(216, getActivity());
@@ -126,7 +136,6 @@ public class FragmentInputItem extends CustomFragment{
         initContainer(container);
         listData.add(container);
         container.setTag(listData.size());
-
 
 //        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
 //            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -205,6 +214,7 @@ public class FragmentInputItem extends CustomFragment{
     private void initContainer(final LinearLayout container){
         final ImageView imgAddRoadName = (ImageView) container.findViewById(R.id.imgAddRoadName);
         ImageView imgCameraRoadName = (ImageView) container.findViewById(R.id.imgCameraRoadName);
+        final ImageView imgGaleryRoadName = (ImageView) container.findViewById(R.id.imgGaleryRoadName);
         ImageView imgVoidRoadName = (ImageView) container.findViewById(R.id.imgVoidRoadName);
         final ImageView imgEditRoadName = (ImageView) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
@@ -303,6 +313,13 @@ public class FragmentInputItem extends CustomFragment{
             }
         });
 
+        imgGaleryRoadName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                takeMultiPhoto(ORDER_CAMERA_POSITION);
+            }
+        });
+
         imgEditRoadName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -388,21 +405,53 @@ public class FragmentInputItem extends CustomFragment{
         }
     }
 
-    private final int TAKE_PICTURE = 1;
     private final int REQ_CODE_SPEECH_INPUT = 2;
     private final int CHOOSEN_PICTURE = 3;
-    private Uri imageUri;
 
-    public void takePhoto(int pos) {
+    private void takeMultiPhoto(int pos){
         ORDER_CAMERA_POSITION = pos;
 
         Config config = new Config();
-        //config.setTabBackgroundColor(R.color.colorAccent);
-        //config.setTabSelectionIndicatorColor(android.R.color.holo_orange_dark);
+        config.setSelectionLimit(4);
         ImagePickerActivity.setConfig(config);
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
         startActivityForResult(intent,CHOOSEN_PICTURE);
+    }
+
+    public void takePhoto(int pos) {
+        ORDER_CAMERA_POSITION = pos;
+
+        RxImagePicker.with(getActivity()).requestImage(Sources.CAMERA).subscribe(new Action1<Uri>() {
+            @Override
+            public void call(Uri uri) {
+                //Get image by uri using one of image loading libraries. I use Glide in sample app.
+                Logger.error("uri: " + uri);
+//                uri = Uri.parse("file://" + uri);
+                uri = Uri.parse("file://" + FunctionUtils.getRealPathFromUri(getActivity(), uri));
+                Logger.error("uri realpath: " + uri.getPath());
+                try {
+
+                    Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), uri);
+                    int size = rootView.findViewById(R.id.viewNull).getWidth();
+                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
+//                    Bitmap decodedBitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(),  size / 3, size / 3);
+                    final ImageView img = new ImageView(getActivity());
+                    img.setImageBitmap(decodedBitmap);
+                    img.setTag(uri.toString());
+                    img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    LinearLayout lnlFirstPlan = (LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.lnlFirstPlan);
+                    HorizontalScrollView scroll = (HorizontalScrollView) lnlFirstPlan.findViewById(R.id.scrImage);
+                    //((LinearLayout) scroll.getChildAt(0)).setLayoutTransition(new LayoutTransition());
+                    ((LinearLayout) scroll.getChildAt(0)).addView(img);
+                    addTouchListenerImage(img);
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
     }
 
     @Override
@@ -418,10 +467,6 @@ public class FragmentInputItem extends CustomFragment{
             case CHOOSEN_PICTURE:
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     ArrayList<Uri>  imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
-//                    if(imageUriList.size() > GlobalParams.MAX_UPLOAD_IMAGE_AMOUNT){
-//                        Toast.makeText(getActivity(), "Bạn không thể chọn nhiều hơn 3 bức ảnh!", Toast.LENGTH_SHORT).show();
-//                        return;
-//                    }
                     LinearLayout lnlHorizontal = null;
                     int i = 0;
                     if(imageUriList.size() > 0)
@@ -433,26 +478,24 @@ public class FragmentInputItem extends CustomFragment{
                                         LinearLayout.LayoutParams.WRAP_CONTENT);
                                 lParams.gravity = Gravity.CENTER;
                                 lnlHorizontal.setLayoutParams(lParams);
+                                lnlHorizontal.setLayoutTransition(new LayoutTransition());
                                 ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.lnlFirstPlan)).addView(lnlHorizontal);
                             }
-                            getActivity().getContentResolver().notifyChange(selectedImage, null);
-                            ContentResolver cr = getActivity().getContentResolver();
-                            Bitmap bitmap;
+
                             selectedImage = Uri.parse("file://" + selectedImage);
                             try {
-                                bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, selectedImage);
-                                //resize image
-                                Bitmap b = FunctionUtils.scaleBitmap(bitmap, rootView.findViewById(R.id.viewNull).getWidth() / 3, rootView.findViewById(R.id.viewNull).getWidth() / 3);
+
+                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
+                                int size = rootView.findViewById(R.id.viewNull).getWidth();
+                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
+
                                 final ImageView img = new ImageView(getActivity());
-                                img.setImageBitmap(b);
+                                img.setImageBitmap(decodedBitmap);
                                 img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);
-                                img.setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        showImage(img);
-                                    }
-                                });
+
+                                addTouchListenerImage(img);
+
                             } catch (Exception e) {
                                 Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
@@ -460,16 +503,149 @@ public class FragmentInputItem extends CustomFragment{
                             if(i == 3)
                                 i = 0;
                         }
-                }
-                break;
+                    }
+                 break;
         }
     }
+
+    private void moveImageToCurrent(final ImageView img, int currentY){
+        //img.setOnTouchListener(null);
+        Logger.error("move image to current");
+        img.animate().y(currentY);
+    }
+
+    private void addTouchListenerImage(final ImageView img){
+        img.setOnTouchListener(new View.OnTouchListener() {
+            private int initialY;
+            private float initialTouchY;
+            int currentPosition = 0;
+            int temp = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                // enlarge animation
+                enlargeHeight = ObjectAnimator.ofFloat(img,"scaleY", 1f, 0.7f);
+                enlargeHeight.setDuration(200);
+                enlargeWidth = ObjectAnimator.ofFloat(img,"scaleX", 1f, 0.7f);
+                enlargeWidth.setDuration(200);
+
+
+                // shink animation
+                shrinkHeight = ObjectAnimator.ofFloat(img,"scaleY", 0.7f, 1f);
+                shrinkHeight.setDuration(200);
+                shrinkWidth = ObjectAnimator.ofFloat(img,"scaleX", 0.7f, 1f);
+                shrinkWidth.setDuration(200);
+                shrinkWidth.addListener(new Animator.AnimatorListener() {
+                    @Override
+                    public void onAnimationStart(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationEnd(Animator animation) {
+                        img.setAlpha(1f);
+                        moveImageToCurrent(img, initialY);
+                    }
+
+                    @Override
+                    public void onAnimationCancel(Animator animation) {
+
+                    }
+
+                    @Override
+                    public void onAnimationRepeat(Animator animation) {
+
+                    }
+                });
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        scroll.requestDisallowInterceptTouchEvent(false);
+                        initialY = (int) img.getY();
+                        initialTouchY = event.getRawY();
+
+                        mHandler.postDelayed(myRunnable, TIME_ALPHA_LONGPRESS);
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        isRunningAnimation = false;
+                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 250){
+                            ((ViewGroup) img.getParent()).removeView(img);
+                        }else {
+                            Logger.error("temp: " + temp + " current: " + currentPosition);
+                            if (img.getAlpha() == 1f) {
+                                mHandler.removeCallbacks(myRunnable);
+                                showImage(img);
+                            } else {
+                                shinkImage();
+                            }
+                        }
+                        return true;
+                    case MotionEvent.ACTION_MOVE:
+                        temp = initialY + (int) (event.getRawY() - initialTouchY);
+
+                        scroll.requestDisallowInterceptTouchEvent(true);
+
+                        if (isRunningAnimation) {
+                                Logger.error("temp: " + temp);
+                            img.setY(temp);
+                            float alpha = (1 - (float)Math.abs(temp) / 120);
+                            if( alpha <= 1 && alpha >= 0)
+                                img.setAlpha(alpha);
+                        } else {
+                            if (Math.abs(temp - currentPosition) > 15) {
+                                Logger.error("removeCallbacks");
+                                mHandler.removeCallbacks(myRunnable);
+                            }
+                        }
+                        currentPosition = temp;
+                        return true;
+                    case MotionEvent.ACTION_CANCEL:
+                        Logger.error("ACTION_CANCEL");
+                        shinkImage();
+                        mHandler.removeCallbacks(myRunnable);
+                        return true;
+                    case MotionEvent.ACTION_OUTSIDE:
+                        Logger.error("ACTION_OUTSIDE");
+                        mHandler.removeCallbacks(myRunnable);
+                        return true;
+                }
+                return false;
+            }
+        });
+
+    }
+    boolean isRunningAnimation = false;
+    private final int TIME_ALPHA_LONGPRESS = 1000;
+
+    private void enlargeImage() {
+        Logger.error("enlargeImage!");
+        isRunningAnimation = true;
+        enlargeWidth.start();
+        enlargeHeight.start();
+    }
+
+    private void shinkImage() {
+        mHandler.removeCallbacks(myRunnable);
+        shrinkWidth.start();
+        shrinkHeight.start();
+    }
+
+    ObjectAnimator enlargeWidth, enlargeHeight, shrinkWidth, shrinkHeight;
+    Handler mHandler = new Handler();
+    Runnable myRunnable = new Runnable() {
+
+        @Override
+        public void run() {
+            Logger.error("my RUnnable!");
+            enlargeImage();
+        }
+    };
+    private float currentX = 0, currentY = 0;
 
     private void showImage(ImageView img){
         Intent in = new Intent(getActivity(), AcImageInformation.class);
         in.putExtra("imgRef", img.getTag().toString());
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-
+            img.setTransitionName("viewimage");
             ActivityOptionsCompat options =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), img,
                             "viewimage");
@@ -522,9 +698,9 @@ public class FragmentInputItem extends CustomFragment{
 
             if(lnl.getChildAt(j) instanceof MaterialBetterSpinner){
                 if(b)
-                    ((MaterialBetterSpinner)lnl.getChildAt(j)).setEnabled(true);
+                    lnl.getChildAt(j).setEnabled(true);
                 else
-                    ((MaterialBetterSpinner)lnl.getChildAt(j)).setEnabled(false);
+                    lnl.getChildAt(j).setEnabled(false);
             }
 
             if(lnl.getChildAt(j) instanceof ImageView){
@@ -533,12 +709,6 @@ public class FragmentInputItem extends CustomFragment{
                     img.setEnabled(b);
                     img.setVisibility(b ? View.VISIBLE : View.GONE);
                 }
-            }
-
-            if(lnl.getChildAt(j) instanceof FrameLayout) {
-                FrameLayout fr = (FrameLayout) lnl.getChildAt(j);
-                EditText edt = (EditText) fr.getChildAt(0);
-
             }
 
             if(lnl.getChildAt(j) instanceof RelativeLayout) {

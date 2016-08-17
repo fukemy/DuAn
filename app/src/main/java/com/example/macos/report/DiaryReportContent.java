@@ -1,11 +1,17 @@
 package com.example.macos.report;
 
+import android.app.SharedElementCallback;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +34,6 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
 import com.example.macos.utilities.FunctionUtils;
-import com.google.android.gms.internal.du;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,6 +44,8 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.gson.Gson;
+
+import java.io.IOException;
 
 public class DiaryReportContent extends AppCompatActivity {
     private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary;
@@ -58,6 +65,26 @@ public class DiaryReportContent extends AppCompatActivity {
         initData();
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setExitSharedElementCallback(new SharedElementCallback() {
+                @Override
+                public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
+                    int bitmapWidth = Math.round(screenBounds.width());
+                    int bitmapHeight = Math.round(screenBounds.height());
+                    Bitmap bitmap = null;
+                    if (bitmapWidth > 0 && bitmapHeight > 0) {
+                        Matrix matrix = new Matrix();
+                        matrix.set(viewToGlobalMatrix);
+                        matrix.postTranslate(-screenBounds.left, -screenBounds.top);
+                        bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        canvas.concat(matrix);
+                        sharedElement.draw(canvas);
+                    }
+                    return bitmap;
+                }
+            });
+
+
             Transition transition = new Explode().setDuration(600);
             transition.addListener(new Transition.TransitionListener() {
                 @Override
@@ -67,7 +94,11 @@ public class DiaryReportContent extends AppCompatActivity {
 
                 @Override
                 public void onTransitionEnd(Transition transition) {
-                    initMap();
+                    try {
+                        initMap();
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
 
                 @Override
@@ -87,9 +118,13 @@ public class DiaryReportContent extends AppCompatActivity {
             });
             getWindow().setEnterTransition(transition);
             getWindow().setSharedElementExitTransition(new Fade().setDuration(300));
-            getWindow().setExitTransition(new Fade().setDuration(300));
+            getWindow().setExitTransition(new Fade().setDuration(100));
         }else{
-            initMap();
+            try {
+                initMap();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -211,28 +246,58 @@ public class DiaryReportContent extends AppCompatActivity {
                 lnlHorizontal.setLayoutParams(lParams);
                 imgContainer.addView(lnlHorizontal);
             }
+
+            final ImageView img = new ImageView(DiaryReportContent.this);
+            img.setTag(uri.toString());
+
+            lnlHorizontal.addView(img);
+            new ApplyImage(img, uri).execute();
+            if(i == 2)
+                i = 0;
+        }
+        lnlInput.addView(container);
+    }
+
+    private class ApplyImage extends AsyncTask<Void, Void, Bitmap>{
+        ImageView img;
+        Uri uri;
+        public ApplyImage(ImageView img, Uri uri){
+            this.img = img;
+            this.uri = uri;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Bitmap doInBackground(Void... params) {
             try {
-                Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
+                Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
                 //resize image
                 Bitmap b = FunctionUtils.scaleBitmap(bitmap, dm.widthPixels / 2, dm.widthPixels / 2);
-                final ImageView img = new ImageView(DiaryReportContent.this);
-                img.setImageBitmap(b);
-                img.setTag(uri.toString());
+                return b;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+            if(bitmap != null){
+                img.setImageBitmap(bitmap);
                 img.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         showImage(img);
                     }
                 });
-                lnlHorizontal.addView(img);
-            } catch (Exception e) {
-                Toast.makeText(DiaryReportContent.this, "Failed to load", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
             }
-            if(i == 2)
-                i = 0;
         }
-        lnlInput.addView(container);
     }
 
     private void showImage(ImageView img){

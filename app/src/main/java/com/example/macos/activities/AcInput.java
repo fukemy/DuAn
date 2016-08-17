@@ -2,13 +2,19 @@ package com.example.macos.activities;
 
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
+import android.app.SharedElementCallback;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -16,11 +22,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.transition.Slide;
-import android.view.Gravity;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 
@@ -91,6 +96,26 @@ public class AcInput extends FragmentActivity {
             dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             dialog.setCanceledOnTouchOutside(false);
             dialog.show();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setExitSharedElementCallback(new SharedElementCallback() {
+                @Override
+                public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
+                    int bitmapWidth = Math.round(screenBounds.width());
+                    int bitmapHeight = Math.round(screenBounds.height());
+                    Bitmap bitmap = null;
+                    if (bitmapWidth > 0 && bitmapHeight > 0) {
+                        Matrix matrix = new Matrix();
+                        matrix.set(viewToGlobalMatrix);
+                        matrix.postTranslate(-screenBounds.left, -screenBounds.top);
+                        bitmap = Bitmap.createBitmap(bitmapWidth, bitmapHeight, Bitmap.Config.ARGB_8888);
+                        Canvas canvas = new Canvas(bitmap);
+                        canvas.concat(matrix);
+                        sharedElement.draw(canvas);
+                    }
+                    return bitmap;
+                }
+            });
         }
 
     }
@@ -326,9 +351,6 @@ public class AcInput extends FragmentActivity {
                 f.setActionDone("Done");
             else
                 f.setActionDone("Next");
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                f.setEnterTransition(new Slide(Gravity.BOTTOM).addTarget(R.id.scroll));
-            }
             f.setCatalog(list.get(i).getItemName());
             adapter.addFragment(f, list.get(i).getItemName());
         }
@@ -413,6 +435,7 @@ public class AcInput extends FragmentActivity {
                     ImageView img = (ImageView) lnl.getChildAt(j);
                     if (img.getTag() != null) {
                         if (img.getTag().toString().length() > 10) {
+                            Logger.error("img ref: " + img.getTag().toString());
                             String temp = "" +  new Random().nextInt(20);
                             imgModal = new ImageModel();
                             String type = img.getTag().toString().substring(img.getTag().toString().lastIndexOf("."));
@@ -431,6 +454,12 @@ public class AcInput extends FragmentActivity {
 
                 if (lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
                     collectNestedData((LinearLayout) lnl.getChildAt(j));
+                }
+
+                if(lnl.getChildAt(j) instanceof HorizontalScrollView) {
+                    Logger.error("found scrollview");
+                    HorizontalScrollView scroll = (HorizontalScrollView) lnl.getChildAt(j);
+                    collectNestedData((LinearLayout) scroll.getChildAt(0));
                 }
             }catch (Exception e){
                 e.printStackTrace();

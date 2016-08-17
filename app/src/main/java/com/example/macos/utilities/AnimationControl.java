@@ -132,7 +132,10 @@ public class AnimationControl {
                             e.printStackTrace();
                         }finally {
                             {
-                                swap.doListWork(en);
+                                if(swap != null) {
+                                    swap.doListWork(en);
+                                }else{
+                                }
                             }
                         }
                     }
