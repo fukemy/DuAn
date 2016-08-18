@@ -325,6 +325,7 @@ public class AcInput extends FragmentActivity {
                             @Override
                             public boolean onMyLocationButtonClick() {
                                 IS_FOUND_LOCATION = false;
+                                gMap.setOnMyLocationChangeListener(myLocationChangeListener);
                                 return false;
                             }
                         });
@@ -399,6 +400,9 @@ public class AcInput extends FragmentActivity {
                         .tilt(40)                   // Sets the tilt of the camera to 30 degrees
                         .build();                   // Creates a CameraPosition from the builder
                 gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+//                gMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLongitude(), location.getLatitude())));
+//                gMap.animateCamera(CameraUpdateFactory.zoomTo(17));
+                gMap.setOnMyLocationChangeListener(null);
             }
         }
     };
@@ -414,7 +418,7 @@ public class AcInput extends FragmentActivity {
              */
             try {
                 if (lnl.getChildAt(j) instanceof EditText) {
-                    String tag = ((EditText) lnl.getChildAt(j)).getTag().toString();
+                    String tag = (lnl.getChildAt(j)).getTag().toString();
                     String text = ((EditText) lnl.getChildAt(j)).getText().toString();
                     if (tag.equals("promptCatalog")) {   // for catalog spin
                         int selectionId = Integer.parseInt("" + text.charAt(0));

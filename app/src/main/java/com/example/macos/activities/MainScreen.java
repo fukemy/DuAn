@@ -395,16 +395,16 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 ROAD_NAME = gson.fromJson(ROAD_NAME, RoadInformation.class).getTenDuong();
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("Warning");
-                    builder.setMessage("Tên đường trước đó bạn đã nhập là '" + ROAD_NAME +"'"
-                            + ", " + getResources().getString(R.string.bancomuonchonlaitenduongchu));
-                    builder.setCancelable(true);
-                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            showDialog();
-                        }
-                    });
-                    builder.setNegativeButton("Cancel", null);
+                builder.setMessage("Tên đường trước đó bạn đã nhập là '" + ROAD_NAME + "'"
+                        + ", " + getResources().getString(R.string.bancomuonchonlaitenduongchu));
+                builder.setCancelable(true);
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        showDialog();
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
                 builder.show();
             }catch(Exception e){
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

@@ -20,6 +20,7 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.information.FragmentViewFullReport;
 import com.example.macos.interfaces.iListWork;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.CustomFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -171,37 +172,49 @@ public class FragmentReportMap extends CustomFragment{
                 if(e.getDaValue().getLocationItem() != null && e.getDaValue().getLocationItem().getLocation() != null){
                     MarkerOptions options = new MarkerOptions();
                     options.title("Danh mục : " + e.getDaValue().getAction());
-                    String promptItem;
+                    String dataTypeName;
+                    String promptItemname;
                     String status;
                     String infor;
                     try {
-                        promptItem = e.getDaValue().getDataTypeName().equals("") ? "Chưa có dữ liệu" : e.getDaValue().getDataTypeName();
+                        dataTypeName = (e.getDaValue().getDataName().equals("null") && e.getDaValue().getDataName().equals("")) ? "Chưa có dữ liệu" : e.getDaValue().getDataName();
                     }catch(Exception ex){
-                        promptItem = "Chưa có dữ liệu";
+                        ex.printStackTrace();
+                        dataTypeName = "Chưa có dữ liệu";
                     }
 
                     try {
-                        status = e.getDaValue().getMoTaTinhTrang().equals("") ? "Chưa có dữ liệu" : e.getDaValue().getThangDanhGia();
+                        promptItemname = (e.getDaValue().getDataTypeName().equals("null") && e.getDaValue().getDataTypeName().equals("")) ? "Chưa có dữ liệu" : e.getDaValue().getDataTypeName();
                     }catch(Exception ex){
+                        ex.printStackTrace();
+                        promptItemname = "Chưa có dữ liệu";
+                    }
+
+                    try {
+                        status = (e.getDaValue().getThangDanhGia().equals("null") && e.getDaValue().getThangDanhGia().equals("")) ? "Chưa có dữ liệu" : e.getDaValue().getThangDanhGia();
+                    }catch(Exception ex){
+                        ex.printStackTrace();
                         status = "Chưa có dữ liệu";
                     }
 
                     try {
-                        infor = e.getDaValue().getMoTaTinhTrang().equals("") ? "Chưa có dữ liệu" : e.getDaValue().getMoTaTinhTrang();
+                        infor = (e.getDaValue().getMoTaTinhTrang().equals("null") && e.getDaValue().getMoTaTinhTrang().equals("")) ? "Chưa có dữ liệu" : e.getDaValue().getMoTaTinhTrang();
                     }catch(Exception ex){
+                        ex.printStackTrace();
                         infor = "Chưa có dữ liệu";
                     }
-                    options.snippet("Hạng mục : " + promptItem
+                    options.snippet("Hạng mục : " + dataTypeName
+                            + "\n Danh mục: " + promptItemname
                             + "\n Mức độ: " + status
                             + "\n Đánh giá: " + infor);
                     options.position(new LatLng(e.getDaValue().getLocationItem().getLocation().getLatitude(), e.getDaValue().getLocationItem().getLocation().getLongitude()));
-
                     options.draggable(true);
                     options.icon(icon);
                     Marker marker = gMap.addMarker(options);
                     listMarkerData.put(marker, e);
-                    System.out.println("data :" + e.getDaValue().getDataTypeName());
+                    Logger.error("data :" + e.getDaValue().getDataTypeName());
                 }
+
                 gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
                     public View getInfoWindow(Marker arg0) {
                         return null;
@@ -235,34 +248,30 @@ public class FragmentReportMap extends CustomFragment{
                     Iterator myVeryOwnIterator = listMarkerData.keySet().iterator();
                     while(myVeryOwnIterator.hasNext()) {
                         Marker markerKey = (Marker) myVeryOwnIterator.next();
+                        Logger.error("marker key: " + markerKey.getPosition() + "marker: " + marker.getPosition());
                         if(markerKey.getTitle().trim().equals(marker.getTitle().trim())
-                            && markerKey.getTitle().trim().equals(marker.getTitle().trim())) {
-                            System.out.println("marker found: -----------");
+                            && markerKey.getPosition().equals(marker.getPosition())) {
+                            Logger.error("marker found: ----------- " + listMarkerData.get(markerKey).getDaValue().toString());
                             EnDataModel statusData = listMarkerData.get(markerKey);
                             FragmentViewFullReport reportInformation = new FragmentViewFullReport();
                             reportInformation.setData(statusData);
 
                             reportInformation.show(getChildFragmentManager(), "test");
-//
+
 //                            final Intent in = new Intent(getActivity(), DiaryReportContent.class);
 //                            Gson gson = new Gson();
 //                            in.putExtra("data",  gson.toJson(statusData));
 //                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                                Handler handler = new Handler();
-//                                handler.postDelayed(new Runnable() {
-//                                    @Override
-//                                    public void run() {
 //                                        ActivityOptionsCompat options =
-//                                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), infoWindow ,
+//                                                ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
+//                                                        infoWindow.getBackground(),
 //                                                        getActivity().getResources().getString(R.string.show_map));
-//                                        getActivity().startActivity(in, options.toBundle());
-//                                    }
-//                                }, 100);
+//                                getActivity().startActivity(in, options.toBundle());
 //
 //                            }else{
 //                                getActivity().startActivity(in);
 //                            }
-
+                            break;
                         }
                     }
                 }

@@ -26,10 +26,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,20 +55,17 @@ import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import rx.functions.Action1;
 
 public class FragmentInputItem extends CustomFragment{
     private View rootView;
-    private ImageView imgDone;
     private LinearLayout  lnlAll, container;
     private List<LinearLayout> listData;
-    private EditText edtComment;
     private TextView tvCurrentLocation, tvRoadNameEntered;
     private LinearLayoutThatDetectsSoftKeyboard linearLayoutThatDetectsSoftKeyboard;
-    private LinearLayout bottomView;
-    private int ORDER_CAMERA_POSITION = 0;
+    private FrameLayout bottomView;
+    private int ORDER_CAMERA_POSITION = 0, ORDER_SPEAK_POSITION = 0;
     private View keyBoardView;
     public String catalog = "";
     public String ACTION_BUTTON_ITEM = "Done";
@@ -83,12 +80,8 @@ public class FragmentInputItem extends CustomFragment{
     }
     boolean isExpand = true;
     DisplayMetrics dm;
-    public String getCatalog(){
-        return catalog;
-    }
-    public String getSummary(){
-        return edtComment.getText().toString();
-    }
+    private ImageView viewingImage;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -124,12 +117,16 @@ public class FragmentInputItem extends CustomFragment{
         tvCurrentLocation.setText("Vị trí hiện tại: Đang cập nhập!");
 
         keyBoardView =  rootView.findViewById(R.id.keyBoardView);
-        bottomView =  (LinearLayout)rootView.findViewById(R.id.bottomView);
+        bottomView =  (FrameLayout)rootView.findViewById(R.id.lnlDone);
         scroll = (NestedScrollView) rootView.findViewById(R.id.scroll);
 
-        imgDone = (ImageView) rootView.findViewById(R.id.imgDone);
-        edtComment = (EditText) rootView.findViewById(R.id.edtComment);
-        FunctionUtils.setupEdittext(edtComment, getActivity());
+        bottomView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FunctionUtils.hideSoftInput(rootView, getActivity());
+                FunctionUtils.showConfirmDialog(getResources().getString(R.string.bancochacchandanhapdayduthongtin), getActivity(), dialogAction);
+            }
+        });
 
         lnlAll = (LinearLayout) rootView.findViewById(R.id.lnlAll);
         container = (LinearLayout) rootView.findViewById(R.id.container);
@@ -175,14 +172,6 @@ public class FragmentInputItem extends CustomFragment{
             }
         });
 
-        imgDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FunctionUtils.hideSoftInput(rootView, getActivity());
-                FunctionUtils.showConfirmDialog(getResources().getString(R.string.bancochacchandanhapdayduthongtin), getActivity(), dialogAction);
-            }
-        });
-
         tvCurrentLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,9 +202,9 @@ public class FragmentInputItem extends CustomFragment{
 
     private void initContainer(final LinearLayout container){
         final ImageView imgAddRoadName = (ImageView) container.findViewById(R.id.imgAddRoadName);
-        ImageView imgCameraRoadName = (ImageView) container.findViewById(R.id.imgCameraRoadName);
+        final ImageView imgCameraRoadName = (ImageView) container.findViewById(R.id.imgCameraRoadName);
         final ImageView imgGaleryRoadName = (ImageView) container.findViewById(R.id.imgGaleryRoadName);
-        ImageView imgVoidRoadName = (ImageView) container.findViewById(R.id.imgVoidRoadName);
+        final ImageView imgVoidRoadName = (ImageView) container.findViewById(R.id.imgVoidRoadName);
         final ImageView imgEditRoadName = (ImageView) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
@@ -282,6 +271,7 @@ public class FragmentInputItem extends CustomFragment{
         });
 
         final int ORDER_CAMERA_POSITION = listData.size();
+        final int ORDER_SPEAK_POSITION = listData.size();
 
         imgAddRoadName.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -293,6 +283,9 @@ public class FragmentInputItem extends CustomFragment{
                     imgAddRoadName.setImageDrawable(null);
                     imgAddRoadName.setTag("noMoreAdd");
                     addNewContainer();
+                    imgVoidRoadName.setVisibility(View.GONE);
+                    imgCameraRoadName.setVisibility(View.GONE);
+                    imgGaleryRoadName.setVisibility(View.GONE);
                     imgEditRoadName.setVisibility(View.VISIBLE);
                     imgDeleteRoadName.setVisibility(View.VISIBLE);
                     imgAddRoadName.setVisibility(View.GONE);
@@ -329,12 +322,18 @@ public class FragmentInputItem extends CustomFragment{
                         disableNestedData(listData.get(ORDER_CAMERA_POSITION), true);
                         imgEditRoadName.setTag("done");
                         imgEditRoadName.setImageResource(R.mipmap.done_black);
+                        imgVoidRoadName.setVisibility(View.VISIBLE);
+                        imgCameraRoadName.setVisibility(View.VISIBLE);
+                        imgGaleryRoadName.setVisibility(View.VISIBLE);
                         System.out.println("edit");
                     } else {
                         if (imgEditRoadName.getTag().toString().equals("done")) {
                             disableNestedData(listData.get(ORDER_CAMERA_POSITION), false);
                             imgEditRoadName.setTag("edit");
                             imgEditRoadName.setImageResource(R.mipmap.edit_black);
+                            imgVoidRoadName.setVisibility(View.GONE);
+                            imgCameraRoadName.setVisibility(View.GONE);
+                            imgGaleryRoadName.setVisibility(View.GONE);
                             System.out.println("done");
                         }
                     }
@@ -370,13 +369,13 @@ public class FragmentInputItem extends CustomFragment{
         imgVoidRoadName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                promptSpeechInput();
+                promptSpeechInput(ORDER_SPEAK_POSITION);
             }
         });
     }
 
     private void addNewContainer(){
-        disableNestedData(((LinearLayout) listData.get(listData.size() - 1).findViewById(R.id.lnlContainerData)), false);
+        disableNestedData(((LinearLayout) listData.get(listData.size() - 1).findViewById(R.id.lnlFirstPlan)), false);
         LinearLayout temp;
         temp = (LinearLayout) LayoutInflater.from(getActivity()).inflate(R.layout.road_surface_include, null, false);
         initContainer(temp);
@@ -391,13 +390,15 @@ public class FragmentInputItem extends CustomFragment{
         }, 100);
     }
 
-    private void promptSpeechInput() {
+    private void promptSpeechInput(int pos) {
+        ORDER_SPEAK_POSITION = pos;
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+//        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "vi_VN");
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT,
-                "Say something!");
+                "Nói và chờ ít giây đề nhập mô tả tình trạng!");
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
@@ -407,6 +408,7 @@ public class FragmentInputItem extends CustomFragment{
 
     private final int REQ_CODE_SPEECH_INPUT = 2;
     private final int CHOOSEN_PICTURE = 3;
+    private final int SHOW_IMAGE = 5;
 
     private void takeMultiPhoto(int pos){
         ORDER_CAMERA_POSITION = pos;
@@ -425,13 +427,10 @@ public class FragmentInputItem extends CustomFragment{
         RxImagePicker.with(getActivity()).requestImage(Sources.CAMERA).subscribe(new Action1<Uri>() {
             @Override
             public void call(Uri uri) {
-                //Get image by uri using one of image loading libraries. I use Glide in sample app.
                 Logger.error("uri: " + uri);
-//                uri = Uri.parse("file://" + uri);
                 uri = Uri.parse("file://" + FunctionUtils.getRealPathFromUri(getActivity(), uri));
                 Logger.error("uri realpath: " + uri.getPath());
                 try {
-
                     Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), uri);
                     int size = rootView.findViewById(R.id.viewNull).getWidth();
                     Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
@@ -460,8 +459,25 @@ public class FragmentInputItem extends CustomFragment{
         switch (requestCode) {
             case REQ_CODE_SPEECH_INPUT:
                 if (resultCode == Activity.RESULT_OK && null != data) {
-                    Toast.makeText(getActivity(), "Fail", Toast.LENGTH_SHORT).show();
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    if(result != null && result.size() > 0){
+                        LinearLayout lnlTemp = ((LinearLayout) listData.get(ORDER_SPEAK_POSITION).findViewById(R.id.lnlFirstPlan));
+                        LinearLayout lnlInputInformation = ((LinearLayout) lnlTemp.findViewById(R.id.lnlInputInformation));
+                        EditText edtInformation = (EditText) lnlInputInformation.findViewById(R.id.edtInformation);
+                        edtInformation.setText(result.get(0));
+                    }
+                }
+                break;
+            case SHOW_IMAGE:
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    boolean isDelete = data.getBooleanExtra("isDelete", false);
+                    Logger.error("Show image result: " + isDelete);
+                    if(isDelete){
+                        if(viewingImage != null){
+                            ((ViewGroup) viewingImage.getParent()).removeView(viewingImage);
+                            viewingImage = null;
+                        }
+                    }
                 }
                 break;
             case CHOOSEN_PICTURE:
@@ -507,11 +523,17 @@ public class FragmentInputItem extends CustomFragment{
                  break;
         }
     }
-
-    private void moveImageToCurrent(final ImageView img, int currentY){
+    private void moveImageToCurrent(final ImageView img, final int currentY){
         //img.setOnTouchListener(null);
         Logger.error("move image to current");
-        img.animate().y(currentY);
+        img.animate().y(currentY).withEndAction(new Runnable() {
+            @Override
+            public void run() {
+                isRunningAnimation = false;
+                img.setY(currentY);
+                img.setEnabled(true);
+            }
+        });
     }
 
     private void addTouchListenerImage(final ImageView img){
@@ -538,13 +560,14 @@ public class FragmentInputItem extends CustomFragment{
                 shrinkWidth.addListener(new Animator.AnimatorListener() {
                     @Override
                     public void onAnimationStart(Animator animation) {
-
+                        img.setEnabled(false);
                     }
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         img.setAlpha(1f);
                         moveImageToCurrent(img, initialY);
+//                        isRunningAnimation = false;
                     }
 
                     @Override
@@ -559,15 +582,16 @@ public class FragmentInputItem extends CustomFragment{
                 });
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        scroll.requestDisallowInterceptTouchEvent(false);
+                        temp = 0;
+                        currentPosition = 0;
                         initialY = (int) img.getY();
                         initialTouchY = event.getRawY();
-
                         mHandler.postDelayed(myRunnable, TIME_ALPHA_LONGPRESS);
                         return true;
                     case MotionEvent.ACTION_UP:
+                        scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 250){
+                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 350){
                             ((ViewGroup) img.getParent()).removeView(img);
                         }else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
@@ -580,19 +604,21 @@ public class FragmentInputItem extends CustomFragment{
                         }
                         return true;
                     case MotionEvent.ACTION_MOVE:
+
                         temp = initialY + (int) (event.getRawY() - initialTouchY);
-
-                        scroll.requestDisallowInterceptTouchEvent(true);
-
                         if (isRunningAnimation) {
-                                Logger.error("temp: " + temp);
+                            Logger.error("temp: " + temp);
                             img.setY(temp);
-                            float alpha = (1 - (float)Math.abs(temp) / 120);
-                            if( alpha <= 1 && alpha >= 0)
-                                img.setAlpha(alpha);
+                            float alpha = (1 - (float)Math.abs(temp) / 200);
+                            if(alpha <= 1 && alpha >= 0)
+                                 img.setAlpha(alpha);
+                            else if(alpha > 1)
+                                img.setAlpha(1f);
+                            else
+                                img.setAlpha(0f);
                         } else {
                             if (Math.abs(temp - currentPosition) > 15) {
-                                Logger.error("removeCallbacks");
+                                Logger.error("removeCallbacks: temp: " + temp + " - current: " + currentPosition);
                                 mHandler.removeCallbacks(myRunnable);
                             }
                         }
@@ -621,6 +647,7 @@ public class FragmentInputItem extends CustomFragment{
         isRunningAnimation = true;
         enlargeWidth.start();
         enlargeHeight.start();
+        scroll.requestDisallowInterceptTouchEvent(true);
     }
 
     private void shinkImage() {
@@ -639,9 +666,9 @@ public class FragmentInputItem extends CustomFragment{
             enlargeImage();
         }
     };
-    private float currentX = 0, currentY = 0;
 
     private void showImage(ImageView img){
+        viewingImage = img;
         Intent in = new Intent(getActivity(), AcImageInformation.class);
         in.putExtra("imgRef", img.getTag().toString());
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
@@ -649,9 +676,9 @@ public class FragmentInputItem extends CustomFragment{
             ActivityOptionsCompat options =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), img,
                             "viewimage");
-            startActivity(in, options.toBundle());
+            startActivityForResult(in, SHOW_IMAGE, options.toBundle());
         }else{
-            startActivity(in);
+            startActivityForResult(in, SHOW_IMAGE);
         }
     }
 
@@ -682,8 +709,6 @@ public class FragmentInputItem extends CustomFragment{
 
     private void disableNestedData(LinearLayout lnl, boolean b){
 
-        lnl.setClickable(b);
-        lnl.setEnabled(false);
         if(lnl.getId() == R.id.lnlFirstPlan) {
 //            if (!b)
 //                lnl.setBackground(getResources().getDrawable(R.drawable.border_disable));
@@ -705,22 +730,31 @@ public class FragmentInputItem extends CustomFragment{
 
             if(lnl.getChildAt(j) instanceof ImageView){
                 ImageView img = (ImageView) lnl.getChildAt(j);
-                if(img.getTag() == null) {
-                    img.setEnabled(b);
-                    img.setVisibility(b ? View.VISIBLE : View.GONE);
+                if(img.getTag() != null) {
+                    if(img.getTag().toString().length() > 15) {
+                        Logger.error("disable img tag: " + img.getTag().toString());
+                        img.setEnabled(b);
+                        img.setAlpha(b ? 1f : 0.6f);
+                    }
                 }
             }
 
-            if(lnl.getChildAt(j) instanceof RelativeLayout) {
-                RelativeLayout fr = (RelativeLayout) lnl.getChildAt(j);
-                EditText edt = (EditText) fr.getChildAt(1);
-                edt.setEnabled(b);
-                LinearLayout lnlInputIcon = (LinearLayout) fr.findViewById(R.id.lnlInputIcon);
-                disableNestedData(lnlInputIcon, b);
-            }
+//            if(lnl.getChildAt(j) instanceof RelativeLayout) {
+//                RelativeLayout fr = (RelativeLayout) lnl.getChildAt(j);
+//                EditText edt = (EditText) fr.getChildAt(1);
+//                edt.setEnabled(b);
+//                LinearLayout lnlInputIcon = (LinearLayout) fr.findViewById(R.id.lnlInputIcon);
+//                disableNestedData(lnlInputIcon, b);
+//            }
 
             if(lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
                 disableNestedData((LinearLayout)lnl.getChildAt(j), b);
+            }
+
+            if(lnl.getChildAt(j) instanceof HorizontalScrollView) {
+                Logger.error("found scrollview");
+                HorizontalScrollView scroll = (HorizontalScrollView) lnl.getChildAt(j);
+                disableNestedData((LinearLayout) scroll.getChildAt(0), b);
             }
         }
     }

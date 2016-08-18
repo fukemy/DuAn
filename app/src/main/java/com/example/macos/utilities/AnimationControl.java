@@ -4,7 +4,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.view.View;
@@ -52,10 +51,19 @@ public class AnimationControl {
         v.startAnimation(scale);
     }
 
+    public static void showIcon(View v){
+        ScaleAnimation scale = new ScaleAnimation(0f, 1f, 0f, 1f, Animation.RELATIVE_TO_SELF, 0.5f
+                , Animation.RELATIVE_TO_SELF, 0.5f);
+        scale.setDuration(mShortAnimationDurationEffect);
+        scale.setFillAfter(true);
+        scale.setInterpolator(new LinearInterpolator());
+        v.startAnimation(scale);
+    }
+
     public static void translateView(View v, int fromX, int toX, int fromY, int toY, boolean isFillAfter,
-                                     int time, Context mCtx){
+                                     int time){
         TranslateAnimation trans = new TranslateAnimation(fromX, toX, fromY, toY);
-        trans.setInterpolator(new DecelerateInterpolator());
+        trans.setInterpolator(new LinearInterpolator());
         trans.setDuration(time == 0 ? mShortAnimationDurationEffect : time);
         trans.setFillAfter(isFillAfter);
         v.startAnimation(trans);

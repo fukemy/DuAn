@@ -27,7 +27,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'de.greenrobot:greendao:2.1.0'
-    compile 'com.android.support:support-v4:23.4.0'
+    compile ('com.android.support:support-v4:23.4.0')
     compile 'com.android.support:design:23.4.0'
     compile 'com.google.android.gms:play-services:6.+'
     compile 'com.github.douglasjunior.BetterSpinner:library-material:bugfix-1.1.0-2'
@@ -36,4 +36,5 @@ dependencies {
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1@aar' //for viewpager indicator
     compile 'com.google.code.gson:gson:2.2.+'
+    //compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
 }

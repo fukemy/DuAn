@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.ImageView;
 
+import com.example.macos.libraries.Logger;
+
 import java.io.IOException;
 
 /**
@@ -49,6 +51,7 @@ public class AsyncTaskHelper {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
             if(bitmap != null){
+                Logger.error("Done load img");
                 img.setImageBitmap(bitmap);
             }
         }

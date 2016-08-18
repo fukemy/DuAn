@@ -14,13 +14,13 @@
         android:paddingBottom="10dp">
 
         <LinearLayout
-            android:clipChildren="false"
-            android:clipToPadding="false"
             android:id="@+id/lnlFirstPlan"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:animateLayoutChanges="true"
             android:background="@color/grayColor30"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
@@ -80,15 +80,15 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginLeft="20dp"
-                    android:background="@mipmap/camera_black"/>
+                    android:background="@mipmap/camera_black" />
 
                 <ImageView
                     android:id="@+id/imgGaleryRoadName"
-                    android:layout_marginTop="2dp"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_marginLeft="28dp"
-                    android:background="@mipmap/galery"/>
+                    android:layout_marginTop="2dp"
+                    android:background="@mipmap/galery" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -129,6 +129,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/lnlInputInformation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -151,21 +152,21 @@
 
             <HorizontalScrollView
                 android:id="@+id/scrImage"
-                android:clipChildren="false"
-                android:clipToPadding="false"
-                android:layout_marginRight="10dp"
-                android:layout_marginLeft="10dp"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
                 <LinearLayout
                     android:id="@+id/lnlImage"
                     android:layout_width="match_parent"
-                    android:gravity="top|left"
-                    android:background="@drawable/image_ripple"
-                    android:clickable="true"
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true"
+                    android:background="@drawable/image_ripple"
+                    android:clickable="true"
+                    android:gravity="top|left"
                     android:orientation="horizontal" />
             </HorizontalScrollView>
         </LinearLayout>

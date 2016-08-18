@@ -274,10 +274,9 @@ public class DiaryReportContent extends AppCompatActivity {
         @Override
         protected Bitmap doInBackground(Void... params) {
             try {
-                Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
-                //resize image
-                Bitmap b = FunctionUtils.scaleBitmap(bitmap, dm.widthPixels / 2, dm.widthPixels / 2);
-                return b;
+                Bitmap b = FunctionUtils.decodeSampledBitmap(DiaryReportContent.this, uri);
+                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, dm.widthPixels / 2, dm.widthPixels / 2, true);
+                return decodedBitmap;
             } catch (IOException e) {
                 e.printStackTrace();
                 return null;
@@ -303,6 +302,7 @@ public class DiaryReportContent extends AppCompatActivity {
     private void showImage(ImageView img){
         Intent in = new Intent(DiaryReportContent.this, AcImageInformation.class);
         in.putExtra("imgRef", img.getTag().toString());
+        in.putExtra("isAcceptDelete", false);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
 
             ActivityOptionsCompat options =

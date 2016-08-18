@@ -11,10 +11,6 @@
             android:icon="@mipmap/report"
             android:title="@string/statics" />
 
-        <item
-            android:id="@+id/nav_null"
-            android:title="" />
-
         <item android:title="Cài đặt">
             <menu>
                 <item

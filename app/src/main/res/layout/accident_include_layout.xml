@@ -3,6 +3,9 @@
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:animateLayoutChanges="true"
     android:orientation="vertical">
 
     <LinearLayout
@@ -23,10 +26,10 @@
         android:background="@drawable/border_disable"
         android:gravity="top|left"
         android:hint="@string/report"
+        android:lines="5"
         android:maxLines="5"
         android:minHeight="60dp"
         android:minLines="5"
-        android:lines="5"
         android:padding="5dp"
         android:tag="information"
         android:textColor="@android:color/black"
@@ -36,9 +39,32 @@
         android:id="@+id/imagelist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        android:animateLayoutChanges="true"
         android:orientation="vertical" />
 
-    <LinearLayout
+    <HorizontalScrollView
+        android:id="@+id/scrImage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:clipChildren="false"
+        android:clipToPadding="false">
+
+        <LinearLayout
+            android:id="@+id/lnlImage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:background="@drawable/image_ripple"
+            android:clickable="true"
+            android:gravity="top|left"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -46,31 +72,44 @@
         android:paddingBottom="15dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:paddingTop="15dp">
-
-        <ImageView
-            android:id="@+id/imgCamera"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:padding="2dp"
-            android:src="@mipmap/camera_black"
-            android:tag="camera" />
+        android:paddingTop="15dp"
+        android:weightSum="2">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right|center_vertical"
-            android:layout_weight="1"
-            android:gravity="right">
+            android:layout_alignParentLeft="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/imgAddRoadName"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:id="@+id/imgVoidRoadName"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@mipmap/record_black" />
+
+            <ImageView
+                android:id="@+id/imgCameraRoadName"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
                 android:layout_marginLeft="20dp"
-                android:padding="2dp"
-                android:src="@mipmap/add_black"
-                android:tag="add" />
+                android:background="@mipmap/camera_black" />
+
+            <ImageView
+                android:id="@+id/imgGaleryRoadName"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="28dp"
+                android:layout_marginTop="2dp"
+                android:background="@mipmap/galery" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:gravity="right|center_vertical"
+            android:orientation="horizontal">
 
             <ImageView
                 android:id="@+id/imgEditRoadName"
@@ -89,8 +128,16 @@
                 android:padding="2dp"
                 android:src="@mipmap/delete_black"
                 android:tag="delete" />
-        </LinearLayout>
-    </LinearLayout>
 
+            <ImageView
+                android:id="@+id/imgAddRoadName"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="20dp"
+                android:padding="2dp"
+                android:src="@mipmap/add_black"
+                android:tag="add" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

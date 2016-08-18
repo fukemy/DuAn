@@ -1,5 +1,6 @@
 package com.example.macos.main;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Rect;
@@ -38,6 +39,7 @@ import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
+import com.example.macos.utilities.NetworkUtil;
 import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -259,13 +261,6 @@ public class SprashScreen extends AppCompatActivity {
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }finally {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            btLogin.setEnabled(false);
-                            lnlRegister.setEnabled(false);
-                        }
-                    });
                     login(GlobalParams.BASED_LOGIN_URL);
                 }
 
@@ -367,7 +362,6 @@ public class SprashScreen extends AppCompatActivity {
 
                     @Override
                     public void onAnimationEnd(Animation animation) {
-                        Logger.error("visible lnlRegister");
                         lnlLogin.setVisibility(View.VISIBLE);
                         lnlRegister.setVisibility(View.VISIBLE);
                         AnimationControl.appearLoginForm(lnlLogin);
@@ -423,6 +417,22 @@ public class SprashScreen extends AppCompatActivity {
 
     public void login(String url)
     {
+        if(NetworkUtil.getConnectivityStatus(this) == NetworkUtil.TYPE_NOT_CONNECTED) {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Điện thoại đang không ở chế độ trực tuyến");
+            builder.setMessage("Xin vui lòng mở mạng để đăng nhập.");
+            builder.setCancelable(true);
+            builder.setPositiveButton("Ok", null);
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    builder.show();
+                    prLogin.setVisibility(View.GONE);
+                }
+            });
+
+            return;
+        }
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -434,18 +444,28 @@ public class SprashScreen extends AppCompatActivity {
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
         HttpResponse response;
+        String result;
         try {
             response = httpclient.execute(httpget);
             Logger.error("login status:" + response.getStatusLine().toString());
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 InputStream instream = entity.getContent();
-                String result = FunctionUtils.convertStreamToString(instream).replace("\"","");
+                result = FunctionUtils.convertStreamToString(instream).replace("\"","");
                 Logger.error("login response:" + result);
                 USER_TOKEN = result;
                 instream.close();
                 loadRoadName();
+
             }else{
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        btLogin.setEnabled(true);
+                        Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                        prLogin.setVisibility(View.GONE);
+                    }
+                });
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -453,6 +473,8 @@ public class SprashScreen extends AppCompatActivity {
                 @Override
                 public void run() {
                     btLogin.setEnabled(true);
+                    Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                    prLogin.setVisibility(View.GONE);
                 }
             });
 
