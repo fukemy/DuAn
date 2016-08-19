@@ -570,4 +570,10 @@
         <item name="1">6 ngày</item>
         <item name="1">7 ngày</item>
     </string-array>
+
+    //bao cao khac
+    <string-array name="baocaokhac">
+        <item name="1">Báo cáo tai nạn</item>
+        <item name="1">Báo cáo sự cố</item>
+    </string-array>
 </resources>

@@ -40,6 +40,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
@@ -658,6 +659,22 @@ public class FunctionUtils {
         }
     }
 
+    public static void calcelAlarm(Context context) {
+        Intent i = new Intent("com.dungdv4.alarmreceiver");
+        //check alarm is exist
+        boolean alarmUp = (PendingIntent.getBroadcast(context, GlobalParams.NOTIFICATION_ID,
+                i, PendingIntent.FLAG_NO_CREATE) != null);
+
+        if (alarmUp) {
+            Logger.error("Alarm is already active");
+        } else {
+            Logger.error("calcelAlarm functionutil");
+            PendingIntent pi = PendingIntent.getBroadcast(context, GlobalParams.NOTIFICATION_ID, i, PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            am.cancel(pi);
+        }
+    }
+
     public static int getDataTypedByDataId(int dataId){
         int id = 0;
         switch (dataId){
@@ -913,7 +930,11 @@ public class FunctionUtils {
         imageStream = context.getContentResolver().openInputStream(selectedImage);
         Bitmap img = BitmapFactory.decodeStream(imageStream, null, options);
 
-        img = rotateImageIfRequired(context, img, selectedImage);
+        try {
+            img = rotateImageIfRequired(context, img, selectedImage);
+        }catch (Exception e){
+            Toast.makeText(context, "Hệ thống không thể xoay ảnh được theo đúng trạng thái hiện thị!", Toast.LENGTH_SHORT).show();
+        }
         return img;
     }
 

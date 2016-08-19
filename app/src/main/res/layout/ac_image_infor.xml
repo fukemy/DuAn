@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:background="#50FFFFFF"
+        android:background="#AA000000"
         android:orientation="horizontal"
         android:visibility="gone">
 

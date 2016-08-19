@@ -1,37 +1,110 @@
 package com.example.macos.activities;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 
 import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
+import com.example.macos.main.SprashScreen;
+import com.example.macos.utilities.FunctionUtils;
+import com.example.macos.utilities.GlobalParams;
+import com.example.macos.utilities.SharedPreferenceManager;
 
 /**
  * Created by devil2010 on 8/18/16.
  */
-public class AcSetting extends AppCompatActivity implements OnCheckedChangeListener{
+public class AcSetting extends AppCompatActivity implements OnCheckedChangeListener, View.OnClickListener{
+    private SharedPreferenceManager pref;
     private Spinner spnLimitLoginTime;
     private Switch swLimitLoginTime,swAcceptAlertUpload;
+    private FrameLayout lnlLogout;
+    private Button btnBack;
+    int MAX_LOGIN_TIME;
+    boolean IS_ACCEPT_NOTIFICATION;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_setting);
+
+        pref = new SharedPreferenceManager(this);
         initLayout();
+        initData();
     }
 
     private void initLayout(){
         spnLimitLoginTime  = (Spinner) findViewById(R.id.spnLimitLoginTime);
-        spnLimitLoginTime.setEnabled(false);
         swLimitLoginTime  = (Switch) findViewById(R.id.swLimitLoginTime);
         swLimitLoginTime.setOnCheckedChangeListener(this);
 
         swAcceptAlertUpload  = (Switch) findViewById(R.id.swAcceptAlertUpload);
         swAcceptAlertUpload.setOnCheckedChangeListener(this);
+
+        lnlLogout  = (FrameLayout) findViewById(R.id.lnlLogout);
+        lnlLogout.setOnClickListener(this);
+
+        btnBack  = (Button) findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(this);
+    }
+
+    private void initData(){
+        spnLimitLoginTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                int time = Integer.parseInt(spnLimitLoginTime.getSelectedItem().toString().replace(" ", "").replace("ngày", ""));
+                pref.saveInt(GlobalParams.MAX_LOGIN_TIME, time);
+                Logger.error("spnLimitLoginTime select: " + time);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        MAX_LOGIN_TIME = pref.getInt(GlobalParams.MAX_LOGIN_TIME, 9999);
+        if(MAX_LOGIN_TIME == 9999){
+            spnLimitLoginTime.setEnabled(false);
+            swLimitLoginTime.setChecked(false);
+        }else{
+            spnLimitLoginTime.setEnabled(true);
+            swLimitLoginTime.setChecked(true);
+            setSpinText(spnLimitLoginTime, MAX_LOGIN_TIME);
+        }
+
+        IS_ACCEPT_NOTIFICATION = pref.getBoolean(GlobalParams.IS_ACCEPT_NOTIFICATION, true);
+        swAcceptAlertUpload.setChecked(IS_ACCEPT_NOTIFICATION);
+        if(IS_ACCEPT_NOTIFICATION){
+            FunctionUtils.setAlarm(this);
+        }else{
+            FunctionUtils.calcelAlarm(this);
+        }
+    }
+
+    public void setSpinText(Spinner spin, int text)
+    {
+        for(int i= 0; i < spin.getAdapter().getCount(); i++)
+        {
+            if(spin.getAdapter().getItem(i).toString().contains("" + text))
+            {
+                spin.setSelection(i);
+            }
+        }
+
     }
 
     @Override
@@ -41,9 +114,15 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
                 Logger.error("swLimitLoginTime check: " + isChecked);
                 spnLimitLoginTime.setEnabled(isChecked);
                 findViewById(R.id.tvAmountLoginLimit).setEnabled(isChecked);
+                if(!isChecked){
+                    pref.saveInt(GlobalParams.MAX_LOGIN_TIME, 9999);
+                }else{
+                    pref.saveInt(GlobalParams.MAX_LOGIN_TIME, 3); //default
+                }
                 break;
             case R.id.swAcceptAlertUpload:
                 Logger.error("swAcceptAlertUpload check: " + isChecked);
+                pref.saveBoolean(GlobalParams.IS_ACCEPT_NOTIFICATION, isChecked);
                 break;
         }
     }
@@ -52,4 +131,36 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
     public void onBackPressed() {
         finish();
     }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.lnlLogout:
+                AlertDialog.Builder builder = new AlertDialog.Builder(AcSetting.this);
+                builder.setTitle("Warning");
+                builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
+
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
+                        pref.saveString(GlobalParams.USERNAME, "");
+                        pref.saveLong(GlobalParams.LAST_LOGIN, 0);
+
+                        startActivity(new Intent(AcSetting.this, SprashScreen.class));
+                        finish();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", null);
+                builder.show();
+                break;
+
+            case R.id.btnBack:
+                onBackPressed();
+                break;
+        }
+    }
+
+
 }

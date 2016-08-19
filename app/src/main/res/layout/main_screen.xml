@@ -52,11 +52,5 @@
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main_screen"
         app:menu="@menu/main_screen_drawer">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_gravity="bottom"
-            android:src="@mipmap/logo_horizontal" />
     </android.support.design.widget.NavigationView>
 </android.support.v4.widget.DrawerLayout>

@@ -11,12 +11,12 @@
             android:icon="@mipmap/report"
             android:title="@string/statics" />
 
-        <item android:title="Cài đặt">
+        <item android:title="">
             <menu>
                 <item
                     android:id="@+id/nav_logout"
-                    android:icon="@mipmap/logout"
-                    android:title="@string/logout" />
+                    android:icon="@mipmap/setting"
+                    android:title="Cài đặt" />
             </menu>
         </item>
 

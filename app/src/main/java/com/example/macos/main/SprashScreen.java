@@ -552,9 +552,14 @@ public class SprashScreen extends AppCompatActivity {
             pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
             pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
 
-            FunctionUtils.setAlarm(SprashScreen.this);
+
+            boolean IS_ACCEPT_NOTIFICATION = pref.getBoolean(GlobalParams.IS_ACCEPT_NOTIFICATION, true);
+            Logger.error("IS_ACCEPT_NOTIFICATION: " + IS_ACCEPT_NOTIFICATION);
+            if(IS_ACCEPT_NOTIFICATION)
+                FunctionUtils.setAlarm(SprashScreen.this);
 
             Intent in = new Intent(SprashScreen.this, MainScreen.class);
+            in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(in);
             finish();
         }

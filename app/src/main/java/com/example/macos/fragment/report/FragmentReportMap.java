@@ -114,7 +114,8 @@ public class FragmentReportMap extends CustomFragment{
                 Location mCurrentLocation = null;
                 IS_FIRST_INIT_MAP = true;
                 if (enList.size() > 0) {
-                    if(enList.get(enList.size() - 1).getDaValue().getLocationItem().getLocation() != null)
+                    if(enList.get(enList.size() - 1).getDaValue().getLocationItem() != null
+                            && enList.get(enList.size() - 1).getDaValue().getLocationItem().getLocation() != null)
                         mCurrentLocation = enList.get(enList.size() - 1).getDaValue().getLocationItem().getLocation();
                         if(mCurrentLocation != null) {
                             CameraPosition cameraPosition = new CameraPosition.Builder()

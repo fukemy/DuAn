@@ -418,7 +418,11 @@ public class FragmentInputItem extends CustomFragment{
         ImagePickerActivity.setConfig(config);
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
-        startActivityForResult(intent,CHOOSEN_PICTURE);
+        try {
+            startActivityForResult(intent, CHOOSEN_PICTURE);
+        }catch (Exception e){
+            Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void takePhoto(int pos) {
@@ -609,7 +613,7 @@ public class FragmentInputItem extends CustomFragment{
                         if (isRunningAnimation) {
                             Logger.error("temp: " + temp);
                             img.setY(temp);
-                            float alpha = (1 - (float)Math.abs(temp) / 200);
+                            float alpha = (1 - (float)Math.abs(temp) / 250);
                             if(alpha <= 1 && alpha >= 0)
                                  img.setAlpha(alpha);
                             else if(alpha > 1)
