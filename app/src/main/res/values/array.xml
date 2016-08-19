@@ -561,4 +561,13 @@
         <item name="doluntuongchan">Xói lở</item>
         <item name="khac">Khác</item>
     </string-array>
+
+    //gioi han dang nhap
+    <string-array name="gioihandangnhap">
+        <item name="1">3 ngày</item>
+        <item name="1">4 ngày</item>
+        <item name="1">5 ngày</item>
+        <item name="1">6 ngày</item>
+        <item name="1">7 ngày</item>
+    </string-array>
 </resources>

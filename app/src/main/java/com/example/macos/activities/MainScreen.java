@@ -43,10 +43,10 @@ import com.example.macos.fragment.report.FragmentReportDiary;
 import com.example.macos.fragment.report.FragmentReportLastDay;
 import com.example.macos.fragment.report.FragmentReportMap;
 import com.example.macos.fragment.report.FragmentReportStatus;
+import com.example.macos.information.FragmentViewFullReport;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iListWork;
 import com.example.macos.libraries.Logger;
-import com.example.macos.main.SprashScreen;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -589,24 +589,27 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 initReportScreen();
                 FunctionUtils.hideMenu(menu, false);
             } else if (id == R.id.nav_logout) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
-                builder.setTitle("Warning");
-                builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
+//                AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
+//                builder.setTitle("Warning");
+//                builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
+//
+//                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
+//                        pref.saveString(GlobalParams.USERNAME, "");
+//                        pref.saveLong(GlobalParams.LAST_LOGIN, 0);
+//
+//                        startActivity(new Intent(MainScreen.this, SprashScreen.class));
+//                        finish();
+//                    }
+//                });
+//
+//                builder.setNegativeButton("Cancel", null);
+//                builder.show();
 
-                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
-                        pref.saveString(GlobalParams.USERNAME, "");
-                        pref.saveLong(GlobalParams.LAST_LOGIN, 0);
-
-                        startActivity(new Intent(MainScreen.this, SprashScreen.class));
-                        finish();
-                    }
-                });
-
-                builder.setNegativeButton("Cancel", null);
-                builder.show();
+                Intent in = new Intent(MainScreen.this, AcSetting.class);
+                startActivity(in);
             }
 
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

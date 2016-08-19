@@ -26,6 +26,9 @@ public class GlobalParams {
     public static final String IS_ALARM = "is alarm";
     public static final String IS_WORKED_TODAY = "is worked today";
     public static final String IS_SYNC_TODAY = "is sync today";
+    public static final String MAX_LOGIN_TIME = "max login time";
+    public static final String IS_ACCEPT_LOGIN_TIME = "is accept login time";
+    public static final String IS_ACCEPT_NOTIFICATION = "is accept notification";
     public static final String BASED_URL = "http://khaosatdiachat.com:8887/api";
     public static final String USER_TOKEN = "";
     public static final String BASED_LOGIN_URL = "http://khaosatdiachat.com:8887/api/users/login/thangdv/123456";

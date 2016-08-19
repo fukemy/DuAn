@@ -147,23 +147,11 @@ public class SprashScreen extends AppCompatActivity {
                         Calendar last = Calendar.getInstance();
                         last.setTimeInMillis(LAST_LOGIN);
                         Logger.error("DIFF_LAST_LOGIN: " + (now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)));
-                        if ((now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > 3) {
+                        int MAX_LOGIN_TIME = pref.getInt(GlobalParams.MAX_LOGIN_TIME, 9999);
+                        if ((now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > MAX_LOGIN_TIME) {
                             showLogin();
                         } else {
                             final Intent in = new Intent(SprashScreen.this, MainScreen.class);
-//                            runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(SprashScreen.this);
-//                                        startActivity(in, options.toBundle());
-//                                        finish();
-//                                    }else{
-//
-//                                    }
-//                                }
-//                            });
-
                             startActivity(in);
                             finish();
                         }

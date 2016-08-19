@@ -53,6 +53,7 @@ public class AsyncTaskHelper {
             if(bitmap != null){
                 Logger.error("Done load img");
                 img.setImageBitmap(bitmap);
+//                img.setImageBitmap(FunctionUtils.fastblur(bitmap, 1f, 25));
             }
         }
     }

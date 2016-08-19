@@ -199,4 +199,5 @@ public class AcImageInformation extends Activity {
         AsyncTaskHelper helper = new AsyncTaskHelper();
         helper.applyImage(this, img, selectedImage);
     }
+
 }

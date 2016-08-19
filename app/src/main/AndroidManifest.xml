@@ -36,8 +36,8 @@
         android:allowBackup="true"
         android:icon="@mipmap/logo_thehegeo"
         android:label="@string/app_name"
-        android:launchMode = "singleInstance"
         android:largeHeap="true"
+        android:launchMode="singleInstance"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <meta-data
@@ -76,7 +76,9 @@
             android:name="com.example.macos.activities.AcSummary"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
-
+        <activity
+            android:name="com.example.macos.activities.AcSetting"
+            android:screenOrientation="portrait" />
         <service
             android:name="com.example.macos.service.MyTrackingService"
             android:label="My Service" />
@@ -90,9 +92,10 @@
         </receiver>
 
         <activity android:name="com.example.macos.main.AcRegister" />
-        <activity android:name="com.example.macos.activities.AcImageInformation"
+        <activity
+            android:name="com.example.macos.activities.AcImageInformation"
             android:launchMode="singleTop"
-            android:theme="@style/AppThemeTransitionImage"/>
+            android:theme="@style/AppThemeTransitionImage" />
 
         <receiver android:name="com.example.macos.receiver.AutoStart">
             <intent-filter>
