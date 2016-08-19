@@ -43,7 +43,6 @@ import com.example.macos.fragment.report.FragmentReportDiary;
 import com.example.macos.fragment.report.FragmentReportLastDay;
 import com.example.macos.fragment.report.FragmentReportMap;
 import com.example.macos.fragment.report.FragmentReportStatus;
-import com.example.macos.information.FragmentViewFullReport;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iListWork;
 import com.example.macos.libraries.Logger;
@@ -579,7 +578,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         final String title = item.getTitle().toString();
-        if(id != currrentID) {
+        if(id != currrentID && currrentID != R.id.nav_logout) {
             if (id == R.id.nav_input) {
                 getSupportActionBar().setTitle(title);
                 initLayoutAndData();
