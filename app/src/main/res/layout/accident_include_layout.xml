@@ -16,16 +16,25 @@
         android:layout_marginRight="20dp"
         android:background="@color/grayColor" />
 
+    <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
+        android:id="@+id/spinPromtCatalog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Chọn loại báo cáo"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:background="@drawable/border_disable"
+        android:tag="promptCatalog" />
+
     <EditText
         android:id="@+id/edtInput"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:layout_marginTop="5dp"
         android:background="@drawable/border_disable"
         android:gravity="top|left"
-        android:hint="@string/report"
+        android:hint="Viết báo cáo"
         android:lines="5"
         android:maxLines="5"
         android:minHeight="60dp"

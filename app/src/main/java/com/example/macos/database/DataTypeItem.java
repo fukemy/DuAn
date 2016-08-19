@@ -21,45 +21,45 @@ public class DataTypeItem {
     private String ThoiGianNhap;
     private String ThangDanhGia;
 
-    @Override
-    public String toString() {
-        return "\n{" +
-                "\n\"DataID\":" + DataID +
-                ", \n\"DataType\":" + DataType +
-                ", \n\"MaDuong\":" + MaDuong +
-                ", \n\"TuyenSo\":" + TuyenSo +
-                ", \n\"MoTaTinhTrang\":\"" + MoTaTinhTrang + "\"" +
-                ", \n\"KinhDo\":\"" + KinhDo + "\"" +
-                ", \n\"ViDo\":\"" + ViDo + "\"" +
-                ", \n\"CaoDo\":\"" + CaoDo + "\"" +
-                ", \n\"NguoiNhap\":\"" + NguoiNhap + "\"" +
-                ", \n\"ThoiGianNhap\":\"" + ThoiGianNhap + "\""+
-                ", \n\"DanhGia\":\"" + ThangDanhGia + "\""+
-                "\n}";
-    }
-
-
 //    @Override
 //    public String toString() {
-//        return "DataTypeItem{" +
-//                "\nDataID=" + DataID +
-//                ",\n DataType=" + DataType +
-//                ",\n MaDuong=" + MaDuong +
-//                ",\n TuyenSo=" + TuyenSo +
-//                ",\n MoTaTinhTrang='" + MoTaTinhTrang + '\'' +
-//                ",\n KinhDo='" + KinhDo + '\'' +
-//                ",\n ViDo='" + ViDo + '\'' +
-//                ",\n CaoDo='" + CaoDo + '\'' +
-//                ",\n NguoiNhap='" + NguoiNhap + '\'' +
-//                ",\n ThoiGianNhap='" + ThoiGianNhap + '\'' +
-//                ",\n ThangDanhGia='" + ThangDanhGia + '\'' +
-//                ",\n DataTypeName='" + DataTypeName + '\'' +
-//                ",\n Action='" + Action + '\'' +
-//                ",\n TenDuong='" + TenDuong + '\'' +
-//                ",\n DataName='" + DataName + '\'' +
-//                ",\n locationItem=" + locationItem +
-//                '}';
+//        return "\n{" +
+//                "\n\"DataID\":" + DataID +
+//                ", \n\"DataType\":" + DataType +
+//                ", \n\"MaDuong\":" + MaDuong +
+//                ", \n\"TuyenSo\":" + TuyenSo +
+//                ", \n\"MoTaTinhTrang\":\"" + MoTaTinhTrang + "\"" +
+//                ", \n\"KinhDo\":\"" + KinhDo + "\"" +
+//                ", \n\"ViDo\":\"" + ViDo + "\"" +
+//                ", \n\"CaoDo\":\"" + CaoDo + "\"" +
+//                ", \n\"NguoiNhap\":\"" + NguoiNhap + "\"" +
+//                ", \n\"ThoiGianNhap\":\"" + ThoiGianNhap + "\""+
+//                ", \n\"DanhGia\":\"" + ThangDanhGia + "\""+
+//                "\n}";
 //    }
+
+
+    @Override
+    public String toString() {
+        return "DataTypeItem{" +
+                "\nDataID=" + DataID +
+                ",\n DataType=" + DataType +
+                ",\n MaDuong=" + MaDuong +
+                ",\n TuyenSo=" + TuyenSo +
+                ",\n MoTaTinhTrang='" + MoTaTinhTrang + '\'' +
+                ",\n KinhDo='" + KinhDo + '\'' +
+                ",\n ViDo='" + ViDo + '\'' +
+                ",\n CaoDo='" + CaoDo + '\'' +
+                ",\n NguoiNhap='" + NguoiNhap + '\'' +
+                ",\n ThoiGianNhap='" + ThoiGianNhap + '\'' +
+                ",\n ThangDanhGia='" + ThangDanhGia + '\'' +
+                ",\n DataTypeName='" + DataTypeName + '\'' +
+                ",\n Action='" + Action + '\'' +
+                ",\n TenDuong='" + TenDuong + '\'' +
+                ",\n DataName='" + DataName + '\'' +
+                ",\n locationItem=" + locationItem +
+                '}';
+    }
 
     //sub data
     private String DataTypeName;

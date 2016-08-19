@@ -327,15 +327,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         final FragmentAccident accident = new FragmentAccident();
         accident.setInterface(swap);
-        adapter.addFragment(accident, getResources().getString(R.string.accident));
-
-        final FragmentProblem problem = new FragmentProblem();
-        problem.setInterface(swap);
-        adapter.addFragment(problem, getResources().getString(R.string.problem));
+        adapter.addFragment(accident, "Báo cáo khác");
 
         // set data
         viewPager.setAdapter(adapter);
-        viewPager.setOffscreenPageLimit(4);
+        viewPager.setOffscreenPageLimit(3);
         tabLayout = (TabLayout)findViewById(R.id.tablayout);
         tabLayout.setupWithViewPager(viewPager);
 
@@ -359,13 +355,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                         FunctionUtils.hideMenu(menu, false);
                         break;
                     case 2:
-                        ACTION_TYPE = getResources().getString(R.string.problem);
+                        ACTION_TYPE = "Báo cáo khác";
                         accident.setUpMap();
-                        FunctionUtils.hideMenu(menu, false);
-                        break;
-                    case 3:
-                        ACTION_TYPE = getResources().getString(R.string.problem);
-                        problem.setUpMap();
                         FunctionUtils.hideMenu(menu, false);
                         break;
                     default:
@@ -578,42 +569,21 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onNavigationItemSelected(MenuItem item) {
         int id = item.getItemId();
         final String title = item.getTitle().toString();
-        if(id != currrentID && currrentID != R.id.nav_logout) {
-            if (id == R.id.nav_input) {
-                getSupportActionBar().setTitle(title);
-                initLayoutAndData();
-                FunctionUtils.hideMenu(menu, true);
-            } else if (id == R.id.nav_report) {
-                getSupportActionBar().setTitle(title);
-                initReportScreen();
-                FunctionUtils.hideMenu(menu, false);
-            } else if (id == R.id.nav_logout) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(MainScreen.this);
-//                builder.setTitle("Warning");
-//                builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
-//
-//                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, false);
-//                        pref.saveString(GlobalParams.USERNAME, "");
-//                        pref.saveLong(GlobalParams.LAST_LOGIN, 0);
-//
-//                        startActivity(new Intent(MainScreen.this, SprashScreen.class));
-//                        finish();
-//                    }
-//                });
-//
-//                builder.setNegativeButton("Cancel", null);
-//                builder.show();
-
-                Intent in = new Intent(MainScreen.this, AcSetting.class);
-                startActivity(in);
-            }
-
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-            drawer.closeDrawer(GravityCompat.START);
+        if (id != currrentID && id == R.id.nav_input) {
+            getSupportActionBar().setTitle(title);
+            initLayoutAndData();
+            FunctionUtils.hideMenu(menu, true);
+        } else if (id != currrentID && id == R.id.nav_report) {
+            getSupportActionBar().setTitle(title);
+            initReportScreen();
+            FunctionUtils.hideMenu(menu, false);
+        } else if (id == R.id.nav_logout) {
+            Intent in = new Intent(MainScreen.this, AcSetting.class);
+            startActivity(in);
         }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
         currrentID = id;
         return true;
     }

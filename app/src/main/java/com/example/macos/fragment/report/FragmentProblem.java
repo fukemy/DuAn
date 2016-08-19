@@ -611,7 +611,7 @@ public class FragmentProblem  extends CustomFragment {
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 350){
+                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 250){
                             ((ViewGroup) img.getParent()).removeView(img);
                         }else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
@@ -709,7 +709,11 @@ public class FragmentProblem  extends CustomFragment {
         ImagePickerActivity.setConfig(config);
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
-        startActivityForResult(intent,CHOOSEN_PICTURE);
+        try {
+            startActivityForResult(intent, CHOOSEN_PICTURE);
+        }catch (Exception e){
+            Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void takePhoto(int pos) {

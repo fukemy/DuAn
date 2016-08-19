@@ -53,6 +53,7 @@ import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
+import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,12 +167,14 @@ public class FragmentReportLastDay extends CustomFragment {
     private void initContainer(final LinearLayout container){
         final EditText edtInput = (EditText) container.findViewById(R.id.edtInput);
         final ImageView imgSpeak = (ImageView) container.findViewById(R.id.imgVoidRoadName);
+        final MaterialBetterSpinner spinPromtCatalog = (MaterialBetterSpinner) container.findViewById(R.id.spinPromtCatalog);
         final ImageView imgCamera = (ImageView) container.findViewById(R.id.imgCameraRoadName);
         final ImageView imgGallery = (ImageView) container.findViewById(R.id.imgGaleryRoadName);
         final ImageView imgAdd = (ImageView) container.findViewById(R.id.imgAddRoadName);
         final ImageView imgEdit = (ImageView) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDelete = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
 
+        spinPromtCatalog.setVisibility(View.GONE);
         FunctionUtils.setupEdittext(edtInput, getActivity());
         final int ORDER_CAMERA_POSITION = listData.size();
         final int ORDER_SPEAK_POSITION = listData.size();
@@ -350,7 +353,8 @@ public class FragmentReportLastDay extends CustomFragment {
             dataTypeItem.setAction(getResources().getString(R.string.lastday));
             dataTypeItem.setLocationItem(null);
             dataTypeItem.setTenDuong(ROAD_NAME);
-            dataTypeItem.setDataName(getResources().getString(R.string.lastday));
+            dataTypeItem.setDataName(getResources().getString(R.string.report));
+            dataTypeItem.setDataTypeName(getResources().getString(R.string.lastday));
             dataTypeItem.setThoiGianNhap("" + System.currentTimeMillis());
             dataTypeItem.setKinhDo(null);
             dataTypeItem.setViDo(null);
@@ -387,11 +391,14 @@ public class FragmentReportLastDay extends CustomFragment {
                     if (lnl.getChildAt(j) instanceof EditText) {
                         String tag = (lnl.getChildAt(j)).getTag().toString();
                         String text = ((EditText) lnl.getChildAt(j)).getText().toString();
-                        if (tag.equals("information") && ((EditText) lnl.getChildAt(j)).getText() != null
-                                && text.toString().length() > 0) {     // for edittext
-                            dataTypeItem.setMoTaTinhTrang(text);
-                        }else{
-                            isAcceptCollectData = false;
+                        if (tag.equals("information")) {
+                            if (((EditText) lnl.getChildAt(j)).getText() != null && text.toString().length() > 0) {
+                                dataTypeItem.setMoTaTinhTrang(text);
+
+                            } else {
+                                Logger.error("cac");
+                                isAcceptCollectData = false;
+                            }
                         }
                     }
 
@@ -524,7 +531,7 @@ public class FragmentReportLastDay extends CustomFragment {
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 350){
+                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 250){
                             ((ViewGroup) img.getParent()).removeView(img);
                         }else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
@@ -622,7 +629,11 @@ public class FragmentReportLastDay extends CustomFragment {
         ImagePickerActivity.setConfig(config);
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
-        startActivityForResult(intent,CHOOSEN_PICTURE);
+        try {
+            startActivityForResult(intent, CHOOSEN_PICTURE);
+        }catch (Exception e){
+            Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void takePhoto(int pos) {

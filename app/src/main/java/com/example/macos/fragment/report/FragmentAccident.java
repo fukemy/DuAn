@@ -27,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -63,6 +64,7 @@ import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
+import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -81,7 +83,6 @@ public class FragmentAccident extends CustomFragment{
     private Button btnDone;
     private NestedScrollView scroll;
     private List<LinearLayout> listData;
-    private LinearLayout lnlScrollContainer;
     private int ORDER_CAMERA_POSITION = 0, ORDER_SPEAK_POSITION = 0;
     private View keyBoardView;
     List<String> uriStringList;
@@ -93,6 +94,8 @@ public class FragmentAccident extends CustomFragment{
     int currentHeightDiff = 0;
     int currentEditorChild = 0;
     int containerSize = 0;
+    int TYPE_ACCIDENT = 88, TYPE_PROBLEM = 90;
+
     private DisplayMetrics dm;
     public void setInterface(iListWork swapInterface) {
         this.swapInterface = swapInterface;
@@ -122,7 +125,6 @@ public class FragmentAccident extends CustomFragment{
         btnDone = (Button) rootView.findViewById(R.id.btnDone);
         keyBoardView =  rootView.findViewById(R.id.keyBoardView);
         scroll = (NestedScrollView) rootView.findViewById(R.id.scroll);
-        lnlScrollContainer = (LinearLayout) rootView.findViewById(R.id.lnlScrollContainer);
 
         btnDone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -185,12 +187,17 @@ public class FragmentAccident extends CustomFragment{
 
     private void initContainer(final LinearLayout container){
         final EditText edtInput = (EditText) container.findViewById(R.id.edtInput);
+        final MaterialBetterSpinner spinPromtCatalog = (MaterialBetterSpinner) container.findViewById(R.id.spinPromtCatalog);
         final ImageView imgSpeak = (ImageView) container.findViewById(R.id.imgVoidRoadName);
         final ImageView imgCamera = (ImageView) container.findViewById(R.id.imgCameraRoadName);
         final ImageView imgGallery = (ImageView) container.findViewById(R.id.imgGaleryRoadName);
         final ImageView imgAdd = (ImageView) container.findViewById(R.id.imgAddRoadName);
         final ImageView imgEdit = (ImageView) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDelete = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), android.R.layout.simple_dropdown_item_1line,
+                getResources().getStringArray(R.array.baocaokhac));
+        spinPromtCatalog.setAdapter(adapter);
 
         FunctionUtils.setupEdittext(edtInput, getActivity());
         final int ORDER_CAMERA_POSITION = listData.size();
@@ -227,17 +234,22 @@ public class FragmentAccident extends CustomFragment{
         imgAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!edtInput.getText().toString().trim().equals("")) {
-                    imgAdd.setImageResource(0);
-                    imgAdd.setImageDrawable(null);
-                    imgAdd.setTag(null);
-                    imgSpeak.setVisibility(View.GONE);
-                    imgCamera.setVisibility(View.GONE);
-                    imgGallery.setVisibility(View.GONE);
-                    container.setTag(listData.size());
-                    addnewContainer((LinearLayout)scroll.getChildAt(0), container);
-                }else{
-                    edtInput.setError("Trường báo cáo không được để trống!");
+                if(spinPromtCatalog.getText().toString().equals("") || spinPromtCatalog.getText().toString().contains("Chọn")){
+                    spinPromtCatalog.setError("Bạn phải chọn loại báo cáo trước!");
+                }else {
+                    if (!edtInput.getText().toString().trim().equals("")) {
+                        imgAdd.setImageResource(0);
+                        imgAdd.setImageDrawable(null);
+                        imgAdd.setTag(null);
+                        imgSpeak.setVisibility(View.GONE);
+                        imgCamera.setVisibility(View.GONE);
+                        imgGallery.setVisibility(View.GONE);
+                        container.setTag(listData.size());
+                        addnewContainer((LinearLayout) scroll.getChildAt(0), container);
+                        edtInput.setError(null);
+                    } else {
+                        edtInput.setError("Trường báo cáo không được để trống!");
+                    }
                 }
             }
         });
@@ -436,17 +448,15 @@ public class FragmentAccident extends CustomFragment{
         for (int i = 0; i < lnlAll.getChildCount(); i++) {
             isAcceptCollectData = true;
             dataTypeItem = new DataTypeItem();
-            dataTypeItem.setAction(getResources().getString(R.string.accident));
             dataTypeItem.setLocationItem(locationItem);
             dataTypeItem.setTenDuong(ROAD_NAME);
-            dataTypeItem.setDataName(getResources().getString(R.string.accident));
             dataTypeItem.setThoiGianNhap("" + System.currentTimeMillis());
             dataTypeItem.setKinhDo("" + (locationItem.getLocation() != null ? locationItem.getLocation().getLongitude() : ""));
             dataTypeItem.setViDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getLatitude() : ""));
             dataTypeItem.setMaDuong(99);
-            dataTypeItem.setDataType(99);
             dataTypeItem.setCaoDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getAltitude() : ""));
             dataTypeItem.setTuyenSo(99);
+            dataTypeItem.setDataName(getResources().getString(R.string.report));
             dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME,"User"));
             dataTypeItem.setDataID((long)99);
 
@@ -460,10 +470,10 @@ public class FragmentAccident extends CustomFragment{
             if(isAcceptCollectData) {
                 DatabaseHelper.insertData(gson.toJson(enDataModel));
                 Logger.error("accident saved: " + enDataModel.toString());
+            }else{
+
             }
         }
-
-
         ((MainScreen) getActivity()).initLayoutAndData();
     }
 
@@ -476,11 +486,29 @@ public class FragmentAccident extends CustomFragment{
                     if (lnl.getChildAt(j) instanceof EditText) {
                         String tag = (lnl.getChildAt(j)).getTag().toString();
                         String text = ((EditText) lnl.getChildAt(j)).getText().toString();
-                        if (tag.equals("information") && ((EditText) lnl.getChildAt(j)).getText() != null
-                                && text.toString().length() > 0) {     // for edittext
-                            dataTypeItem.setMoTaTinhTrang(text);
-                        }else{
-                            isAcceptCollectData = false;
+
+                        if(tag != null) {
+                            if(tag.equals("promptCatalog")){
+                                Logger.error("text:" + text);
+                                if(text.toLowerCase().contains(getResources().getString(R.string.accident).toLowerCase())){
+
+                                    dataTypeItem.setAction(getResources().getString(R.string.accident));
+                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.accident));
+                                }else if(text.toLowerCase().contains(getResources().getString(R.string.problem).toLowerCase())) {
+
+                                    dataTypeItem.setAction(getResources().getString(R.string.problem));
+                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.problem));
+                                }
+                            }
+                            if (tag.equals("information")) {
+                                if (((EditText) lnl.getChildAt(j)).getText() != null && text.toString().length() > 0) {
+                                    dataTypeItem.setMoTaTinhTrang(text);
+
+                                } else {
+                                    Logger.error("cac");
+                                    isAcceptCollectData = false;
+                                }
+                            }
                         }
                     }
 
@@ -613,7 +641,7 @@ public class FragmentAccident extends CustomFragment{
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 350){
+                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 250){
                             ((ViewGroup) img.getParent()).removeView(img);
                         }else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
@@ -711,7 +739,11 @@ public class FragmentAccident extends CustomFragment{
         ImagePickerActivity.setConfig(config);
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
-        startActivityForResult(intent,CHOOSEN_PICTURE);
+        try {
+            startActivityForResult(intent, CHOOSEN_PICTURE);
+        }catch (Exception e){
+            Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void takePhoto(int pos) {

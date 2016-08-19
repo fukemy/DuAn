@@ -514,21 +514,24 @@ public class FragmentReportStatus extends CustomFragment {
         hashMap = new HashMap<>();
         listHeader=  new ArrayList<>();
         for(EnDataModel en : data){
-            if(en.getDaValue().getAction().equals(getResources().getString(R.string.accident)) || en.getDaValue().getAction().equals(getResources().getString(R.string.problem))
-                    || en.getDaValue().getAction().equals(getResources().getString(R.string.lastday))) {
-            }else{
-                if(!hashMap.containsKey(en.getDaValue().getDataName())){
-                    List<EnDataModel> statusList = new ArrayList<>();
-                    statusList.add(en);
-                    listHeader.add(en.getDaValue().getDataName());
-                    hashMap.put(en.getDaValue().getDataName(), statusList);
+            if(en.getDaValue() != null) {
+                Logger.error("fapfap:" + en.getDaValue().toString());
+                if(en.getDaValue().getAction().equals(getResources().getString(R.string.accident)) || en.getDaValue().getAction().equals(getResources().getString(R.string.problem))
+                        || en.getDaValue().getAction().equals(getResources().getString(R.string.lastday))) {
                 }else{
-                    Iterator myVeryOwnIterator = hashMap.keySet().iterator();
-                    while(myVeryOwnIterator.hasNext()) {
-                        String key = (String) myVeryOwnIterator.next();
-                        if (key.equals(en.getDaValue().getDataName())) {
-                            List<EnDataModel> listCurrently = hashMap.get(key);
-                                listCurrently.add(en);
+                    if(!hashMap.containsKey(en.getDaValue().getDataName())){
+                        List<EnDataModel> statusList = new ArrayList<>();
+                        statusList.add(en);
+                        listHeader.add(en.getDaValue().getDataName());
+                        hashMap.put(en.getDaValue().getDataName(), statusList);
+                    }else{
+                        Iterator myVeryOwnIterator = hashMap.keySet().iterator();
+                        while(myVeryOwnIterator.hasNext()) {
+                            String key = (String) myVeryOwnIterator.next();
+                            if (key.equals(en.getDaValue().getDataName())) {
+                                List<EnDataModel> listCurrently = hashMap.get(key);
+                                    listCurrently.add(en);
+                            }
                         }
                     }
                 }
