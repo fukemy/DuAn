@@ -127,9 +127,24 @@ public class FragmentViewFullReport extends DialogFragment {
         TextView tvStatus = (TextView) container.findViewById(R.id.tvStatus);
         TextView tvComment = (TextView) container.findViewById(R.id.tvComment);
 
-        tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + data.getDaValue().getDataTypeName());
-        tvStatus.setText(tvStatus.getText().toString() + " : " + data.getDaValue().getThangDanhGia());
-        tvComment.setText(tvComment.getText().toString() + " : " + data.getDaValue().getMoTaTinhTrang());
+        try {
+            tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + ((data.getDaValue().getDataTypeName() == null || data.getDaValue().getDataTypeName().equals("")) ?
+                    "Chưa có dữ liệu!" : data.getDaValue().getDataTypeName()));
+        }catch (Exception e){
+            tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa có dữ liệu!");
+        }
+        try{
+            tvStatus.setText(tvStatus.getText().toString() + " : " + ((data.getDaValue().getThangDanhGia() == null || data.getDaValue().getThangDanhGia().equals("null") || data.getDaValue().getThangDanhGia().equals(""))?
+                    "Chưa có dữ liệu!" : data.getDaValue().getThangDanhGia()));
+        }catch (Exception e){
+            tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa có dữ liệu!");
+        }
+        try{
+            tvComment.setText(tvComment.getText().toString() + " : " + ((data.getDaValue().getMoTaTinhTrang() == null || data.getDaValue().getMoTaTinhTrang().equals(""))?
+                    "Chưa có dữ liệu!" : data.getDaValue().getMoTaTinhTrang()));
+        }catch (Exception e){
+            tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa có dữ liệu!");
+        }
         ContentResolver cr = getActivity().getContentResolver();
         DisplayMetrics dm = getResources().getDisplayMetrics();
 

@@ -8,8 +8,11 @@
     <string name="action_settings">Settings</string>
     <string name="road_test">Tuần đường</string>
     <string name="accident">Tai nạn</string>
+    <string name="accident_report">Tai nạn</string>
     <string name="problem">Sự cố</string>
+    <string name="problem_report">Sự cố</string>
     <string name="lastday">Báo cáo cuối ngày</string>
+    <string name="lastdaytext">Cuối ngày</string>
     <string name="map">Map</string>
     <string name="thongtin">Thông tin</string>
     <string name="username">Tên đăng nhập </string>
@@ -87,5 +90,6 @@
     <string name="recapture_image">Retake Picture</string>
     <string name="capturing_image">Taking New Picture</string>
     <string name="done">Done</string>
+    <string name="other">Khác</string>
 
 </resources>

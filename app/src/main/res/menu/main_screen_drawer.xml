@@ -10,7 +10,6 @@
             android:id="@+id/nav_report"
             android:icon="@mipmap/report"
             android:title="@string/statics" />
-
         <item android:title="">
             <menu>
                 <item

@@ -5,6 +5,7 @@ import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -54,7 +55,6 @@ import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
@@ -86,7 +86,7 @@ public class FragmentAccident extends CustomFragment{
     private int ORDER_CAMERA_POSITION = 0, ORDER_SPEAK_POSITION = 0;
     private View keyBoardView;
     List<String> uriStringList;
-
+    ProgressDialog progressDialog;
     private ImageView viewingImage;
     private final int SHOW_IMAGE = 5;
     SupportMapFragment mSupportMapFragment;
@@ -362,7 +362,8 @@ public class FragmentAccident extends CustomFragment{
     }
 
     public void setUpMap(){
-        MapsInitializer.initialize(getActivity());
+        if(progressDialog != null && !progressDialog.isShowing())
+            progressDialog.show();
         if (mSupportMapFragment != null) {
             mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
@@ -375,6 +376,9 @@ public class FragmentAccident extends CustomFragment{
                         gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                             @Override
                             public boolean onMyLocationButtonClick() {
+                                if(progressDialog != null && !progressDialog.isShowing())
+                                    progressDialog.show();
+
                                 IS_FIRST_INIT_MAP = false;
                                 return false;
                             }
@@ -386,7 +390,12 @@ public class FragmentAccident extends CustomFragment{
         }
     }
 
+    public boolean getProgressState(){
+        return IS_FIRST_INIT_MAP;
+    }
     private void initData(){
+        progressDialog = new ProgressDialog(getActivity());
+        progressDialog.setMessage("Đang tìm vị trí hiện tại...");
         mSupportMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.mapp);
 
         if (mSupportMapFragment == null) {
@@ -394,20 +403,6 @@ public class FragmentAccident extends CustomFragment{
             getChildFragmentManager().beginTransaction().replace(R.id.mapp, mSupportMapFragment).commit();
         }
 
-//        MapsInitializer.initialize(getActivity());
-//        if (mSupportMapFragment != null) {
-//            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
-//                @Override
-//                public void onMapReady(GoogleMap googleMap) {
-//                    if (googleMap != null) {
-//                        gMap = googleMap;
-//                        gMap.setMyLocationEnabled(true);
-//                        gMap.setOnMyLocationChangeListener(myLocationChangeListener);
-//                    }
-//
-//                }
-//            });
-//        }
     }
 
     private GoogleMap gMap;
@@ -418,13 +413,29 @@ public class FragmentAccident extends CustomFragment{
         public void onMyLocationChange(Location location) {
             if (!IS_FIRST_INIT_MAP) {
                 IS_FIRST_INIT_MAP = true;
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                        .zoom(15)                   // Sets the zoom
-                        .build();                   // Creates a CameraPosition from the builder
-                gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 100, null);
-                locationItem = FunctionUtils.getDataAboutLocation(location, getActivity());
-                tvCurrentLocation.setText("Vị trí hiện tại: " + locationItem.getAddress());
+                if(location != null) {
+                    locationItem = FunctionUtils.getDataAboutLocation(location, getActivity());
+                    tvCurrentLocation.setText("Vị trí hiện tại: " + locationItem.getAddress());
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                            .zoom(15)                   // Sets the zoom
+                            .build();                   // Creates a CameraPosition from the builder
+                    gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1000, new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            if (progressDialog != null && progressDialog.isShowing())
+                                progressDialog.dismiss();
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            if (progressDialog != null && progressDialog.isShowing())
+                                progressDialog.dismiss();
+                        }
+                    });
+                }else{
+                    tvCurrentLocation.setText("Vị trí hiện tại: Chưa cập nhập!");
+                }
             }
         }
     };
@@ -457,6 +468,7 @@ public class FragmentAccident extends CustomFragment{
             dataTypeItem.setCaoDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getAltitude() : ""));
             dataTypeItem.setTuyenSo(99);
             dataTypeItem.setDataName(getResources().getString(R.string.report));
+            dataTypeItem.setDataType(99);
             dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME,"User"));
             dataTypeItem.setDataID((long)99);
 
@@ -467,10 +479,26 @@ public class FragmentAccident extends CustomFragment{
             EnDataModel enDataModel = new EnDataModel();
             enDataModel.setDaValue(dataTypeItem);
             enDataModel.setListImageData(imgModalList);
-            if(isAcceptCollectData) {
+            if(isAcceptCollectData && dataTypeItem.getAction() != null && locationItem.getLocation()!= null) {
                 DatabaseHelper.insertData(gson.toJson(enDataModel));
                 Logger.error("accident saved: " + enDataModel.toString());
             }else{
+                if(locationItem == null){
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Lưu dữ liệu thất bại!");
+                    builder.setMessage("Hệ thống không định vị được vị trí của bạn, hãy nhấn vị trí của tôi trên bản đồ để dò lại!");
+                    builder.setNegativeButton("OK", null);
+                    builder.show();
+                    return;
+                }
+                else if(dataTypeItem.getAction() == null) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                    builder.setTitle("Lưu dữ liệu thất bại!");
+                    builder.setMessage("Bạn phải chọn hạng mục trước khi lưu!");
+                    builder.setNegativeButton("OK", null);
+                    builder.show();
+                    return;
+                }
 
             }
         }
@@ -492,12 +520,20 @@ public class FragmentAccident extends CustomFragment{
                                 Logger.error("text:" + text);
                                 if(text.toLowerCase().contains(getResources().getString(R.string.accident).toLowerCase())){
 
-                                    dataTypeItem.setAction(getResources().getString(R.string.accident));
-                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.accident));
-                                }else if(text.toLowerCase().contains(getResources().getString(R.string.problem).toLowerCase())) {
+                                    dataTypeItem.setAction(getResources().getString(R.string.accident_report));
+                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.accident_report));
+                                }else if(text.toLowerCase().contains(getResources().getString(R.string.problem_report).toLowerCase())) {
 
-                                    dataTypeItem.setAction(getResources().getString(R.string.problem));
-                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.problem));
+                                    dataTypeItem.setAction(getResources().getString(R.string.problem_report));
+                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.problem_report));
+                                }else if(text.toLowerCase().contains(getResources().getString(R.string.lastdaytext).toLowerCase())) {
+
+                                    dataTypeItem.setAction(getResources().getString(R.string.lastday));
+                                    dataTypeItem.setDataTypeName(getResources().getString(R.string.lastday));
+                                }else{
+                                    dataTypeItem.setAction(null);
+                                    dataTypeItem.setDataTypeName(null);
+                                    isAcceptCollectData = false;
                                 }
                             }
                             if (tag.equals("information")) {
@@ -740,6 +776,7 @@ public class FragmentAccident extends CustomFragment{
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
         try {
+            Toast.makeText(getActivity(), "Đang khởi động camera, xin chờ 1 chút cho đến khi thông báo này tắt đi!", Toast.LENGTH_SHORT).show();
             startActivityForResult(intent, CHOOSEN_PICTURE);
         }catch (Exception e){
             Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
@@ -845,5 +882,6 @@ public class FragmentAccident extends CustomFragment{
                 }
                 break;
         }
+
     }
 }

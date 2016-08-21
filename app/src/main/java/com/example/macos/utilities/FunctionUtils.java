@@ -287,7 +287,7 @@ public class FunctionUtils {
     }
 
     public static int getStatusListFromPrompt(String catalog, int pos, Context mContext){
-        int returnId =  R.array.chuacodulieu;
+        int returnId = R.array.chuacapnhap;
         if (catalog.equals(mContext.getResources().getString(R.string.road_surface))) {
             //if(pos == 2 || pos == 4 || pos == 7) {
                 returnId = R.array.road_surface_status_list;
@@ -398,8 +398,6 @@ public class FunctionUtils {
         else if (catalog.equals(mContext.getResources().getString(R.string.vertical_drain))){
             if(pos == 2) {
                 returnId = R.array.huhongbiendangcongdoc;
-            }else{
-                returnId = R.array.chuacapnhap;
             }
         }
         return returnId;
@@ -667,11 +665,11 @@ public class FunctionUtils {
 
         if (alarmUp) {
             Logger.error("Alarm is already active");
-        } else {
-            Logger.error("calcelAlarm functionutil");
             PendingIntent pi = PendingIntent.getBroadcast(context, GlobalParams.NOTIFICATION_ID, i, PendingIntent.FLAG_UPDATE_CURRENT);
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
             am.cancel(pi);
+        } else {
+            Logger.error("no alarm to cancel!");
         }
     }
 

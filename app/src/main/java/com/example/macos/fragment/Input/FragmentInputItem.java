@@ -102,7 +102,11 @@ public class FragmentInputItem extends CustomFragment{
     }
 
     public void setCurrentLocation(EnLocationItem lo){
-        tvCurrentLocation.setText("Vị trí hiện tại: " + lo.getAddress());
+        if(lo.getAddress() != null)
+            tvCurrentLocation.setText("Vị trí hiện tại: " + lo.getAddress());
+        else
+            tvCurrentLocation.setText("Vị trí hiện tại: Chưa cập nhập");
+
     }
 
     private void initLayout() {
@@ -208,6 +212,7 @@ public class FragmentInputItem extends CustomFragment{
         final ImageView imgEditRoadName = (ImageView) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
+        final EditText edtOtherStatus = (EditText) container.findViewById(R.id.edtOtherStatus);
         final TextView tvRoadName = (TextView) container.findViewById(R.id.tvRoadName);
         tvRoadName.setVisibility(View.GONE);
         edtInformation.clearFocus();
@@ -266,6 +271,20 @@ public class FragmentInputItem extends CustomFragment{
                     spinStatus.setAdapter(null);
                     spinStatus.setAdapter(arrayAdapter);
                     spinStatus.setSelection(0);
+                }
+            }
+        });
+
+        spinStatus.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String selectedData = spinStatus.getText().toString();
+                Logger.error("text:" + selectedData);
+                if(selectedData.toLowerCase().equals(getResources().getString(R.string.other).toLowerCase())){
+                    edtOtherStatus.setVisibility(View.VISIBLE);
+                    Logger.error("visible");
+                }else{
+                    edtOtherStatus.setVisibility(View.GONE);
                 }
             }
         });
@@ -419,6 +438,7 @@ public class FragmentInputItem extends CustomFragment{
 
         Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
         try {
+            Toast.makeText(getActivity(), "Đang khởi động camera, xin chờ 1 chút cho đến khi thông báo này tắt đi!", Toast.LENGTH_SHORT).show();
             startActivityForResult(intent, CHOOSEN_PICTURE);
         }catch (Exception e){
             Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();

@@ -137,7 +137,53 @@
                     android:layout_height="0.5dp"
                     android:background="@color/grayColor" />
 
+                <Button
+                    android:id="@+id/btnDeleteData"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:textStyle="normal"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent"
+                    android:padding="10dp"
+                    android:textColor="#4169E1"
+                    android:text="Xoá dữ liệu tuần đường và báo cáo" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/grayColor" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:textStyle="normal"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:textColor="@android:color/black"
+                    android:text="Thông tin phần mềm:" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_vertical"
+                    android:textStyle="normal"
+                    android:textAllCaps="false"
+                    android:background="@android:color/transparent"
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:textColor="@color/grayColor"
+                    android:text="Phần mềm tuần đường v3.0" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:background="@color/grayColor" />
             </LinearLayout>
+
+
 
             <FrameLayout
                 android:id="@+id/lnlLogout"

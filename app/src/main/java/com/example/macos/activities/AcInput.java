@@ -1,6 +1,5 @@
 package com.example.macos.activities;
 
-import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.app.SharedElementCallback;
 import android.content.Context;
@@ -16,14 +15,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -133,7 +130,7 @@ public class AcInput extends FragmentActivity {
 
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Dịch vụ vị trí chưa được bật, bạn có muốn bật lên?")
+        builder.setMessage("Dịch vụ định vị vị trí chưa được bật, bạn có muốn bật lên?")
                 .setCancelable(false)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     public void onClick(final DialogInterface dialog,  final int id) {
@@ -232,50 +229,6 @@ public class AcInput extends FragmentActivity {
         }
     };
 
-    Thread t;
-    public void closeToolbar(final boolean isClose){
-        if(t != null) {
-            if (t.isAlive()) {
-            }
-            else
-                t = null;
-        }
-        if(t == null) {
-            t = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-                    final AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-                    if (behavior != null) {
-                        final ValueAnimator valueAnimator = ValueAnimator.ofInt();
-                        valueAnimator.setInterpolator(new DecelerateInterpolator());
-                        valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                            @Override
-                            public void onAnimationUpdate(ValueAnimator animation) {
-                                behavior.setTopAndBottomOffset((Integer) animation.getAnimatedValue());
-                                appBarLayout.requestLayout();
-                            }
-                        });
-                        if (isClose)
-                            valueAnimator.setIntValues(0, -appBarLayout.getHeight());
-                        else
-                            valueAnimator.setIntValues(0, appBarLayout.getHeight() * 2);
-
-                        valueAnimator.setDuration(400);
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                valueAnimator.start();
-                            }
-                        });
-
-                    }
-                }
-            });
-            t.start();
-        }
-    }
-
     private void initLayout() {
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
@@ -302,9 +255,6 @@ public class AcInput extends FragmentActivity {
                 builder.show();
             }
         });
-        CoordinatorLayout.LayoutParams params = (CoordinatorLayout.LayoutParams) appBarLayout.getLayoutParams();
-        AppBarLayout.Behavior behavior = (AppBarLayout.Behavior) params.getBehavior();
-
 
         mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp);
         if (mSupportMapFragment == null) {
@@ -324,6 +274,8 @@ public class AcInput extends FragmentActivity {
                         gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                             @Override
                             public boolean onMyLocationButtonClick() {
+                                if(dialog != null && !dialog.isShowing())
+                                    dialog.show();
                                 IS_FOUND_LOCATION = false;
                                 gMap.setOnMyLocationChangeListener(myLocationChangeListener);
                                 return false;
@@ -388,18 +340,37 @@ public class AcInput extends FragmentActivity {
         public void onMyLocationChange(Location location) {
             if(!IS_FOUND_LOCATION) {
                 title.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
-                dialog.dismiss();
+
                 locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
                 ((FragmentInputItem)((MainScreenAdapter)viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
-                System.out.println("got location : " + locationItem.toString());
+//                System.out.println("got location : " + locationItem.toString());
                 IS_FOUND_LOCATION = true;
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                        .zoom(17)                   // Sets the zoom
-                        .bearing(90)                // Sets the orientation of the camera to east
-                        .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                        .build();                   // Creates a CameraPosition from the builder
-                gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                if(location != null) {
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                            .zoom(17)                   // Sets the zoom
+                            .bearing(90)                // Sets the orientation of the camera to east
+                            .tilt(40)                   // Sets the tilt of the camera to 30 degrees
+                            .build();                   // Creates a CameraPosition from the builder
+                    gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1000, new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            try {
+                                if (dialog != null && dialog.isShowing())
+                                    dialog.dismiss();
+                                gMap.setOnMyLocationChangeListener(null);
+                            } catch (Exception e) {
+                            }
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            if (dialog != null && dialog.isShowing())
+                                dialog.dismiss();
+
+                        }
+                    });
+                }
 //                gMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLongitude(), location.getLatitude())));
 //                gMap.animateCamera(CameraUpdateFactory.zoomTo(17));
                 gMap.setOnMyLocationChangeListener(null);
@@ -433,13 +404,16 @@ public class AcInput extends FragmentActivity {
                     if (tag.equals("information")) {     // for edittext
                         dataTypeItem.setMoTaTinhTrang(text);
                     }
+                    if (tag.equals("otherStatus")) {     // for edittext
+                        if(text != null && !text.equals(""))
+                            dataTypeItem.setThangDanhGia(text);
+                    }
                 }
 
                 if (lnl.getChildAt(j) instanceof ImageView) {
                     ImageView img = (ImageView) lnl.getChildAt(j);
                     if (img.getTag() != null) {
                         if (img.getTag().toString().length() > 10) {
-                            Logger.error("img ref: " + img.getTag().toString());
                             String temp = "" +  new Random().nextInt(20);
                             imgModal = new ImageModel();
                             String type = img.getTag().toString().substring(img.getTag().toString().lastIndexOf("."));
@@ -461,7 +435,6 @@ public class AcInput extends FragmentActivity {
                 }
 
                 if(lnl.getChildAt(j) instanceof HorizontalScrollView) {
-                    Logger.error("found scrollview");
                     HorizontalScrollView scroll = (HorizontalScrollView) lnl.getChildAt(j);
                     collectNestedData((LinearLayout) scroll.getChildAt(0));
                 }
@@ -476,11 +449,10 @@ public class AcInput extends FragmentActivity {
         if(locationItem.getLocation() == null){
             AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
             builder.setTitle("Lưu dữ liệu thất bại!");
-            builder.setMessage("Chúng tôi ko tìm được vị trí của bạn, hãy kiểm tra lại vị trí trên bản đồ!");
+            builder.setMessage("Hệ thống không định vị được vị trí của bạn, hãy nhấn vị trí của tôi trên bản đồ để dò lại!");
             builder.setNegativeButton("OK", null);
             builder.show();
             return;
-
         }
 
         Gson gson = new Gson();
@@ -521,7 +493,7 @@ public class AcInput extends FragmentActivity {
                 enDataModel.setListImageData(imgModalList);
                 DatabaseHelper.insertData(gson.toJson(enDataModel));
 
-                Logger.error("dataTypeItem:  " + enDataModel.toString());
+//                Logger.error("dataTypeItem:  " + enDataModel.toString());
             }
             pref.saveBoolean(GlobalParams.IS_WORKED_TODAY, true);
         }

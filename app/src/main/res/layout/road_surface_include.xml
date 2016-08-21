@@ -54,6 +54,22 @@
                 android:background="@drawable/border_disable"
                 android:tag="status" />
 
+            <EditText
+                android:id="@+id/edtOtherStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/border_disable"
+                android:gravity="left|top"
+                android:hint="Nhập tình trạng"
+                android:imeOptions="actionDone"
+                android:lines="2"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:tag="otherStatus" />
+
 
             <LinearLayout
                 android:id="@+id/lnlInputIcon"

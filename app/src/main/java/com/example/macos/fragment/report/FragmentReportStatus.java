@@ -1,8 +1,8 @@
 package com.example.macos.fragment.report;
 
 import android.app.ProgressDialog;
-import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -252,13 +252,19 @@ public class FragmentReportStatus extends CustomFragment {
         List<Data> listData = DatabaseHelper.getData();
         if(listData!= null) {
             if (listData.size() != 0) {
-                List<EnDataModel> enList = new ArrayList<>();
                 for (Data d : listData) {
                     EnDataModel en = gson.fromJson(d.getInput(), EnDataModel.class);
-                    enList.add(en);
-                    if(!d.getIsUploaded())
-                        syncData.add(en);
+                    if(!d.getIsUploaded()) {
+                        if(en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.accident_report).toLowerCase()) ||
+                                en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.problem_report).toLowerCase()) ||
+                                en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.lastday).toLowerCase())) {
+                        }else {
+                            syncData.add(en);
+//                            Logger.error("add en:  " + en.getDaValue().getAction());
+                        }
+                    }
                 }
+
             }
         }
 
@@ -267,7 +273,6 @@ public class FragmentReportStatus extends CustomFragment {
             public void run(){
                 Logger.error("size upload : " + syncData.size());
                 try{
-                    ContentResolver cr = getActivity().getContentResolver();
                     if(syncData.size() == 0){
                         isAcceptUpload = false;
                         return;
@@ -316,6 +321,7 @@ public class FragmentReportStatus extends CustomFragment {
                 instream.close();
 
 //                new UploadData().execute();
+                failUploadData.clear();
                 syncAndUploadData();
             }
         } catch (Exception e) {
@@ -431,11 +437,12 @@ public class FragmentReportStatus extends CustomFragment {
         @Override
         protected void onPostExecute(final String result) {
             Logger.error("response: " + result);
-            if(!result.contains("Successfull")){
+            if(result.contains("Successfull") || result.contains("Image List")){
+                syncDataOffline(uploadData);
+            }else{
                 uploadData = null;
                 IS_UPLOAD_SUSSCESS = false;
-            }else{
-                syncDataOffline(uploadData);
+                failUploadData.add(uploadData);
             }
             if (order < syncData.size() - 1) {
                 order = order + 1;
@@ -466,12 +473,30 @@ public class FragmentReportStatus extends CustomFragment {
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    fab.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.fab_hide));
-                                    AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                                    builder.setTitle("Đã upload xong dữ liệu!");
-                                    builder.setMessage("Kết quả trả về: \n \"" + result.replace("\"","").replace(",","").trim() + "\"");
-                                    builder.setPositiveButton("ok", null);
-                                    builder.show();
+                                    if(failUploadData.size() == 0) {
+                                        fab.startAnimation(AnimationUtils.loadAnimation(getActivity(), R.anim.fab_hide));
+                                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                        builder.setTitle("Đã upload xong dữ liệu!");
+                                        builder.setMessage("Kết quả trả về: Tất cả dữ liệu upload thành công!");
+                                        builder.setPositiveButton("ok", null);
+                                        builder.show();
+                                    }else{
+                                        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                        builder.setTitle("Thông tin upload dữ liệu.");
+                                        builder.setMessage("Có " + failUploadData.size() + " trên " + syncData.size() + " dữ liệu upload không thành công."
+                                                + "\nKết quả cuối cùng trả về: " + result.replace(" ","").replace(".","").replace("\"","") + "."
+                                                + "\nBạn có muốn upload lại không?");
+                                        builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                uploadData();
+                                            }
+                                        });
+                                        builder.setNegativeButton("Cancel", null);
+                                        builder.setCancelable(false);
+                                        builder.show();
+                                    }
                                 }
                             });
                         }
@@ -486,7 +511,7 @@ public class FragmentReportStatus extends CustomFragment {
         List<Data> listData = DatabaseHelper.getData();
         if(listData!= null) {
             if (listData.size() != 0) {
-                Logger.error("syncDataOffline");
+//                Logger.error("syncDataOffline");
                 for (Data d : listData) {
 
                     EnDataModel e = gson.fromJson(d.getInput(), EnDataModel.class);
@@ -495,7 +520,6 @@ public class FragmentReportStatus extends CustomFragment {
                             && e.getDaValue().getThangDanhGia().equals(dataModel.getDaValue().getThangDanhGia())
                             && e.getDaValue().getTuyenSo().equals(dataModel.getDaValue().getTuyenSo())
                             && e.getDaValue().getDataType().equals(dataModel.getDaValue().getDataType())) {
-                        Logger.error("found data id:" + d.getID());
                         d.setIsUploaded(true);
 //                        dataList.add(e);
                         DatabaseHelper.updateData(d);
@@ -514,10 +538,9 @@ public class FragmentReportStatus extends CustomFragment {
         hashMap = new HashMap<>();
         listHeader=  new ArrayList<>();
         for(EnDataModel en : data){
-            if(en.getDaValue().getAction().equals(getResources().getString(R.string.report )) ||
-                    en.getDaValue().getAction().equals(getResources().getString(R.string.accident)) ||
-                    en.getDaValue().getAction().equals(getResources().getString(R.string.problem)) ||
-                    en.getDaValue().getAction().equals(getResources().getString(R.string.lastday))) {
+            if(en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.accident_report).toLowerCase()) ||
+                    en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.problem_report).toLowerCase()) ||
+                    en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.lastday).toLowerCase())) {
             }else{
                 if(!hashMap.containsKey(en.getDaValue().getDataName())){
                     List<EnDataModel> statusList = new ArrayList<>();

@@ -191,7 +191,6 @@ public class DiaryReportContent extends AppCompatActivity {
     private void initData() {
         Gson gson = new Gson();
         data = gson.fromJson(getIntent().getStringExtra("data"), EnDataModel.class);
-        System.out.println("data: " + data.toString());
 
         tvCalalog.setText(tvCalalog.getText().toString() + " : " + (data.getDaValue().getDataName().equals("") ? "Chưa cập nhập!" :data.getDaValue().getDataName()));
         tvRoadName.setText(tvRoadName.getText().toString() + " : " + data.getDaValue().getTenDuong());

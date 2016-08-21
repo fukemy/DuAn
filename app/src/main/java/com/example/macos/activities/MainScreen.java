@@ -38,9 +38,7 @@ import com.example.macos.entities.EnMainCatalogItem;
 import com.example.macos.entities.EnWorkList;
 import com.example.macos.fragment.mainscreen.FragmentMainDataScreen;
 import com.example.macos.fragment.report.FragmentAccident;
-import com.example.macos.fragment.report.FragmentProblem;
 import com.example.macos.fragment.report.FragmentReportDiary;
-import com.example.macos.fragment.report.FragmentReportLastDay;
 import com.example.macos.fragment.report.FragmentReportMap;
 import com.example.macos.fragment.report.FragmentReportStatus;
 import com.example.macos.interfaces.iDialogAction;
@@ -50,6 +48,7 @@ import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
+import com.google.android.gms.maps.MapsInitializer;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -83,6 +82,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         pref = new SharedPreferenceManager(MainScreen.this);
         gson = new Gson();
+
+
+        MapsInitializer.initialize(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -321,13 +323,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         mainDataScreen.setInterface(swap);
         adapter.addFragment(mainDataScreen, getResources().getString(R.string.road_test));
 
-        final FragmentReportLastDay lastday = new FragmentReportLastDay();
-        lastday.setInterface(swap);
-        adapter.addFragment(lastday, getResources().getString(R.string.lastday));
-
         final FragmentAccident accident = new FragmentAccident();
         accident.setInterface(swap);
-        adapter.addFragment(accident, "Báo cáo khác");
+        adapter.addFragment(accident, "Lập báo cáo");
 
         // set data
         viewPager.setAdapter(adapter);
@@ -351,12 +349,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                         FunctionUtils.hideMenu(menu, true);
                         break;
                     case 1:
-                        ACTION_TYPE = getResources().getString(R.string.lastday);
-                        FunctionUtils.hideMenu(menu, false);
-                        break;
-                    case 2:
-                        ACTION_TYPE = "Báo cáo khác";
-                        accident.setUpMap();
+                        ACTION_TYPE = "Lập báo cáo";
+                        if(!accident.getProgressState())
+                            accident.setUpMap();
                         FunctionUtils.hideMenu(menu, false);
                         break;
                     default:

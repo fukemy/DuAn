@@ -8,21 +8,24 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.example.macos.database.Data;
+import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
 import com.example.macos.main.SprashScreen;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
+
+import java.util.List;
 
 /**
  * Created by devil2010 on 8/18/16.
@@ -32,7 +35,7 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
     private Spinner spnLimitLoginTime;
     private Switch swLimitLoginTime,swAcceptAlertUpload;
     private FrameLayout lnlLogout;
-    private Button btnBack;
+    private Button btnBack,btnDeleteData;
     int MAX_LOGIN_TIME;
     boolean IS_ACCEPT_NOTIFICATION;
 
@@ -59,6 +62,9 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
 
         btnBack  = (Button) findViewById(R.id.btnBack);
         btnBack.setOnClickListener(this);
+
+        btnDeleteData  = (Button) findViewById(R.id.btnDeleteData);
+        btnDeleteData.setOnClickListener(this);
     }
 
     private void initData(){
@@ -134,9 +140,10 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
 
     @Override
     public void onClick(View view) {
+        AlertDialog.Builder builder;
         switch (view.getId()){
             case R.id.lnlLogout:
-                AlertDialog.Builder builder = new AlertDialog.Builder(AcSetting.this);
+                builder = new AlertDialog.Builder(AcSetting.this);
                 builder.setTitle("Warning");
                 builder.setMessage(getResources().getString(R.string.bancochacchanmuondangxuat));
 
@@ -158,6 +165,26 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
 
             case R.id.btnBack:
                 onBackPressed();
+                break;
+            case R.id.btnDeleteData:
+                List<Data> dataList = DatabaseHelper.getData();
+                if(dataList.size() > 0) {
+                    builder = new AlertDialog.Builder(AcSetting.this);
+                    builder.setTitle("Warning");
+                    builder.setMessage("Bạn có chắc chắn muốn xoá mọi dữ liệu?");
+
+                    builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            DatabaseHelper.clearData();
+                        }
+                    });
+
+                    builder.setNegativeButton("Cancel", null);
+                    builder.show();
+                }else{
+                    Toast.makeText(AcSetting.this, "Chưa có dữ liệu để xoá!", Toast.LENGTH_SHORT).show();
+                }
                 break;
         }
     }

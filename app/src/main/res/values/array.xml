@@ -172,7 +172,11 @@
     </string-array>
 
     <string-array name="chuacapnhap">
-        <item name="chuacapnhap">Chưa cập nhập</item>
+        <item name="chuacapnhap">Xấu vừa</item>cập
+        <item name="chuacapnhap">Xấu</item>cập
+        <item name="chuacapnhap">Rất xấu</item>cập
+        <item name="chuacapnhap">Cần thay thế</item>cập
+        <item name="chuacapnhap">Khác</item>cập
     </string-array>
 
 
@@ -575,5 +579,6 @@
     <string-array name="baocaokhac">
         <item name="1">Báo cáo tai nạn</item>
         <item name="1">Báo cáo sự cố</item>
+        <item name="1">Báo cáo cuối ngày</item>
     </string-array>
 </resources>
