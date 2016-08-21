@@ -177,6 +177,11 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             DatabaseHelper.clearData();
+                            Intent in = new Intent(AcSetting.this, MainScreen.class);
+                            in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            in.putExtra("isDeleteData", true);
+                            startActivity(in);
+                            finish();
                         }
                     });
 

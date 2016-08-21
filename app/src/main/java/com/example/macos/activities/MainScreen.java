@@ -72,7 +72,11 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         super.onNewIntent(intent);
         Logger.error("on new intent");
         IS_SYNC_NOW = true;
-        initUploadScreen();
+        if(intent.getBooleanExtra("isDeleteData", false))
+            initLayoutAndData();
+        else
+            initUploadScreen();
+
     }
 
     @Override
