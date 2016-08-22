@@ -1,5 +1,6 @@
 package com.example.macos.activities;
 
+import android.app.ActivityOptions;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Build;
@@ -578,7 +579,12 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             FunctionUtils.hideMenu(menu, false);
         } else if (id == R.id.nav_logout) {
             Intent in = new Intent(MainScreen.this, AcSetting.class);
-            startActivity(in);
+            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(this).toBundle();
+                startActivity(in,bundle);
+            }else {
+                startActivity(in);
+            }
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -3,10 +3,15 @@ package com.example.macos.activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.transition.Explode;
+import android.transition.Slide;
+import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -42,11 +47,16 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getWindow().requestFeature(Window.FEATURE_ACTIVITY_TRANSITIONS);
         setContentView(R.layout.ac_setting);
 
         pref = new SharedPreferenceManager(this);
         initLayout();
         initData();
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            getWindow().setEnterTransition(new Slide(Gravity.RIGHT).setDuration(500));
+            getWindow().setExitTransition(new Explode().setDuration(400));
+        }
     }
 
     private void initLayout(){
@@ -134,8 +144,8 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
     }
 
     @Override
-    public void onBackPressed() {
-        finish();
+    public void finish() {
+        super.finish();
     }
 
     @Override

@@ -42,6 +42,7 @@ import com.example.macos.entities.EnLocationItem;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.libraries.LinearLayoutThatDetectsSoftKeyboard;
 import com.example.macos.libraries.Logger;
+import com.example.macos.utilities.AsyncTaskHelper;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -51,12 +52,15 @@ import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.functions.Action1;
+import tyrantgit.explosionfield.ExplosionField;
 
 public class FragmentInputItem extends CustomFragment{
     private View rootView;
@@ -81,14 +85,19 @@ public class FragmentInputItem extends CustomFragment{
     boolean isExpand = true;
     DisplayMetrics dm;
     private ImageView viewingImage;
+    private ExplosionField mExplosionField;
+    AsyncTaskHelper helper;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fr_road_surface, container, false);
+        mExplosionField = ExplosionField.attach2Window(getActivity());
+        helper = new AsyncTaskHelper();
+        dm = getResources().getDisplayMetrics();
+
         initLayout();
 
-        dm = getResources().getDisplayMetrics();
 
         LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams)bottomView.getLayoutParams();
         btmParams.bottomMargin = FunctionUtils.dpToPx(216, getActivity());
@@ -457,17 +466,32 @@ public class FragmentInputItem extends CustomFragment{
                 try {
                     Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), uri);
                     int size = rootView.findViewById(R.id.viewNull).getWidth();
-                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
+//                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
 //                    Bitmap decodedBitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(),  size / 3, size / 3);
                     final ImageView img = new ImageView(getActivity());
-                    img.setImageBitmap(decodedBitmap);
+                    img.setLayoutParams(new ViewGroup.LayoutParams(size /3, size / 3));
+//                    img.setImageBitmap(decodedBitmap);
                     img.setTag(uri.toString());
-                    img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    img.setScaleType(ImageView.ScaleType.FIT_XY);
                     LinearLayout lnlFirstPlan = (LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.lnlFirstPlan);
                     HorizontalScrollView scroll = (HorizontalScrollView) lnlFirstPlan.findViewById(R.id.scrImage);
-                    //((LinearLayout) scroll.getChildAt(0)).setLayoutTransition(new LayoutTransition());
                     ((LinearLayout) scroll.getChildAt(0)).addView(img);
-                    addTouchListenerImage(img);
+
+                    Picasso.with(getActivity())
+                            .load(uri) // Uri of the picture
+                            .fit()
+                            .into(img, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    addTouchListenerImage(img);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
+
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -525,16 +549,32 @@ public class FragmentInputItem extends CustomFragment{
                             selectedImage = Uri.parse("file://" + selectedImage);
                             try {
 
-                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
                                 int size = rootView.findViewById(R.id.viewNull).getWidth();
-                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
+//                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
+//                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
 
                                 final ImageView img = new ImageView(getActivity());
-                                img.setImageBitmap(decodedBitmap);
+                                img.setLayoutParams(new ViewGroup.LayoutParams(size /3, size / 3));
+                                img.setScaleType(ImageView.ScaleType.FIT_XY);
+//                                img.setImageBitmap(decodedBitmap);
                                 img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);
 
-                                addTouchListenerImage(img);
+//                                helper.applyImage(getActivity(), img, selectedImage);
+                                Picasso.with(getActivity())
+                                        .load(selectedImage) // Uri of the picture
+                                        .fit()
+                                        .into(img, new Callback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                addTouchListenerImage(img);
+                                            }
+
+                                            @Override
+                                            public void onError() {
+
+                                            }
+                                        });
 
                             } catch (Exception e) {
                                 Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
@@ -615,12 +655,15 @@ public class FragmentInputItem extends CustomFragment{
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 350){
+                        if(img.getAlpha() < 0.1f || Math.abs(temp) > 200){
+                            mExplosionField.explode(img);
                             ((ViewGroup) img.getParent()).removeView(img);
                         }else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
                             if (img.getAlpha() == 1f) {
                                 mHandler.removeCallbacks(myRunnable);
+                                img.setScaleX(1f);
+                                img.setScaleY(1f);
                                 showImage(img);
                             } else {
                                 shinkImage();
@@ -632,11 +675,11 @@ public class FragmentInputItem extends CustomFragment{
                         temp = initialY + (int) (event.getRawY() - initialTouchY);
                         if (isRunningAnimation) {
                             Logger.error("temp: " + temp);
-                            img.setY(temp);
                             float alpha = (1 - (float)Math.abs(temp) / 250);
-                            if(alpha <= 1 && alpha >= 0)
-                                 img.setAlpha(alpha);
-                            else if(alpha > 1)
+                            if(alpha <= 1 && alpha >= 0) {
+                                img.setAlpha(alpha);
+                                img.setY(temp);
+                            }else if(alpha > 1)
                                 img.setAlpha(1f);
                             else
                                 img.setAlpha(0f);

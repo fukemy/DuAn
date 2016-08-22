@@ -37,6 +37,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.macos.activities.AcImageInformation;
 import com.example.macos.activities.MainScreen;
 import com.example.macos.database.DataTypeItem;
@@ -49,6 +50,7 @@ import com.example.macos.entities.ImageModel;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iListWork;
 import com.example.macos.libraries.Logger;
+import com.example.macos.utilities.AsyncTaskHelper;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -64,12 +66,15 @@ import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import rx.functions.Action1;
+import tyrantgit.explosionfield.ExplosionField;
 
 
 /**
@@ -85,7 +90,6 @@ public class FragmentAccident extends CustomFragment{
     private List<LinearLayout> listData;
     private int ORDER_CAMERA_POSITION = 0, ORDER_SPEAK_POSITION = 0;
     private View keyBoardView;
-    List<String> uriStringList;
     ProgressDialog progressDialog;
     private ImageView viewingImage;
     private final int SHOW_IMAGE = 5;
@@ -93,9 +97,9 @@ public class FragmentAccident extends CustomFragment{
     EnLocationItem locationItem;
     int currentHeightDiff = 0;
     int currentEditorChild = 0;
-    int containerSize = 0;
-    int TYPE_ACCIDENT = 88, TYPE_PROBLEM = 90;
+    private ExplosionField mExplosionField;
 
+    AsyncTaskHelper helper;
     private DisplayMetrics dm;
     public void setInterface(iListWork swapInterface) {
         this.swapInterface = swapInterface;
@@ -106,9 +110,10 @@ public class FragmentAccident extends CustomFragment{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fr_accident, container, false);
 //        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        uriStringList = new ArrayList<>();
         listData = new ArrayList<>();
         dm = getResources().getDisplayMetrics();
+        mExplosionField = ExplosionField.attach2Window(getActivity());
+        helper = new AsyncTaskHelper();
         initLayout();
         initData();
 
@@ -379,6 +384,7 @@ public class FragmentAccident extends CustomFragment{
                                 if(progressDialog != null && !progressDialog.isShowing())
                                     progressDialog.show();
 
+                                gMap.setOnMyLocationChangeListener(myLocationChangeListener);
                                 IS_FIRST_INIT_MAP = false;
                                 return false;
                             }
@@ -414,6 +420,7 @@ public class FragmentAccident extends CustomFragment{
             if (!IS_FIRST_INIT_MAP) {
                 IS_FIRST_INIT_MAP = true;
                 if(location != null) {
+                    gMap.setOnMyLocationChangeListener(null);
                     locationItem = FunctionUtils.getDataAboutLocation(location, getActivity());
                     tvCurrentLocation.setText("Vị trí hiện tại: " + locationItem.getAddress());
                     CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -637,7 +644,6 @@ public class FragmentAccident extends CustomFragment{
                 enlargeWidth = ObjectAnimator.ofFloat(img,"scaleX", 1f, 0.7f);
                 enlargeWidth.setDuration(200);
 
-
                 // shink animation
                 shrinkHeight = ObjectAnimator.ofFloat(img,"scaleY", 0.7f, 1f);
                 shrinkHeight.setDuration(200);
@@ -677,12 +683,15 @@ public class FragmentAccident extends CustomFragment{
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.2f || Math.abs(temp) > 250){
+                        if(img.getAlpha() < 0.1f || Math.abs(temp) > 250){
+                            mExplosionField.explode(img);
                             ((ViewGroup) img.getParent()).removeView(img);
                         }else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
                             if (img.getAlpha() == 1f) {
                                 mHandler.removeCallbacks(myRunnable);
+                                img.setScaleX(1f);
+                                img.setScaleY(1f);
                                 showImage(img);
                             } else {
                                 shinkImage();
@@ -694,10 +703,11 @@ public class FragmentAccident extends CustomFragment{
                         temp = initialY + (int) (event.getRawY() - initialTouchY);
                         if (isRunningAnimation) {
                             Logger.error("temp: " + temp);
-                            img.setY(temp);
                             float alpha = (1 - (float)Math.abs(temp) / 200);
-                            if(alpha <= 1 && alpha >= 0)
+                            if(alpha <= 1 && alpha >= 0) {
+                                img.setY(temp);
                                 img.setAlpha(alpha);
+                            }
                             else if(alpha > 1)
                                 img.setAlpha(1f);
                             else
@@ -795,19 +805,32 @@ public class FragmentAccident extends CustomFragment{
                 try {
                     Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), uri);
                     int size = rootView.findViewById(R.id.viewNull).getWidth();
-                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
+//                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
 //                    Bitmap decodedBitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(),  size / 3, size / 3);
                     final ImageView img = new ImageView(getActivity());
-                    img.setImageBitmap(decodedBitmap);
+                    img.setLayoutParams(new ViewGroup.LayoutParams(size /3, size / 3));
+//                    img.setImageBitmap(decodedBitmap);
                     img.setTag(uri.toString());
-                    img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                    img.setScaleType(ImageView.ScaleType.FIT_XY);
 
                     LinearLayout lnlFirstPlan = (LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.container);
                     HorizontalScrollView scroll = (HorizontalScrollView) lnlFirstPlan.findViewById(R.id.scrImage);
-                    //((LinearLayout) scroll.getChildAt(0)).setLayoutTransition(new LayoutTransition());
                     ((LinearLayout) scroll.getChildAt(0)).addView(img);
 
-                    addTouchListenerImage(img);
+                    Picasso.with(getActivity())
+                            .load(uri) // Uri of the picture
+                            .fit()
+                            .into(img, new Callback() {
+                                @Override
+                                public void onSuccess() {
+                                    addTouchListenerImage(img);
+                                }
+
+                                @Override
+                                public void onError() {
+
+                                }
+                            });
                 }catch (Exception e){
                     e.printStackTrace();
                 }
@@ -859,19 +882,35 @@ public class FragmentAccident extends CustomFragment{
                                 lnlHorizontal.setLayoutTransition(new LayoutTransition());
                                 ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.imagelist)).addView(lnlHorizontal);
                             }
-                            getActivity().getContentResolver().notifyChange(selectedImage, null);
                             selectedImage = Uri.parse("file://" + selectedImage);
+                            getActivity().getContentResolver().notifyChange(selectedImage, null);
                             try {
-                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
                                 int size = rootView.findViewById(R.id.viewNull).getWidth();
-                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
-                                ImageView img = new ImageView(getActivity());
-                                img.setImageBitmap(decodedBitmap);
+//                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
+//                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
+
+                                final ImageView img = new ImageView(getActivity());
+                                img.setLayoutParams(new ViewGroup.LayoutParams(size /3, size / 3));
+                                img.setScaleType(ImageView.ScaleType.FIT_XY);
+//                                img.setImageBitmap(decodedBitmap);
                                 img.setTag(selectedImage.toString());
                                 lnlHorizontal.addView(img);
-                                uriStringList.add(selectedImage.toString());
 
-                                addTouchListenerImage(img);
+//                                helper.applyImage(getActivity(), img, selectedImage);
+                                Picasso.with(getActivity())
+                                        .load(selectedImage) // Uri of the picture
+                                        .fit()
+                                        .into(img, new Callback() {
+                                            @Override
+                                            public void onSuccess() {
+                                                addTouchListenerImage(img);
+                                            }
+
+                                            @Override
+                                            public void onError() {
+
+                                            }
+                                        });
                             } catch (Exception e) {
                                 Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();

@@ -16,7 +16,8 @@ import java.io.IOException;
 public class AsyncTaskHelper {
 
     public void applyImage(Context mContext, ImageView img, Uri uri){
-        new ApplyImage(mContext, img, uri).execute();
+//        new ApplyImage(mContext, img, uri).execute();
+        new ApplyImage(mContext, img, uri).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
     private class ApplyImage extends AsyncTask<Void, Void, Bitmap> {
         ImageView img;
@@ -27,12 +28,8 @@ public class AsyncTaskHelper {
             this.uri = uri;
             this.mContext = mContext;
             img.setImageBitmap(null);
-            img.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+            if(img.getScaleType() != ImageView.ScaleType.FIT_XY)
+                img.setScaleType(ImageView.ScaleType.FIT_CENTER);
         }
 
         @Override
@@ -48,12 +45,12 @@ public class AsyncTaskHelper {
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            super.onPostExecute(bitmap);
-            if(bitmap != null){
+        protected void onPostExecute(Bitmap b) {
+            if(b != null){
                 Logger.error("Done load img");
-                img.setImageBitmap(bitmap);
-//                img.setImageBitmap(FunctionUtils.fastblur(bitmap, 1f, 25));
+                img.setImageBitmap(b);
+            }else{
+                return;
             }
         }
     }

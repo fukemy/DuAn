@@ -346,6 +346,7 @@ public class AcInput extends FragmentActivity {
 //                System.out.println("got location : " + locationItem.toString());
                 IS_FOUND_LOCATION = true;
                 if(location != null) {
+                    gMap.setOnMyLocationChangeListener(null);
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
                             .zoom(17)                   // Sets the zoom
@@ -367,12 +368,9 @@ public class AcInput extends FragmentActivity {
                         public void onCancel() {
                             if (dialog != null && dialog.isShowing())
                                 dialog.dismiss();
-
                         }
                     });
                 }
-//                gMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLongitude(), location.getLatitude())));
-//                gMap.animateCamera(CameraUpdateFactory.zoomTo(17));
                 gMap.setOnMyLocationChangeListener(null);
             }
         }
