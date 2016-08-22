@@ -272,7 +272,7 @@ public class SprashScreen extends AppCompatActivity {
     private boolean validatePassword(){
         if (edtPassword.getText().toString().trim().isEmpty()) {
             inputPassword.setError(getString(R.string.error_blank_password));
-            requestFocus(edtUsername);
+            requestFocus(edtPassword);
             return false;
         } else {
             inputPassword.setErrorEnabled(false);
