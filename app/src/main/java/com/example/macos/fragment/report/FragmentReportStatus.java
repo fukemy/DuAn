@@ -209,8 +209,13 @@ public class FragmentReportStatus extends CustomFragment {
                 for (Data d : listData) {
                     EnDataModel en = gson.fromJson(d.getInput(), EnDataModel.class);
                     enList.add(en);
-                    if(!d.getIsUploaded())
+                    if(en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.accident_report).toLowerCase()) ||
+                            en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.problem_report).toLowerCase()) ||
+                            en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.lastday).toLowerCase())) {
+                    }else {
                         syncData.add(en);
+//                            Logger.error("add en:  " + en.getDaValue().getAction());
+                    }
                 }
 
                 summaryData(enList);
