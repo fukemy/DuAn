@@ -74,6 +74,13 @@
                 android:text="@string/road_name" />
 
             <TextView
+                android:id="@+id/tvJusticeProcess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="10dp"
+                android:text="Lý trình" />
+
+            <TextView
                 android:id="@+id/tvTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

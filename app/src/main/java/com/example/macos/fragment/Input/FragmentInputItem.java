@@ -222,6 +222,7 @@ public class FragmentInputItem extends CustomFragment{
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
         final EditText edtOtherStatus = (EditText) container.findViewById(R.id.edtOtherStatus);
+        final EditText edtJusticeProcess = (EditText) container.findViewById(R.id.edtJusticeProcess);
         final TextView tvRoadName = (TextView) container.findViewById(R.id.tvRoadName);
         tvRoadName.setVisibility(View.GONE);
         edtInformation.clearFocus();
@@ -288,10 +289,8 @@ public class FragmentInputItem extends CustomFragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedData = spinStatus.getText().toString();
-                Logger.error("text:" + selectedData);
                 if(selectedData.toLowerCase().equals(getResources().getString(R.string.other).toLowerCase())){
                     edtOtherStatus.setVisibility(View.VISIBLE);
-                    Logger.error("visible");
                 }else{
                     edtOtherStatus.setVisibility(View.GONE);
                 }
@@ -522,8 +521,14 @@ public class FragmentInputItem extends CustomFragment{
                     Logger.error("Show image result: " + isDelete);
                     if(isDelete){
                         if(viewingImage != null){
-                            ((ViewGroup) viewingImage.getParent()).removeView(viewingImage);
-                            viewingImage = null;
+                            viewingImage.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mExplosionField.explode(viewingImage);
+                                    ((ViewGroup) viewingImage.getParent()).removeView(viewingImage);
+                                    viewingImage = null;
+                                }
+                            }, 100);
                         }
                     }
                 }

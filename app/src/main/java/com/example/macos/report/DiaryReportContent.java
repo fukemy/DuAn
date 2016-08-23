@@ -48,7 +48,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 
 public class DiaryReportContent extends AppCompatActivity {
-    private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary;
+    private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary, tvJusticeProcess;
     LinearLayout lnlInput;
     private EnDataModel data;
     private GoogleMap gMap;
@@ -140,6 +140,7 @@ public class DiaryReportContent extends AppCompatActivity {
         tvCurrentLocation = (TextView) findViewById(R.id.tvCurrentLocation);
         tvTime = (TextView) findViewById(R.id.tvTime);
         tvSummary = (TextView) findViewById(R.id.tvSummary);
+        tvJusticeProcess = (TextView) findViewById(R.id.tvJusticeProcess);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,9 +192,21 @@ public class DiaryReportContent extends AppCompatActivity {
     private void initData() {
         Gson gson = new Gson();
         data = gson.fromJson(getIntent().getStringExtra("data"), EnDataModel.class);
-
-        tvCalalog.setText(tvCalalog.getText().toString() + " : " + (data.getDaValue().getDataName().equals("") ? "Chưa cập nhập!" :data.getDaValue().getDataName()));
+        try {
+            tvCalalog.setText(tvCalalog.getText().toString() + " : " + (data.getDaValue().getDataName().equals("")
+                    || data.getDaValue().getDataName().equals("null") ? "Chưa cập nhập!" : data.getDaValue().getDataName()));
+        } catch (Exception e) {
+            tvCalalog.setText(tvCalalog.getText().toString() + " : " + "Chưa cập nhập!");
+        }
         tvRoadName.setText(tvRoadName.getText().toString() + " : " + data.getDaValue().getTenDuong());
+
+        try {
+            tvJusticeProcess.setText(tvJusticeProcess.getText().toString() + " : " + (data.getDaValue().getLyTrinh().equals("")
+                    || data.getDaValue().getLyTrinh().equals("null") ? "Chưa cập nhập!" : data.getDaValue().getLyTrinh()));
+        }catch (Exception e){
+            tvJusticeProcess.setText(tvJusticeProcess.getText().toString() + " : " + "Chưa cập nhập!");
+        }
+
         tvSummary.setVisibility(View.GONE);
 
         if (data.getDaValue().getLocationItem() != null)

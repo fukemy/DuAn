@@ -352,6 +352,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                     case 0:
                         ACTION_TYPE = getResources().getString(R.string.road_test);
                         FunctionUtils.hideMenu(menu, true);
+                        FunctionUtils.hideSoftInput(viewPager, MainScreen.this);
                         break;
                     case 1:
                         ACTION_TYPE = "Lập báo cáo";

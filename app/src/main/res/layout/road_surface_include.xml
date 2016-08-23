@@ -70,6 +70,44 @@
                 android:singleLine="true"
                 android:tag="otherStatus" />
 
+            <EditText
+                android:id="@+id/edtJusticeProcess"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/border_disable"
+                android:gravity="left|top"
+                android:hint="Nhập lí trình..."
+                android:imeOptions="actionDone"
+                android:lines="2"
+                android:padding="10dp"
+                android:singleLine="true"
+                android:tag="justiceProcess" />
+
+            <LinearLayout
+                android:id="@+id/lnlInputInformation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <EditText
+                    android:id="@+id/edtInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="top"
+                    android:background="@drawable/border_disable"
+                    android:gravity="left|top"
+                    android:hint="@string/motachitet"
+                    android:imeOptions="actionDone"
+                    android:lines="2"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:tag="information" />
+            </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/lnlInputIcon"
@@ -142,28 +180,6 @@
                         android:tag="add" />
 
                 </LinearLayout>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/lnlInputInformation"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
-
-                <EditText
-                    android:id="@+id/edtInformation"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top"
-                    android:background="@drawable/border_disable"
-                    android:gravity="left|top"
-                    android:hint="@string/motachitet"
-                    android:imeOptions="actionDone"
-                    android:lines="2"
-                    android:padding="10dp"
-                    android:singleLine="true"
-                    android:tag="information" />
             </LinearLayout>
 
             <HorizontalScrollView

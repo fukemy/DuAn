@@ -157,12 +157,14 @@ public class FragmentAccident extends CustomFragment{
                 if(heightDifference != currentHeightDiff) {
                     if (heightDifference > 150) {
                         rootView.setPadding(0, 0, 0, heightDifference);
-                        scroll.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                scroll.smoothScrollBy(0, FunctionUtils.dpToPx(100, getActivity()));
-                            }
-                        }, 100);
+//                        if(lnlALl.getChildCount() > 1) {
+//                            scroll.postDelayed(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    scroll.smoothScrollBy(0, FunctionUtils.dpToPx(100, getActivity()));
+//                                }
+//                            }, 100);
+//                        }
                     } else {
                         rootView.setPadding(0, 0, 0, 0);
                     }
@@ -543,6 +545,11 @@ public class FragmentAccident extends CustomFragment{
                                     isAcceptCollectData = false;
                                 }
                             }
+
+                            if (tag.equals("justiceProcess")) {     // for edittext
+                                dataTypeItem.setLyTrinh(text);
+                            }
+
                             if (tag.equals("information")) {
                                 if (((EditText) lnl.getChildAt(j)).getText() != null && text.toString().length() > 0) {
                                     dataTypeItem.setMoTaTinhTrang(text);
@@ -552,6 +559,7 @@ public class FragmentAccident extends CustomFragment{
                                     isAcceptCollectData = false;
                                 }
                             }
+
                         }
                     }
 
@@ -860,8 +868,14 @@ public class FragmentAccident extends CustomFragment{
                     Logger.error("Show image result: " + isDelete);
                     if(isDelete){
                         if(viewingImage != null){
-                            ((ViewGroup) viewingImage.getParent()).removeView(viewingImage);
-                            viewingImage = null;
+                            viewingImage.postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mExplosionField.explode(viewingImage);
+                                    ((ViewGroup) viewingImage.getParent()).removeView(viewingImage);
+                                    viewingImage = null;
+                                }
+                            }, 100);
                         }
                     }
                 }

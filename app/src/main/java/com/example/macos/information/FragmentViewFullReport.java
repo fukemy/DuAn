@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.FunctionUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,13 +36,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
  * Created by devil2010 on 7/6/16.
  */
 public class FragmentViewFullReport extends DialogFragment {
-    private TextView tvCalalog,tvRoadName,tvCurrentLocation,tvTime,tvSummary;
+    private TextView tvCalalog,tvRoadName,tvCurrentLocation,tvTime,tvSummary,tvJusticeProcess;
     LinearLayout lnlInput;
     private View rootView;
     private EnDataModel data;
     int inputOrder;
     private GoogleMap gMap;
     SupportMapFragment mSupportMapFragment;
+    private Button btnBack;
 
     public void setData(EnDataModel en){
         data = en;
@@ -69,8 +72,14 @@ public class FragmentViewFullReport extends DialogFragment {
         tvCurrentLocation = (TextView) rootView.findViewById(R.id.tvCurrentLocation);
         tvTime = (TextView) rootView.findViewById(R.id.tvTime);
         tvSummary = (TextView) rootView.findViewById(R.id.tvSummary);
-
-
+        tvJusticeProcess = (TextView) rootView.findViewById(R.id.tvJusticeProcess);
+        btnBack = (Button) rootView.findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getDialog().dismiss();
+            }
+        });
         mSupportMapFragment = new SupportMapFragment();
         FragmentTransaction trans = getChildFragmentManager().beginTransaction();
         trans.add(R.id.mapp, mSupportMapFragment).commit();
@@ -114,7 +123,14 @@ public class FragmentViewFullReport extends DialogFragment {
         LinearLayout container = (LinearLayout) LayoutInflater.from(getActivity()).inflate(R.layout.report_status_content_layout_include, null, false);
         tvCalalog.setText(tvCalalog.getText().toString() + " : " + data.getDaValue().getAction());
         tvRoadName.setText(tvRoadName.getText().toString() + " : " + data.getDaValue().getTenDuong());
-//        tvSummary.setText(tvSummary.getText().toString() + " : " + data.getSummary());
+
+        try {
+            tvJusticeProcess.setText(tvJusticeProcess.getText().toString() + " : " + (data.getDaValue().getLyTrinh() == null || data.getDaValue().getLyTrinh().equals("")
+                    || data.getDaValue().getLyTrinh().equals("null") ? "Chưa cập nhập!" : data.getDaValue().getLyTrinh()));
+        }catch (Exception e){
+            tvJusticeProcess.setText(tvJusticeProcess.getText().toString() + " : " + "Chưa cập nhập!");
+        }
+
         tvSummary.setText("");
         if (data.getDaValue().getLocationItem().getLocation() != null) {
             tvCurrentLocation.setText(tvCurrentLocation.getText().toString() + " : " + data.getDaValue().getLocationItem().getAddress());

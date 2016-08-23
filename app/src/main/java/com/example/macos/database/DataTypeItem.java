@@ -20,6 +20,15 @@ public class DataTypeItem {
     private String NguoiNhap;
     private String ThoiGianNhap;
     private String ThangDanhGia;
+    private String LyTrinh;
+
+    public String getLyTrinh() {
+        return LyTrinh;
+    }
+
+    public void setLyTrinh(String lyTrinh) {
+        LyTrinh = lyTrinh;
+    }
 
     @Override
     public String toString() {
@@ -32,6 +41,7 @@ public class DataTypeItem {
                 ", \n\"KinhDo\":\"" + KinhDo + "\"" +
                 ", \n\"ViDo\":\"" + ViDo + "\"" +
                 ", \n\"CaoDo\":\"" + CaoDo + "\"" +
+                ", \n\"LyTrinh\":\"" + LyTrinh + "\"" +
                 ", \n\"NguoiNhap\":\"" + NguoiNhap + "\"" +
                 ", \n\"ThoiGianNhap\":\"" + ThoiGianNhap + "\""+
                 ", \n\"DanhGia\":\"" + ThangDanhGia + "\""+

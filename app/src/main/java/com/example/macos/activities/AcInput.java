@@ -402,6 +402,11 @@ public class AcInput extends FragmentActivity {
                     if (tag.equals("information")) {     // for edittext
                         dataTypeItem.setMoTaTinhTrang(text);
                     }
+
+                    if (tag.equals("justiceProcess")) {     // for edittext
+                        dataTypeItem.setLyTrinh(text);
+                    }
+
                     if (tag.equals("otherStatus")) {     // for edittext
                         if(text != null && !text.equals(""))
                             dataTypeItem.setThangDanhGia(text);
