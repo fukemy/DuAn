@@ -56,20 +56,20 @@ public class FragmentMainDataScreen extends CustomFragment {
         list.add(new EnMainCatalogItem(catalogList.get(1), false, R.mipmap.nenduong, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(2), false, R.mipmap.daiphancach, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(3), false, R.mipmap.cauchui, new FragmentInputItem()));
-        list.add(new EnMainCatalogItem(catalogList.get(4), false, R.mipmap.roads, new FragmentInputItem()));
+        list.add(new EnMainCatalogItem(catalogList.get(4), false, R.mipmap.conghopbanthoatnuoc, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(5), false, R.mipmap.congtron, new FragmentInputItem()));
-        list.add(new EnMainCatalogItem(catalogList.get(6), false, R.mipmap.roads, new FragmentInputItem()));
+        list.add(new EnMainCatalogItem(catalogList.get(6), false, R.mipmap.maidoc, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(7), false, R.mipmap.tuongchan, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(8), false, R.mipmap.hangraobaove, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(9), false, R.mipmap.hethongsang, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(10), false, R.mipmap.bienbao, new FragmentInputItem()));
-        list.add(new EnMainCatalogItem(catalogList.get(11), false, R.mipmap.roads, new FragmentInputItem()));
+        list.add(new EnMainCatalogItem(catalogList.get(11), false, R.mipmap.vachsonduong, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(12), false, R.mipmap.cot_km, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(13), false, R.mipmap.cau, new FragmentInputItem()));
         list.add(new EnMainCatalogItem(catalogList.get(14), false, R.mipmap.coctieu, new FragmentInputItem()));
-        list.add(new EnMainCatalogItem(catalogList.get(15), false, R.mipmap.roads, new FragmentInputItem()));
-        list.add(new EnMainCatalogItem(catalogList.get(16), false, R.mipmap.roads, new FragmentInputItem()));
-        list.add(new EnMainCatalogItem(catalogList.get(17), false, R.mipmap.roads, new FragmentInputItem()));
+        list.add(new EnMainCatalogItem(catalogList.get(15), false, R.mipmap.hogahothu, new FragmentInputItem()));
+        list.add(new EnMainCatalogItem(catalogList.get(16), false, R.mipmap.ranhdocranhbien, new FragmentInputItem()));
+        list.add(new EnMainCatalogItem(catalogList.get(17), false, R.mipmap.congdoc, new FragmentInputItem()));
 
 
 

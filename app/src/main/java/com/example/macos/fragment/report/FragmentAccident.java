@@ -10,6 +10,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.location.Location;
 import android.net.Uri;
@@ -37,7 +38,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.example.macos.activities.AcImageInformation;
 import com.example.macos.activities.MainScreen;
 import com.example.macos.database.DataTypeItem;
@@ -69,6 +69,7 @@ import com.mlsdev.rximagepicker.Sources;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
+import com.wooplr.spotlight.SpotlightView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +99,7 @@ public class FragmentAccident extends CustomFragment{
     int currentHeightDiff = 0;
     int currentEditorChild = 0;
     private ExplosionField mExplosionField;
-
+    private SharedPreferenceManager pref;
     AsyncTaskHelper helper;
     private DisplayMetrics dm;
     public void setInterface(iListWork swapInterface) {
@@ -114,6 +115,7 @@ public class FragmentAccident extends CustomFragment{
         dm = getResources().getDisplayMetrics();
         mExplosionField = ExplosionField.attach2Window(getActivity());
         helper = new AsyncTaskHelper();
+        pref = new SharedPreferenceManager(getActivity());
         initLayout();
         initData();
 
@@ -423,6 +425,9 @@ public class FragmentAccident extends CustomFragment{
                 if(location != null) {
                     gMap.setOnMyLocationChangeListener(null);
                     locationItem = FunctionUtils.getDataAboutLocation(location, getActivity());
+                    if(locationItem.getAddress() == null){
+                        addGoogleMapShowcase();
+                    }
                     tvCurrentLocation.setText("Vị trí hiện tại: " + locationItem.getAddress());
                     CameraPosition cameraPosition = new CameraPosition.Builder()
                             .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
@@ -841,6 +846,7 @@ public class FragmentAccident extends CustomFragment{
                                 @Override
                                 public void onSuccess() {
                                     addTouchListenerImage(img);
+                                    addImageShowcase(img);
                                 }
 
                                 @Override
@@ -927,6 +933,7 @@ public class FragmentAccident extends CustomFragment{
                                             @Override
                                             public void onSuccess() {
                                                 addTouchListenerImage(img);
+                                                addImageShowcase(img);
                                             }
 
                                             @Override
@@ -945,5 +952,68 @@ public class FragmentAccident extends CustomFragment{
                 break;
         }
 
+    }
+
+    private void addGoogleMapShowcase(){
+        boolean addedShowcase = pref.getBoolean(GlobalParams.GOOGLE_MAP_CLICK_SHOWCASE, false);
+        if(!addedShowcase){
+            try {
+                View mapView = mSupportMapFragment.getView();
+                if (mapView != null &&
+                        mapView.findViewById(Integer.parseInt("1")) != null) {
+                    View mapButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                    new SpotlightView.Builder(getActivity())
+                            .introAnimationDuration(400)
+                            .enableRevalAnimation(true)
+                            .performClick(true)
+                            .fadeinTextDuration(400)
+                            .headingTvColor(Color.parseColor("#eb273f"))
+                            .headingTvSize(32)
+                            .headingTvText("Không lấy được vị trí?")
+                            .subHeadingTvColor(Color.parseColor("#ffffff"))
+                            .subHeadingTvSize(16)
+                            .subHeadingTvText("Hệ thống đôi lúc ko lấy được vị trí của bạn trên máy chủ google, thử lại bằng cách nhấn vào nút \""
+                                    + "Vị trí của tôi\" để tìm kiếm lại!")
+                            .maskColor(Color.parseColor("#dc000000"))
+                            .target(mapButton)
+                            .lineAnimDuration(400)
+                            .lineAndArcColor(Color.parseColor("#eb273f"))
+                            .dismissOnTouch(false)
+                            .enableDismissAfterShown(true)
+                            .usageId("mapButton")
+                            .show();
+                    pref.saveBoolean(GlobalParams.GOOGLE_MAP_CLICK_SHOWCASE, true);
+                }
+            }catch (Exception e){
+
+            }
+        }
+    }
+
+    public void addImageShowcase(ImageView img){
+        boolean addedShowcase = pref.getBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, false);
+        if(!addedShowcase){
+            new SpotlightView.Builder(getActivity())
+                    .introAnimationDuration(400)
+                    .enableRevalAnimation(true)
+                    .performClick(true)
+                    .fadeinTextDuration(400)
+                    .headingTvColor(Color.parseColor("#eb273f"))
+                    .headingTvSize(32)
+                    .headingTvText("Xoá ảnh")
+                    .subHeadingTvColor(Color.parseColor("#ffffff"))
+                    .subHeadingTvSize(16)
+                    .subHeadingTvText("Bạn có thể xoá ảnh đã chọn bằng cách nhấn vào ảnh và giữ nguyên 1 giây cho đến khi ảnh thu nhỏ lại"
+                            + " ,và vuốt lên/xuống để xoá!")
+                    .maskColor(Color.parseColor("#dc000000"))
+                    .target(img)
+                    .lineAnimDuration(400)
+                    .lineAndArcColor(Color.parseColor("#eb273f"))
+                    .dismissOnTouch(false)
+                    .enableDismissAfterShown(true)
+                    .usageId(img.getTag().toString())
+                    .show();
+            pref.saveBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, true);
+        }
     }
 }

@@ -39,4 +39,5 @@ dependencies {
     //compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
     compile 'tyrantgit:explosionfield:1.0.1' //explosive view
     compile 'com.squareup.picasso:picasso:2.5.2'
+    compile 'com.github.wooplr:Spotlight:1.2.2' // show case view
 }

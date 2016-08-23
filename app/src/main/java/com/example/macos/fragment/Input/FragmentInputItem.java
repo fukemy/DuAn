@@ -9,6 +9,7 @@ import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ import com.mlsdev.rximagepicker.Sources;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
+import com.wooplr.spotlight.SpotlightView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,6 +88,7 @@ public class FragmentInputItem extends CustomFragment{
     DisplayMetrics dm;
     private ImageView viewingImage;
     private ExplosionField mExplosionField;
+    private SharedPreferenceManager pref;
     AsyncTaskHelper helper;
 
     @Override
@@ -95,9 +98,9 @@ public class FragmentInputItem extends CustomFragment{
         mExplosionField = ExplosionField.attach2Window(getActivity());
         helper = new AsyncTaskHelper();
         dm = getResources().getDisplayMetrics();
+        pref = new SharedPreferenceManager(getActivity());
 
         initLayout();
-
 
         LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams)bottomView.getLayoutParams();
         btmParams.bottomMargin = FunctionUtils.dpToPx(216, getActivity());
@@ -352,7 +355,6 @@ public class FragmentInputItem extends CustomFragment{
                         imgVoidRoadName.setVisibility(View.VISIBLE);
                         imgCameraRoadName.setVisibility(View.VISIBLE);
                         imgGaleryRoadName.setVisibility(View.VISIBLE);
-                        System.out.println("edit");
                     } else {
                         if (imgEditRoadName.getTag().toString().equals("done")) {
                             disableNestedData(listData.get(ORDER_CAMERA_POSITION), false);
@@ -361,7 +363,6 @@ public class FragmentInputItem extends CustomFragment{
                             imgVoidRoadName.setVisibility(View.GONE);
                             imgCameraRoadName.setVisibility(View.GONE);
                             imgGaleryRoadName.setVisibility(View.GONE);
-                            System.out.println("done");
                         }
                     }
                 }
@@ -483,6 +484,7 @@ public class FragmentInputItem extends CustomFragment{
                                 @Override
                                 public void onSuccess() {
                                     addTouchListenerImage(img);
+                                    addImageShowcase(img);
                                 }
 
                                 @Override
@@ -498,6 +500,33 @@ public class FragmentInputItem extends CustomFragment{
             }
         });
 
+    }
+
+    public void addImageShowcase(ImageView img){
+        boolean addedShowcase = pref.getBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, false);
+        if(!addedShowcase){
+           new SpotlightView.Builder(getActivity())
+                    .introAnimationDuration(400)
+                    .enableRevalAnimation(true)
+                    .performClick(true)
+                    .fadeinTextDuration(400)
+                    .headingTvColor(Color.parseColor("#eb273f"))
+                    .headingTvSize(32)
+                    .headingTvText("Xoá ảnh")
+                    .subHeadingTvColor(Color.parseColor("#ffffff"))
+                    .subHeadingTvSize(16)
+                    .subHeadingTvText("Bạn có thể xoá ảnh đã chọn bằng cách nhấn vào ảnh và giữ nguyên 1 giây cho đến khi ảnh thu nhỏ lại"
+                        + " ,và vuốt lên/xuống để xoá!")
+                    .maskColor(Color.parseColor("#dc000000"))
+                    .target(img)
+                    .lineAnimDuration(400)
+                    .lineAndArcColor(Color.parseColor("#eb273f"))
+                    .dismissOnTouch(false)
+                    .enableDismissAfterShown(true)
+                    .usageId(img.getTag().toString())
+                   .show();
+            pref.saveBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, true);
+        }
     }
 
     @Override
@@ -573,6 +602,7 @@ public class FragmentInputItem extends CustomFragment{
                                             @Override
                                             public void onSuccess() {
                                                 addTouchListenerImage(img);
+                                                addImageShowcase(img);
                                             }
 
                                             @Override

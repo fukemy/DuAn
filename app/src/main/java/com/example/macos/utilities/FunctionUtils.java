@@ -114,6 +114,7 @@ public class FunctionUtils {
 
 
         }catch (Exception e){
+            e.printStackTrace();
         }
 
         return en;

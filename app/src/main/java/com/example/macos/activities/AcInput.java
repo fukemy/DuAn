@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.location.Location;
@@ -50,6 +51,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
 import com.viewpagerindicator.TitlePageIndicator;
+import com.wooplr.spotlight.SpotlightView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -267,6 +269,7 @@ public class AcInput extends FragmentActivity {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     if (googleMap != null) {
+                        Logger.error("get googlemap");
                         gMap = googleMap;
                         gMap.setMyLocationEnabled(true);
                         gMap.setOnMyLocationChangeListener(myLocationChangeListener);
@@ -334,14 +337,53 @@ public class AcInput extends FragmentActivity {
         });
     }
 
+    private void addGoogleMapShowcase(){
+        boolean addedShowcase = pref.getBoolean(GlobalParams.GOOGLE_MAP_CLICK_SHOWCASE, false);
+        if(!addedShowcase){
+            try {
+                View mapView = mSupportMapFragment.getView();
+                if (mapView != null &&
+                        mapView.findViewById(Integer.parseInt("1")) != null) {
+                    View mapButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
+                    new SpotlightView.Builder(this)
+                            .introAnimationDuration(400)
+                            .enableRevalAnimation(true)
+                            .performClick(true)
+                            .fadeinTextDuration(400)
+                            .headingTvColor(Color.parseColor("#eb273f"))
+                            .headingTvSize(32)
+                            .headingTvText("Xoá ảnh")
+                            .subHeadingTvColor(Color.parseColor("#ffffff"))
+                            .subHeadingTvSize(16)
+                            .subHeadingTvText("Hệ thống đôi lúc ko lấy được vị trí của bạn trên máy chủ google, thử lại bằng cách nhấn vào nút \""
+                                    + "Vị trí của tôi\" để tìm kiếm lại!")
+                            .maskColor(Color.parseColor("#dc000000"))
+                            .target(mapButton)
+                            .lineAnimDuration(400)
+                            .lineAndArcColor(Color.parseColor("#eb273f"))
+                            .dismissOnTouch(false)
+                            .enableDismissAfterShown(true)
+                            .usageId("mapButton")
+                            .show();
+                    pref.saveBoolean(GlobalParams.GOOGLE_MAP_CLICK_SHOWCASE, true);
+                }
+            }catch (Exception e){
+
+            }
+        }
+    }
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(Location location) {
             if(!IS_FOUND_LOCATION) {
+                Logger.error("found location :" + location.toString());
                 title.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
                 locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
+                if(locationItem.getAddress() == null){
+                    addGoogleMapShowcase();
+                }
                 ((FragmentInputItem)((MainScreenAdapter)viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
 //                System.out.println("got location : " + locationItem.toString());
                 IS_FOUND_LOCATION = true;
