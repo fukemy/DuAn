@@ -993,27 +993,31 @@ public class FragmentAccident extends CustomFragment{
     public void addImageShowcase(ImageView img){
         boolean addedShowcase = pref.getBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, false);
         if(!addedShowcase){
-            new SpotlightView.Builder(getActivity())
-                    .introAnimationDuration(400)
-                    .enableRevalAnimation(true)
-                    .performClick(true)
-                    .fadeinTextDuration(400)
-                    .headingTvColor(Color.parseColor("#eb273f"))
-                    .headingTvSize(32)
-                    .headingTvText("Xoá ảnh")
-                    .subHeadingTvColor(Color.parseColor("#ffffff"))
-                    .subHeadingTvSize(16)
-                    .subHeadingTvText("Bạn có thể xoá ảnh đã chọn bằng cách nhấn vào ảnh và giữ nguyên 1 giây cho đến khi ảnh thu nhỏ lại"
-                            + " ,và vuốt lên/xuống để xoá!")
-                    .maskColor(Color.parseColor("#dc000000"))
-                    .target(img)
-                    .lineAnimDuration(400)
-                    .lineAndArcColor(Color.parseColor("#eb273f"))
-                    .dismissOnTouch(false)
-                    .enableDismissAfterShown(true)
-                    .usageId(img.getTag().toString())
-                    .show();
-            pref.saveBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, true);
+            try{
+                new SpotlightView.Builder(getActivity())
+                        .introAnimationDuration(400)
+                        .enableRevalAnimation(true)
+                        .performClick(true)
+                        .fadeinTextDuration(400)
+                        .headingTvColor(Color.parseColor("#eb273f"))
+                        .headingTvSize(32)
+                        .headingTvText("Xoá ảnh")
+                        .subHeadingTvColor(Color.parseColor("#ffffff"))
+                        .subHeadingTvSize(16)
+                        .subHeadingTvText("Bạn có thể xoá ảnh đã chọn bằng cách nhấn vào ảnh và giữ nguyên 1 giây cho đến khi ảnh thu nhỏ lại"
+                                + " ,và vuốt lên/xuống để xoá!")
+                        .maskColor(Color.parseColor("#dc000000"))
+                        .target(img)
+                        .lineAnimDuration(400)
+                        .lineAndArcColor(Color.parseColor("#eb273f"))
+                        .dismissOnTouch(false)
+                        .enableDismissAfterShown(true)
+                        .usageId(img.getTag().toString())
+                        .show();
+                pref.saveBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, true);
+            }catch (Exception e){
+
+            }
         }
     }
 }

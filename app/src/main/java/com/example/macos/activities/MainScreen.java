@@ -513,6 +513,37 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         return true;
     }
 
+//    private void addMenuShowcase(){
+//        boolean isAddedShowcase = pref.getBoolean(GlobalParams.MULTI_SELECT_SHOWCASE, false);
+//        if(!isAddedShowcase) {
+//            try {
+//                new SpotlightView.Builder(this)
+//                        .introAnimationDuration(400)
+//                        .enableRevalAnimation(true)
+//                        .performClick(true)
+//                        .fadeinTextDuration(400)
+//                        .headingTvColor(Color.parseColor("#eb273f"))
+//                        .headingTvSize(32)
+//                        .headingTvText("Chọn nhiều mục cùng lúc!")
+//                        .subHeadingTvColor(Color.parseColor("#ffffff"))
+//                        .subHeadingTvSize(16)
+//                        .subHeadingTvText("Thuận tiện hơn khi bạn muốn nhập nhiều dữ liệu cho 1 lần tuần đường, tuy nhiên phải nhập ít nhất 1 lần cho mỗi loại dữ liệu, "
+//                                + "nhấn \"DONE\" để tiếp tục!")
+//                        .maskColor(Color.parseColor("#dc000000"))
+//                        .target(menu.getItem(1).getActionView())
+//                        .lineAnimDuration(400)
+//                        .lineAndArcColor(Color.parseColor("#eb273f"))
+//                        .dismissOnTouch(false)
+//                        .enableDismissAfterShown(true)
+//                        .usageId(GlobalParams.MULTI_SELECT_SHOWCASE)
+//                        .show();
+//                pref.saveBoolean(GlobalParams.MULTI_SELECT_SHOWCASE, true);
+//            }catch (Exception e){
+//
+//            }
+//        }
+//    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -531,6 +562,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 ((FragmentMainDataScreen)adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(true);
                 menu.findItem(R.id.done).setVisible(true);
                 menu.findItem(R.id.select_road_type).setTitle(getResources().getString(R.string.single_select));
+//                addMenuShowcase();
                 return false;
             }
             if(menu.findItem(R.id.select_road_type).getTitle().equals(getResources().getString(R.string.single_select))) {

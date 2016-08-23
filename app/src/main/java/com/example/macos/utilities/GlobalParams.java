@@ -15,6 +15,7 @@ public class GlobalParams {
     public static final String DANH_MUC = "danh muc";
     public static final String GOOGLE_MAP_CLICK_SHOWCASE = "google map click show case";
     public static final String IMAGE_SWIPE_TO_DELETE_SHOWCASE = "swipe image to delete showcase";
+    public static final String MULTI_SELECT_SHOWCASE = "multi select showcase";
     public static final String DATA_SUMMARY = "data summary";
     public static final String IS_LOGGED_ON = "is logged on";
     public static final String USERNAME = "user name";
