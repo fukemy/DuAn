@@ -248,6 +248,7 @@ public class FragmentAccident extends CustomFragment{
                         imgAdd.setImageResource(0);
                         imgAdd.setImageDrawable(null);
                         imgAdd.setTag(null);
+                        imgAdd.setVisibility(View.GONE);
                         imgSpeak.setVisibility(View.GONE);
                         imgCamera.setVisibility(View.GONE);
                         imgGallery.setVisibility(View.GONE);
@@ -274,7 +275,6 @@ public class FragmentAccident extends CustomFragment{
                         imgSpeak.setVisibility(View.VISIBLE);
                         imgCamera.setVisibility(View.VISIBLE);
                         imgGallery.setVisibility(View.VISIBLE);
-                        System.out.println("edit");
                     } else {
                         if (imgEdit.getTag().toString().equals("done")) {
                             FunctionUtils.hideSoftInput(edtInput, getActivity());
@@ -285,7 +285,6 @@ public class FragmentAccident extends CustomFragment{
                             imgSpeak.setVisibility(View.GONE);
                             imgCamera.setVisibility(View.GONE);
                             imgGallery.setVisibility(View.GONE);
-                            System.out.println("done");
                         }
                     }
                 }
@@ -332,7 +331,7 @@ public class FragmentAccident extends CustomFragment{
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-
+//            Toast.makeText(getActivity(), "", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -585,7 +584,6 @@ public class FragmentAccident extends CustomFragment{
                     if(lnl.getChildAt(j) instanceof HorizontalScrollView) {
                         HorizontalScrollView scroll = (HorizontalScrollView) lnl.getChildAt(j);
                         collectNestedData((LinearLayout) scroll.getChildAt(0));
-                        Logger.error("found scroll");
                     }
                 }catch (Exception e){
                     Logger.error("Wrong data");
@@ -626,7 +624,6 @@ public class FragmentAccident extends CustomFragment{
     private final int CHOOSEN_PICTURE = 3;
 
     private void moveImageToCurrent(final ImageView img, final int currentY){
-        Logger.error("move image to current");
         img.animate().y(currentY).withEndAction(new Runnable() {
             @Override
             public void run() {
@@ -730,8 +727,20 @@ public class FragmentAccident extends CustomFragment{
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         Logger.error("ACTION_CANCEL");
-                        shinkImage();
-                        mHandler.removeCallbacks(myRunnable);
+                        if(isRunningAnimation && ((ViewGroup) img.getParent()).getTag() != null &&
+                            ((ViewGroup) img.getParent()).getTag().toString().equals("fromCamera")){
+                            Logger.error("fromCamera");
+                            if(img.getAlpha() < 0.1f){
+                                mExplosionField.explode(img);
+                                ((ViewGroup) img.getParent()).removeView(img);
+                            }else{
+                                shinkImage();
+                                mHandler.removeCallbacks(myRunnable);
+                            }
+                        }else{
+                            shinkImage();
+                            mHandler.removeCallbacks(myRunnable);
+                        }
                         return true;
                     case MotionEvent.ACTION_OUTSIDE:
                         Logger.error("ACTION_OUTSIDE");

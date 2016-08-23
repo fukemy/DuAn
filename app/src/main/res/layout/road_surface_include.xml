@@ -10,6 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:layout_marginBottom="20dp"
+        android:clipChildren="false"
         android:orientation="vertical"
         android:paddingBottom="10dp">
 
@@ -80,7 +81,7 @@
                 android:layout_marginTop="10dp"
                 android:background="@drawable/border_disable"
                 android:gravity="left|top"
-                android:hint="Nhập lí trình..."
+                android:hint="Nhập lý trình..."
                 android:imeOptions="actionDone"
                 android:lines="2"
                 android:padding="10dp"
@@ -196,9 +197,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:animateLayoutChanges="true"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:background="@drawable/image_ripple"
                     android:clickable="true"
                     android:gravity="top|left"
+                    android:tag="fromCamera"
                     android:orientation="horizontal" />
             </HorizontalScrollView>
         </LinearLayout>

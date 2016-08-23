@@ -698,8 +698,20 @@ public class FragmentInputItem extends CustomFragment{
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         Logger.error("ACTION_CANCEL");
-                        shinkImage();
-                        mHandler.removeCallbacks(myRunnable);
+                        if(isRunningAnimation && ((ViewGroup) img.getParent()).getTag() != null &&
+                                ((ViewGroup) img.getParent()).getTag().toString().equals("fromCamera")){
+                            Logger.error("fromCamera");
+                            if(img.getAlpha() < 0.1f){
+                                mExplosionField.explode(img);
+                                ((ViewGroup) img.getParent()).removeView(img);
+                            }else{
+                                shinkImage();
+                                mHandler.removeCallbacks(myRunnable);
+                            }
+                        }else{
+                            shinkImage();
+                            mHandler.removeCallbacks(myRunnable);
+                        }
                         return true;
                     case MotionEvent.ACTION_OUTSIDE:
                         Logger.error("ACTION_OUTSIDE");
