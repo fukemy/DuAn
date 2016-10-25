@@ -91,5 +91,6 @@
     <string name="capturing_image">Taking New Picture</string>
     <string name="done">Done</string>
     <string name="other">Khác</string>
+    <string name="title_activity_ac_video">AcVideo</string>
 
 </resources>

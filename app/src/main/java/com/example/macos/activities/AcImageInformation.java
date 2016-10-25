@@ -86,61 +86,61 @@ public class AcImageInformation extends Activity {
                 }
             });
 
-                    setEnterSharedElementCallback(new SharedElementCallback() {
-                        @Override
-                        public View onCreateSnapshotView(Context context, Parcelable snapshot) {
-                            View view = new View(context);
-                            try {
-                                view.setBackground(new BitmapDrawable((Bitmap) snapshot));
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            return view;
-                        }
+            setEnterSharedElementCallback(new SharedElementCallback() {
+                @Override
+                public View onCreateSnapshotView(Context context, Parcelable snapshot) {
+                    View view = new View(context);
+                    try {
+                        view.setBackground(new BitmapDrawable((Bitmap) snapshot));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return view;
+                }
 
-                        @Override
-                        public void onSharedElementStart(List<String> sharedElementNames,
-                                                         List<View> sharedElements,
-                                                         List<View> sharedElementSnapshots) {
-                            ImageView sharedElement = (ImageView) findViewById(R.id.imgInfo);
-                            for (int i = 0; i < sharedElements.size(); i++) {
-                                if (sharedElements.get(i) == sharedElement) {
-                                    View snapshot = sharedElementSnapshots.get(i);
-                                    Drawable snapshotDrawable = snapshot.getBackground();
-                                    sharedElement.setBackground(snapshotDrawable);
-                                    sharedElement.setImageAlpha(0);
-                                    forceSharedElementLayout();
-                                    break;
-                                }
-                            }
+                @Override
+                public void onSharedElementStart(List<String> sharedElementNames,
+                                                 List<View> sharedElements,
+                                                 List<View> sharedElementSnapshots) {
+                    ImageView sharedElement = (ImageView) findViewById(R.id.imgInfo);
+                    for (int i = 0; i < sharedElements.size(); i++) {
+                        if (sharedElements.get(i) == sharedElement) {
+                            View snapshot = sharedElementSnapshots.get(i);
+                            Drawable snapshotDrawable = snapshot.getBackground();
+                            sharedElement.setBackground(snapshotDrawable);
+                            sharedElement.setImageAlpha(0);
+                            forceSharedElementLayout();
+                            break;
                         }
+                    }
+                }
 
-                        private void forceSharedElementLayout() {
-                            ImageView sharedElement = (ImageView) findViewById(R.id.imgInfo);
-                            int widthSpec = View.MeasureSpec.makeMeasureSpec(sharedElement.getWidth(),
-                                    View.MeasureSpec.EXACTLY);
-                            int heightSpec = View.MeasureSpec.makeMeasureSpec(sharedElement.getHeight(),
-                                    View.MeasureSpec.EXACTLY);
-                            int left = sharedElement.getLeft();
-                            int top = sharedElement.getTop();
-                            int right = sharedElement.getRight();
-                            int bottom = sharedElement.getBottom();
-                            sharedElement.measure(widthSpec, heightSpec);
-                            sharedElement.layout(left, top, right, bottom);
-                        }
+                private void forceSharedElementLayout() {
+                    ImageView sharedElement = (ImageView) findViewById(R.id.imgInfo);
+                    int widthSpec = View.MeasureSpec.makeMeasureSpec(sharedElement.getWidth(),
+                            View.MeasureSpec.EXACTLY);
+                    int heightSpec = View.MeasureSpec.makeMeasureSpec(sharedElement.getHeight(),
+                            View.MeasureSpec.EXACTLY);
+                    int left = sharedElement.getLeft();
+                    int top = sharedElement.getTop();
+                    int right = sharedElement.getRight();
+                    int bottom = sharedElement.getBottom();
+                    sharedElement.measure(widthSpec, heightSpec);
+                    sharedElement.layout(left, top, right, bottom);
+                }
 
-                        @Override
-                        public void onSharedElementEnd(List<String> sharedElementNames,
-                                                       List<View> sharedElements,
-                                                       List<View> sharedElementSnapshots) {
-                            ImageView sharedElement = (ImageView) findViewById(R.id.imgInfo);
-                            sharedElement.setBackground(null);
-                            sharedElement.setImageAlpha(255);
+                @Override
+                public void onSharedElementEnd(List<String> sharedElementNames,
+                                               List<View> sharedElements,
+                                               List<View> sharedElementSnapshots) {
+                    ImageView sharedElement = (ImageView) findViewById(R.id.imgInfo);
+                    sharedElement.setBackground(null);
+                    sharedElement.setImageAlpha(255);
 
-                            //setImage();
-                            Logger.error("end element");
-                        }
-                    });
+                    //setImage();
+                    Logger.error("end element");
+                }
+            });
         }else{
             lnlAction.setVisibility(View.VISIBLE);
             AnimationControl.translateView(lnlAction, 0, 0, 200, 0 , true, 300);

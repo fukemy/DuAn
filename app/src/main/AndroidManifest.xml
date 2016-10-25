@@ -11,6 +11,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
 
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature
@@ -79,6 +81,7 @@
         <activity
             android:name="com.example.macos.activities.AcSetting"
             android:screenOrientation="portrait" />
+
         <service
             android:name="com.example.macos.service.MyTrackingService"
             android:label="My Service" />
@@ -114,6 +117,10 @@
             android:name="com.example.macos.report.DiaryReportContent"
             android:label="@string/title_activity_diary_report_content"
             android:theme="@style/AppTheme" />
+        <activity
+            android:name="com.example.macos.activities.AcVideo"
+            android:label="@string/title_activity_ac_video"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>

@@ -588,6 +588,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                     swap.doListWorks();
                 }else{
                     ((FragmentMainDataScreen) adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(false);
+                    menu.findItem(R.id.select_road_type).setTitle(getResources().getString(R.string.multi_select));
                 }
             }
             return true;

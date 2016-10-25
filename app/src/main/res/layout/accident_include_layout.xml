@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:animateLayoutChanges="true"
     android:orientation="vertical">
 
     <LinearLayout
@@ -20,12 +21,12 @@
         android:id="@+id/spinPromtCatalog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Chọn loại báo cáo"
-        android:textSize="15sp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:background="@drawable/border_disable"
-        android:tag="promptCatalog" />
+        android:hint="Chọn loại báo cáo"
+        android:tag="promptCatalog"
+        android:textSize="15sp" />
 
     <EditText
         android:id="@+id/edtJusticeProcess"
@@ -38,10 +39,10 @@
         android:hint="Nhập lý trình..."
         android:imeOptions="actionDone"
         android:lines="2"
-        android:textSize="13sp"
         android:padding="10dp"
         android:singleLine="true"
-        android:tag="justiceProcess" />
+        android:tag="justiceProcess"
+        android:textSize="13sp" />
 
     <EditText
         android:id="@+id/edtInput"
@@ -65,9 +66,9 @@
         android:id="@+id/imagelist"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
         android:clipChildren="false"
         android:clipToPadding="false"
-        android:animateLayoutChanges="true"
         android:orientation="vertical" />
 
     <HorizontalScrollView
@@ -88,8 +89,8 @@
             android:clickable="true"
             android:clipChildren="false"
             android:gravity="top|left"
-            android:tag="fromCamera"
-            android:orientation="horizontal" />
+            android:orientation="horizontal"
+            android:tag="fromCamera" />
     </HorizontalScrollView>
 
     <RelativeLayout
@@ -112,24 +113,32 @@
 
             <ImageView
                 android:id="@+id/imgVoidRoadName"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:background="@mipmap/record_black" />
 
             <ImageView
                 android:id="@+id/imgCameraRoadName"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_marginLeft="20dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_marginLeft="28dp"
                 android:background="@mipmap/camera_black" />
 
             <ImageView
                 android:id="@+id/imgGaleryRoadName"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:layout_marginLeft="28dp"
                 android:layout_marginTop="2dp"
                 android:background="@mipmap/galery" />
+
+            <ImageView
+                android:id="@+id/imgVideoRoadName"
+                android:layout_width="28dp"
+                android:layout_height="32dp"
+                android:layout_marginLeft="28dp"
+                android:background="@mipmap/video" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -139,21 +148,34 @@
             android:gravity="right|center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
+            <com.sackcentury.shinebuttonlib.ShineButton
                 android:id="@+id/imgEditRoadName"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
+                android:layout_width="26dp"
+                android:layout_height="26dp"
                 android:layout_marginLeft="24dp"
-                android:padding="2dp"
-                android:src="@mipmap/edit_black"
-                android:tag="edit" />
+                android:src="@android:color/black"
+                app:allow_random_color="false"
+                app:big_shine_color="@color/mainColor"
+                app:btn_color="@android:color/black"
+                app:btn_fill_color="@color/mainColor"
+                app:click_animation_duration="200"
+                app:enable_flashing="false"
+                app:shine_animation_duration="1500"
+                app:shine_count="8"
+                app:shine_distance_multiple="1.5"
+                app:shine_turn_angle="10"
+                app:siShape="@mipmap/edit_black"
+                android:visibility="gone"
+                app:small_shine_color="#CC9999"
+                android:tag="edit"
+                app:small_shine_offset_angle="20" />
 
             <ImageView
                 android:id="@+id/imgDeleteRoadName"
                 android:layout_width="28dp"
                 android:layout_height="28dp"
+                android:visibility="gone"
                 android:layout_marginLeft="24dp"
-                android:padding="2dp"
                 android:src="@mipmap/delete_black"
                 android:tag="delete" />
 

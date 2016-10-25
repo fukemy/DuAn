@@ -53,6 +53,7 @@ import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
+import com.sackcentury.shinebuttonlib.ShineButton;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
@@ -221,7 +222,7 @@ public class FragmentInputItem extends CustomFragment{
         final ImageView imgCameraRoadName = (ImageView) container.findViewById(R.id.imgCameraRoadName);
         final ImageView imgGaleryRoadName = (ImageView) container.findViewById(R.id.imgGaleryRoadName);
         final ImageView imgVoidRoadName = (ImageView) container.findViewById(R.id.imgVoidRoadName);
-        final ImageView imgEditRoadName = (ImageView) container.findViewById(R.id.imgEditRoadName);
+        final ShineButton imgEditRoadName = (ShineButton) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
         final EditText edtOtherStatus = (EditText) container.findViewById(R.id.edtOtherStatus);
@@ -380,6 +381,7 @@ public class FragmentInputItem extends CustomFragment{
                     builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            mExplosionField.explode(listData.get(ORDER_CAMERA_POSITION));
                             ((LinearLayout)listData.get(ORDER_CAMERA_POSITION).getParent()).removeView(listData.get(ORDER_CAMERA_POSITION));
                             dialog.dismiss();
                         }
