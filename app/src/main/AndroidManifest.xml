@@ -121,6 +121,12 @@
             android:name="com.example.macos.activities.AcVideo"
             android:label="@string/title_activity_ac_video"
             android:theme="@style/AppTheme"></activity>
+
+        <activity
+            android:name="com.example.macos.adapter.DeviceListActivity"
+            android:theme="@android:style/Theme.Dialog"/>
+
+        <service android:enabled="true" android:name="com.example.macos.service.UartService" />
     </application>
 
 </manifest>

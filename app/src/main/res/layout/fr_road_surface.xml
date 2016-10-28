@@ -28,6 +28,24 @@
                 android:animateLayoutChanges="true"
                 android:orientation="vertical">
 
+                <Button
+                    android:id="@+id/btnGraph"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:layout_gravity="right"
+                    android:text="Dùng biểu đồ"
+                    android:layout_marginRight="10dp"/>
+
+                <com.jjoe64.graphview.GraphView
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:visibility="gone"
+                    app:seriesType="line"
+                    android:layout_marginLeft="5dp"
+                    app:seriesColor="#ee0000"
+                    android:id="@+id/graph" />
+
                 <TextView
                     android:id="@+id/tvCurrentLocation"
                     android:layout_width="match_parent"

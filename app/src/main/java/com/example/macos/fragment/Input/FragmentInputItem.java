@@ -5,20 +5,32 @@ import android.animation.Animator;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.IBinder;
 import android.speech.RecognizerIntent;
+import android.support.annotation.IntegerRes;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -26,23 +38,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.macos.activities.AcImageInformation;
 import com.example.macos.activities.AcInput;
+import com.example.macos.adapter.DeviceListActivity;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.libraries.LinearLayoutThatDetectsSoftKeyboard;
 import com.example.macos.libraries.Logger;
+import com.example.macos.service.UartService;
 import com.example.macos.utilities.AsyncTaskHelper;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
@@ -51,6 +67,11 @@ import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.gson.Gson;
 import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
+import com.jjoe64.graphview.GraphView;
+import com.jjoe64.graphview.LegendRenderer;
+import com.jjoe64.graphview.helper.StaticLabelsFormatter;
+import com.jjoe64.graphview.series.DataPoint;
+import com.jjoe64.graphview.series.LineGraphSeries;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
 import com.sackcentury.shinebuttonlib.ShineButton;
@@ -59,15 +80,25 @@ import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 import com.wooplr.spotlight.SpotlightView;
 
+import org.achartengine.GraphicalView;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import rx.functions.Action1;
 import tyrantgit.explosionfield.ExplosionField;
 
-public class FragmentInputItem extends CustomFragment{
+public class FragmentInputItem extends CustomFragment {
+    private GraphView graph;
     private View rootView;
-    private LinearLayout  lnlAll, container;
+    private LineGraphSeries<DataPoint> series;
+    private LinearLayout lnlAll, container;
     private List<LinearLayout> listData;
     private TextView tvCurrentLocation, tvRoadNameEntered;
     private LinearLayoutThatDetectsSoftKeyboard linearLayoutThatDetectsSoftKeyboard;
@@ -79,18 +110,34 @@ public class FragmentInputItem extends CustomFragment{
     private NestedScrollView scroll;
     private int currentDiffheight = 0;
     RoadInformation roadInformation;
-    public void setCatalog(String s){
+
+    public void setCatalog(String s) {
         this.catalog = s;
     }
-    public void setActionDone(String s){
+
+    public void setActionDone(String s) {
         ACTION_BUTTON_ITEM = s;
     }
+
     boolean isExpand = true;
     DisplayMetrics dm;
     private ImageView viewingImage;
     private ExplosionField mExplosionField;
     private SharedPreferenceManager pref;
+    private Button btnGraph;
     AsyncTaskHelper helper;
+
+    //UART STATUS
+    private static final int REQUEST_SELECT_DEVICE = 11;
+    private static final int REQUEST_ENABLE_BT = 12;
+    private static final int UART_PROFILE_READY = 10;
+    public static final String TAG = "nRFUART";
+    private static final int UART_PROFILE_CONNECTED = 20;
+    private static final int UART_PROFILE_DISCONNECTED = 21;
+    private int mState = UART_PROFILE_DISCONNECTED;
+    private UartService mService = null;
+    private BluetoothDevice mDevice = null;
+    private BluetoothAdapter mBtAdapter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,7 +150,7 @@ public class FragmentInputItem extends CustomFragment{
 
         initLayout();
 
-        LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams)bottomView.getLayoutParams();
+        LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams) bottomView.getLayoutParams();
         btmParams.bottomMargin = FunctionUtils.dpToPx(216, getActivity());
         bottomView.setLayoutParams(btmParams);
 
@@ -111,11 +158,234 @@ public class FragmentInputItem extends CustomFragment{
             scroll.setNestedScrollingEnabled(true);
         }
 
+        initGraphView();
+
         return rootView;
     }
 
-    public void setCurrentLocation(EnLocationItem lo){
-        if(lo.getAddress() != null)
+    private void initGraphView() {
+        graph = (GraphView) rootView.findViewById(R.id.graph);
+        graph.getViewport().setScrollable(true); // enables horizontal scrolling
+        graph.getViewport().setScrollableY(true); // enables vertical scrolling
+        graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
+        graph.getViewport().setScalableY(true); // enables vertical zooming and scrollingZ
+
+        graph.getGridLabelRenderer().setNumHorizontalLabels(5);
+        graph.getGridLabelRenderer().setNumVerticalLabels(5);
+
+
+        graph.getViewport().setXAxisBoundsManual(true);
+        graph.getViewport().setMinX(0);
+        graph.getViewport().setMaxX(40);
+
+
+        series = new LineGraphSeries<>();
+        series.setColor(Color.RED);
+        series.setThickness(1);
+        graph.addSeries(series);
+    }
+
+    private void initBluetooth() {
+        mBtAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (mBtAdapter == null) {
+            Toast.makeText(getActivity(), "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        service_init();
+
+        if (!mBtAdapter.isEnabled()) {
+            Log.e(TAG, "onClick - BT not enabled yet");
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else {
+            if(btnGraph.getText().toString().contains("ready")){
+                if (mDevice!=null)
+                {
+                    mService.disconnect();
+                    btnGraph.setText("Dung bieu do!");
+                    generateNoteOnSD(getActivity(), "tuan duong", stringBuilder.toString());
+                }else{
+
+                }
+            }else{
+                Intent newIntent = new Intent(getActivity(), DeviceListActivity.class);
+                startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+                btnGraph.setClickable(false);
+            }
+        }
+    }
+
+    StringBuilder stringBuilder;
+    StringBuilder BleTemp;
+    int count = 0;
+    private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
+
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+
+            final Intent mIntent = intent;
+            //*********************//
+            if (action.equals(UartService.ACTION_GATT_CONNECTED)) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        Log.d(TAG, "UART_CONNECT_MSG");
+                        btnGraph.setText(mDevice.getName() + " - ready");
+                        Logger.error("[" + currentDateTimeString + "] Connected to: " + mDevice.getName());
+                        mState = UART_PROFILE_CONNECTED;
+                        stringBuilder = new StringBuilder();
+                        BleTemp = new StringBuilder();
+                    }
+                });
+            }
+
+            //*********************//
+            if (action.equals(UartService.ACTION_GATT_DISCONNECTED)) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+                        Log.d(TAG, "UART_DISCONNECT_MSG");
+                        btnGraph.setText("Not Connected");
+                        Logger.error("[" + currentDateTimeString + "] Disconnected to: " + mDevice.getName());
+                        mState = UART_PROFILE_DISCONNECTED;
+                        mService.close();
+                        btnGraph.setClickable(true);
+                        //setUiState();
+
+                    }
+                });
+            }
+
+
+            //*********************//
+            if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
+                mService.enableTXNotification();
+            }
+            //*********************//
+            if (action.equals(UartService.ACTION_DATA_AVAILABLE)) {
+
+                final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        try {
+                            String text = new String(txValue, "UTF-8");
+                            String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
+
+                            if (text.contains("\n")) {
+                                count++;
+                                BleTemp.append(text); // add last data
+                                stringBuilder.append(currentDateTimeString + " - " + BleTemp.toString() ); // add lastdata to total
+
+                                String[] stk = BleTemp.toString().split(",");
+                                int zData = (int) Float.parseFloat(stk[1]);
+                                if (zData < 1500 && zData > -1500) {
+                                    zData = 0;
+                                }
+                                Logger.error(" count: " + count + " z data: " + zData + "-BleData: " + BleTemp);
+                                if(count % 5 == 0) {
+                                    series.appendData(new DataPoint(count, zData / 100), true, count);
+                                }
+                            } else {
+                                BleTemp = new StringBuilder(); //refresh single data
+                                BleTemp.append(text); // add first data
+                            }
+
+                        } catch (Exception e) {
+                            Log.e(TAG, e.toString());
+                        }
+                    }
+                });
+            }
+            //*********************//
+            if (action.equals(UartService.DEVICE_DOES_NOT_SUPPORT_UART)) {
+                //showMessage("Device doesn't support UART. Disconnecting");
+                mService.disconnect();
+            }
+
+
+        }
+    };
+    //UART service connected/disconnected
+    private ServiceConnection mServiceConnection = new ServiceConnection() {
+        public void onServiceConnected(ComponentName className, IBinder rawBinder) {
+            mService = ((UartService.LocalBinder) rawBinder).getService();
+            Log.d(TAG, "onServiceConnected mService= " + mService);
+            if (!mService.initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth");
+            }
+
+        }
+
+        public void onServiceDisconnected(ComponentName classname) {
+            ////     mService.disconnect(mDevice);
+            mService = null;
+        }
+    };
+
+
+    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
+        try {
+            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
+            if (!root.exists()) {
+                root.mkdirs();
+            }
+            File gpxfile = new File(root, sFileName);
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void service_init() {
+        Intent bindIntent = new Intent(getActivity(), UartService.class);
+        getActivity().bindService(bindIntent, mServiceConnection, Context.BIND_AUTO_CREATE);
+
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(UARTStatusChangeReceiver, makeGattUpdateIntentFilter());
+    }
+
+    private static IntentFilter makeGattUpdateIntentFilter() {
+        final IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(UartService.ACTION_GATT_CONNECTED);
+        intentFilter.addAction(UartService.ACTION_GATT_DISCONNECTED);
+        intentFilter.addAction(UartService.ACTION_GATT_SERVICES_DISCOVERED);
+        intentFilter.addAction(UartService.ACTION_DATA_AVAILABLE);
+        intentFilter.addAction(UartService.DEVICE_DOES_NOT_SUPPORT_UART);
+        return intentFilter;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume");
+        if (mBtAdapter != null && !mBtAdapter.isEnabled()) {
+            Log.e(TAG, "onResume - BT not enabled yet");
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        }
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy()");
+
+        try {
+            LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(UARTStatusChangeReceiver);
+        } catch (Exception ignore) {
+            Log.e(TAG, ignore.toString());
+        }
+        getActivity().unbindService(mServiceConnection);
+        mService.stopSelf();
+    }
+
+    public void setCurrentLocation(EnLocationItem lo) {
+        if (lo.getAddress() != null)
             tvCurrentLocation.setText("Vị trí hiện tại: " + lo.getAddress());
         else
             tvCurrentLocation.setText("Vị trí hiện tại: Chưa cập nhập");
@@ -133,8 +403,8 @@ public class FragmentInputItem extends CustomFragment{
         tvCurrentLocation = (TextView) rootView.findViewById(R.id.tvCurrentLocation);
         tvCurrentLocation.setText("Vị trí hiện tại: Đang cập nhập!");
 
-        keyBoardView =  rootView.findViewById(R.id.keyBoardView);
-        bottomView =  (FrameLayout)rootView.findViewById(R.id.lnlDone);
+        keyBoardView = rootView.findViewById(R.id.keyBoardView);
+        bottomView = (FrameLayout) rootView.findViewById(R.id.lnlDone);
         scroll = (NestedScrollView) rootView.findViewById(R.id.scroll);
 
         bottomView.setOnClickListener(new View.OnClickListener() {
@@ -145,6 +415,7 @@ public class FragmentInputItem extends CustomFragment{
             }
         });
 
+        btnGraph = (Button) rootView.findViewById(R.id.btnGraph);
         lnlAll = (LinearLayout) rootView.findViewById(R.id.lnlAll);
         container = (LinearLayout) rootView.findViewById(R.id.container);
         initContainer(container);
@@ -178,7 +449,7 @@ public class FragmentInputItem extends CustomFragment{
         scroll.getChildAt(0).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()){
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         System.out.println("scroll click");
                         isExpand = !isExpand;
@@ -196,6 +467,13 @@ public class FragmentInputItem extends CustomFragment{
                 FunctionUtils.hideSoftInput(rootView, getActivity());
             }
         });
+
+        btnGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                initBluetooth();
+            }
+        });
     }
 
     iDialogAction dialogAction = new iDialogAction() {
@@ -211,13 +489,13 @@ public class FragmentInputItem extends CustomFragment{
 
         @Override
         public void isAcceptWarning(boolean b) {
-            if(b){
+            if (b) {
                 ((AcInput) FragmentInputItem.this.getActivity()).collectAllData();
             }
         }
     };
 
-    private void initContainer(final LinearLayout container){
+    private void initContainer(final LinearLayout container) {
         final ImageView imgAddRoadName = (ImageView) container.findViewById(R.id.imgAddRoadName);
         final ImageView imgCameraRoadName = (ImageView) container.findViewById(R.id.imgCameraRoadName);
         final ImageView imgGaleryRoadName = (ImageView) container.findViewById(R.id.imgGaleryRoadName);
@@ -247,12 +525,12 @@ public class FragmentInputItem extends CustomFragment{
         edtInformation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(container.getTag() != null)
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
-                    if(isExpand) {
-                        isExpand = !isExpand;
-                        //((AcInput) getActivity()).closeToolbar(false);
-                    }
+                if (container.getTag() != null)
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP)
+                        if (isExpand) {
+                            isExpand = !isExpand;
+                            //((AcInput) getActivity()).closeToolbar(false);
+                        }
             }
         });
         spinStatus.setHint(getResources().getString(R.string.Status));
@@ -264,7 +542,7 @@ public class FragmentInputItem extends CustomFragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    if(isExpand) {
+                    if (isExpand) {
                         isExpand = !isExpand;
 //                        ((AcInput) getActivity()).closeToolbar(false);
                     }
@@ -272,14 +550,14 @@ public class FragmentInputItem extends CustomFragment{
 
                 String selectedData = spinPromtCatalog.getText().toString();
                 spinStatus.setText("");
-                if((selectedData.charAt(selectedData.length() - 1)) != ' '){
+                if ((selectedData.charAt(selectedData.length() - 1)) != ' ') {
                     String[] list = getResources().getStringArray(R.array.chuacapnhap);
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, list);
                     spinStatus.setAdapter(null);
                     spinStatus.setAdapter(arrayAdapter);
                     spinStatus.setSelection(0);
-                }else{
-                    int spinItemMatched = FunctionUtils.getStatusListFromPrompt(catalog,Integer.parseInt("" + selectedData.charAt(0)), getActivity());
+                } else {
+                    int spinItemMatched = FunctionUtils.getStatusListFromPrompt(catalog, Integer.parseInt("" + selectedData.charAt(0)), getActivity());
                     String[] list = getResources().getStringArray(spinItemMatched);
                     ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(getContext(), android.R.layout.simple_dropdown_item_1line, list);
                     spinStatus.setAdapter(null);
@@ -293,9 +571,9 @@ public class FragmentInputItem extends CustomFragment{
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String selectedData = spinStatus.getText().toString();
-                if(selectedData.toLowerCase().equals(getResources().getString(R.string.other).toLowerCase())){
+                if (selectedData.toLowerCase().equals(getResources().getString(R.string.other).toLowerCase())) {
                     edtOtherStatus.setVisibility(View.VISIBLE);
-                }else{
+                } else {
                     edtOtherStatus.setVisibility(View.GONE);
                 }
             }
@@ -309,7 +587,7 @@ public class FragmentInputItem extends CustomFragment{
             public void onClick(View v) {
                 checkContainerInput(container);
 
-                if(spinPromtCatalog.getError() == null && spinStatus.getError() == null) {
+                if (spinPromtCatalog.getError() == null && spinStatus.getError() == null) {
                     imgAddRoadName.setImageResource(0);
                     imgAddRoadName.setImageDrawable(null);
                     imgAddRoadName.setTag("noMoreAdd");
@@ -321,8 +599,8 @@ public class FragmentInputItem extends CustomFragment{
                     imgDeleteRoadName.setVisibility(View.VISIBLE);
                     imgAddRoadName.setVisibility(View.GONE);
 
-                    if(listData.size() == 2){
-                        LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams)bottomView.getLayoutParams();
+                    if (listData.size() == 2) {
+                        LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams) bottomView.getLayoutParams();
                         btmParams.bottomMargin = 0;
                         bottomView.setLayoutParams(btmParams);
                     }
@@ -348,7 +626,7 @@ public class FragmentInputItem extends CustomFragment{
             @Override
             public void onClick(View v) {
                 //edit button work only when add button disapear and change to own tag :'noMoreAdd'
-                if(imgAddRoadName.getTag() != null && imgAddRoadName.getTag().equals("noMoreAdd")) {
+                if (imgAddRoadName.getTag() != null && imgAddRoadName.getTag().equals("noMoreAdd")) {
                     if (imgEditRoadName.getTag().toString().equals("edit")) {
                         disableNestedData(listData.get(ORDER_CAMERA_POSITION), true);
                         imgEditRoadName.setTag("done");
@@ -373,7 +651,7 @@ public class FragmentInputItem extends CustomFragment{
         imgDeleteRoadName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(listData.size() > 1) {
+                if (listData.size() > 1) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                     builder.setTitle("Warning");
                     builder.setMessage(getResources().getString(R.string.bancochacchanmuonxoa));
@@ -382,7 +660,7 @@ public class FragmentInputItem extends CustomFragment{
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             mExplosionField.explode(listData.get(ORDER_CAMERA_POSITION));
-                            ((LinearLayout)listData.get(ORDER_CAMERA_POSITION).getParent()).removeView(listData.get(ORDER_CAMERA_POSITION));
+                            ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).getParent()).removeView(listData.get(ORDER_CAMERA_POSITION));
                             dialog.dismiss();
                         }
                     });
@@ -390,7 +668,7 @@ public class FragmentInputItem extends CustomFragment{
                     builder.setNegativeButton("Cancel", null);
                     builder.show();
 
-                }else{
+                } else {
                     Toast.makeText(getActivity(), "Không thể xoá bản ghi này!", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -404,7 +682,7 @@ public class FragmentInputItem extends CustomFragment{
         });
     }
 
-    private void addNewContainer(){
+    private void addNewContainer() {
         disableNestedData(((LinearLayout) listData.get(listData.size() - 1).findViewById(R.id.lnlFirstPlan)), false);
         LinearLayout temp;
         temp = (LinearLayout) LayoutInflater.from(getActivity()).inflate(R.layout.road_surface_include, null, false);
@@ -440,19 +718,19 @@ public class FragmentInputItem extends CustomFragment{
     private final int CHOOSEN_PICTURE = 3;
     private final int SHOW_IMAGE = 5;
 
-    private void takeMultiPhoto(int pos){
+    private void takeMultiPhoto(int pos) {
         ORDER_CAMERA_POSITION = pos;
 
         Config config = new Config();
         config.setSelectionLimit(4);
         ImagePickerActivity.setConfig(config);
 
-        Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
+        Intent intent = new Intent(getContext(), ImagePickerActivity.class);
         try {
             Toast.makeText(getActivity(), "Đang khởi động camera, xin chờ 1 chút cho đến khi thông báo này tắt đi!", Toast.LENGTH_SHORT).show();
             startActivityForResult(intent, CHOOSEN_PICTURE);
-        }catch (Exception e){
-            Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            Toast.makeText(getActivity(), "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -471,7 +749,7 @@ public class FragmentInputItem extends CustomFragment{
 //                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
 //                    Bitmap decodedBitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(),  size / 3, size / 3);
                     final ImageView img = new ImageView(getActivity());
-                    img.setLayoutParams(new ViewGroup.LayoutParams(size /3, size / 3));
+                    img.setLayoutParams(new ViewGroup.LayoutParams(size / 3, size / 3));
 //                    img.setImageBitmap(decodedBitmap);
                     img.setTag(uri.toString());
                     img.setScaleType(ImageView.ScaleType.FIT_XY);
@@ -495,7 +773,7 @@ public class FragmentInputItem extends CustomFragment{
                                 }
                             });
 
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
@@ -504,9 +782,9 @@ public class FragmentInputItem extends CustomFragment{
 
     }
 
-    public void addImageShowcase(ImageView img){
+    public void addImageShowcase(ImageView img) {
         boolean addedShowcase = pref.getBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, false);
-        if(!addedShowcase){
+        if (!addedShowcase) {
             try {
                 new SpotlightView.Builder(getActivity())
                         .introAnimationDuration(400)
@@ -529,7 +807,7 @@ public class FragmentInputItem extends CustomFragment{
                         .usageId(img.getTag().toString())
                         .show();
                 pref.saveBoolean(GlobalParams.IMAGE_SWIPE_TO_DELETE_SHOWCASE, true);
-            }catch (Exception e){
+            } catch (Exception e) {
 
             }
         }
@@ -542,7 +820,7 @@ public class FragmentInputItem extends CustomFragment{
             case REQ_CODE_SPEECH_INPUT:
                 if (resultCode == Activity.RESULT_OK && null != data) {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    if(result != null && result.size() > 0){
+                    if (result != null && result.size() > 0) {
                         LinearLayout lnlTemp = ((LinearLayout) listData.get(ORDER_SPEAK_POSITION).findViewById(R.id.lnlFirstPlan));
                         LinearLayout lnlInputInformation = ((LinearLayout) lnlTemp.findViewById(R.id.lnlInputInformation));
                         EditText edtInformation = (EditText) lnlInputInformation.findViewById(R.id.edtInformation);
@@ -554,8 +832,8 @@ public class FragmentInputItem extends CustomFragment{
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     boolean isDelete = data.getBooleanExtra("isDelete", false);
                     Logger.error("Show image result: " + isDelete);
-                    if(isDelete){
-                        if(viewingImage != null){
+                    if (isDelete) {
+                        if (viewingImage != null) {
                             viewingImage.postDelayed(new Runnable() {
                                 @Override
                                 public void run() {
@@ -570,13 +848,13 @@ public class FragmentInputItem extends CustomFragment{
                 break;
             case CHOOSEN_PICTURE:
                 if (resultCode == Activity.RESULT_OK && data != null) {
-                    ArrayList<Uri>  imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
+                    ArrayList<Uri> imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
                     LinearLayout lnlHorizontal = null;
                     int i = 0;
-                    if(imageUriList.size() > 0)
+                    if (imageUriList.size() > 0)
                         for (Uri selectedImage : imageUriList) {
                             i++;
-                            if(i == 1){
+                            if (i == 1) {
                                 lnlHorizontal = new LinearLayout(getActivity());
                                 LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(rootView.findViewById(R.id.viewNull).getWidth(),
                                         LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -594,7 +872,7 @@ public class FragmentInputItem extends CustomFragment{
 //                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
 
                                 final ImageView img = new ImageView(getActivity());
-                                img.setLayoutParams(new ViewGroup.LayoutParams(size /3, size / 3));
+                                img.setLayoutParams(new ViewGroup.LayoutParams(size / 3, size / 3));
                                 img.setScaleType(ImageView.ScaleType.FIT_XY);
 //                                img.setImageBitmap(decodedBitmap);
                                 img.setTag(selectedImage.toString());
@@ -621,14 +899,42 @@ public class FragmentInputItem extends CustomFragment{
                                 Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
                                 e.printStackTrace();
                             }
-                            if(i == 3)
+                            if (i == 3)
                                 i = 0;
                         }
-                    }
-                 break;
+                }
+                break;
+
+
+            case REQUEST_SELECT_DEVICE:
+                //When the DeviceListActivity return, with the selected device address
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    String deviceAddress = data.getStringExtra(BluetoothDevice.EXTRA_DEVICE);
+                    mDevice = BluetoothAdapter.getDefaultAdapter().getRemoteDevice(deviceAddress);
+
+                    Log.d(TAG, "... onActivityResultdevice.address==" + mDevice + "mserviceValue" + mService);
+                    btnGraph.setText(mDevice.getName() + " - connecting");
+                    mService.connect(deviceAddress);
+                    graph.setVisibility(View.VISIBLE);
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                if (resultCode == Activity.RESULT_OK) {
+                    Toast.makeText(getActivity(), "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
+                } else {
+                    // User did not enable Bluetooth or an error occurred
+                    Log.d(TAG, "BT not enabled");
+                    Toast.makeText(getActivity(), "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                Log.e(TAG, "wrong request code");
+                break;
         }
     }
-    private void moveImageToCurrent(final ImageView img, final int currentY){
+
+    private void moveImageToCurrent(final ImageView img, final int currentY) {
         //img.setOnTouchListener(null);
         Logger.error("move image to current");
         img.animate().y(currentY).withEndAction(new Runnable() {
@@ -641,7 +947,7 @@ public class FragmentInputItem extends CustomFragment{
         });
     }
 
-    private void addTouchListenerImage(final ImageView img){
+    private void addTouchListenerImage(final ImageView img) {
         img.setOnTouchListener(new View.OnTouchListener() {
             private int initialY;
             private float initialTouchY;
@@ -651,16 +957,16 @@ public class FragmentInputItem extends CustomFragment{
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 // enlarge animation
-                enlargeHeight = ObjectAnimator.ofFloat(img,"scaleY", 1f, 0.7f);
+                enlargeHeight = ObjectAnimator.ofFloat(img, "scaleY", 1f, 0.7f);
                 enlargeHeight.setDuration(200);
-                enlargeWidth = ObjectAnimator.ofFloat(img,"scaleX", 1f, 0.7f);
+                enlargeWidth = ObjectAnimator.ofFloat(img, "scaleX", 1f, 0.7f);
                 enlargeWidth.setDuration(200);
 
 
                 // shink animation
-                shrinkHeight = ObjectAnimator.ofFloat(img,"scaleY", 0.7f, 1f);
+                shrinkHeight = ObjectAnimator.ofFloat(img, "scaleY", 0.7f, 1f);
                 shrinkHeight.setDuration(200);
-                shrinkWidth = ObjectAnimator.ofFloat(img,"scaleX", 0.7f, 1f);
+                shrinkWidth = ObjectAnimator.ofFloat(img, "scaleX", 0.7f, 1f);
                 shrinkWidth.setDuration(200);
                 shrinkWidth.addListener(new Animator.AnimatorListener() {
                     @Override
@@ -696,10 +1002,10 @@ public class FragmentInputItem extends CustomFragment{
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if(img.getAlpha() < 0.1f || Math.abs(temp) > 200){
+                        if (img.getAlpha() < 0.1f || Math.abs(temp) > 200) {
                             mExplosionField.explode(img);
                             ((ViewGroup) img.getParent()).removeView(img);
-                        }else {
+                        } else {
                             Logger.error("temp: " + temp + " current: " + currentPosition);
                             if (img.getAlpha() == 1f) {
                                 mHandler.removeCallbacks(myRunnable);
@@ -716,11 +1022,11 @@ public class FragmentInputItem extends CustomFragment{
                         temp = initialY + (int) (event.getRawY() - initialTouchY);
                         if (isRunningAnimation) {
                             Logger.error("temp: " + temp);
-                            float alpha = (1 - (float)Math.abs(temp) / 250);
-                            if(alpha <= 1 && alpha >= 0) {
+                            float alpha = (1 - (float) Math.abs(temp) / 250);
+                            if (alpha <= 1 && alpha >= 0) {
                                 img.setAlpha(alpha);
                                 img.setY(temp);
-                            }else if(alpha > 1)
+                            } else if (alpha > 1)
                                 img.setAlpha(1f);
                             else
                                 img.setAlpha(0f);
@@ -734,17 +1040,17 @@ public class FragmentInputItem extends CustomFragment{
                         return true;
                     case MotionEvent.ACTION_CANCEL:
                         Logger.error("ACTION_CANCEL");
-                        if(isRunningAnimation && ((ViewGroup) img.getParent()).getTag() != null &&
-                                ((ViewGroup) img.getParent()).getTag().toString().equals("fromCamera")){
+                        if (isRunningAnimation && ((ViewGroup) img.getParent()).getTag() != null &&
+                                ((ViewGroup) img.getParent()).getTag().toString().equals("fromCamera")) {
                             Logger.error("fromCamera");
-                            if(img.getAlpha() < 0.1f){
+                            if (img.getAlpha() < 0.1f) {
                                 mExplosionField.explode(img);
                                 ((ViewGroup) img.getParent()).removeView(img);
-                            }else{
+                            } else {
                                 shinkImage();
                                 mHandler.removeCallbacks(myRunnable);
                             }
-                        }else{
+                        } else {
                             shinkImage();
                             mHandler.removeCallbacks(myRunnable);
                         }
@@ -759,6 +1065,7 @@ public class FragmentInputItem extends CustomFragment{
         });
 
     }
+
     boolean isRunningAnimation = false;
     private final int TIME_ALPHA_LONGPRESS = 1000;
 
@@ -787,33 +1094,33 @@ public class FragmentInputItem extends CustomFragment{
         }
     };
 
-    private void showImage(ImageView img){
+    private void showImage(ImageView img) {
         viewingImage = img;
         Intent in = new Intent(getActivity(), AcImageInformation.class);
         in.putExtra("imgRef", img.getTag().toString());
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             img.setTransitionName("viewimage");
             ActivityOptionsCompat options =
                     ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), img,
                             "viewimage");
             startActivityForResult(in, SHOW_IMAGE, options.toBundle());
-        }else{
+        } else {
             startActivityForResult(in, SHOW_IMAGE);
         }
     }
 
-    private void checkContainerInput(LinearLayout lnl){
+    private void checkContainerInput(LinearLayout lnl) {
         for (int j = 0; j < lnl.getChildCount(); j++) {
             if (lnl.getChildAt(j) instanceof MaterialBetterSpinner) {
                 MaterialBetterSpinner spin = (MaterialBetterSpinner) lnl.getChildAt(j);
                 String value = spin.getText().toString();
-                if(value.equals("")){
-                    if(spin.getTag().toString().equals("promptCatalog")) {
+                if (value.equals("")) {
+                    if (spin.getTag().toString().equals("promptCatalog")) {
                         spin.setError("Bạn cần chọn mục cần nhập");
                         break;
                     }
 
-                    if(spin.getTag().toString().equals("status")) {
+                    if (spin.getTag().toString().equals("status")) {
                         spin.setError("Bạn cần chọn tình trạng cho mục cần nhập");
                         break;
                     }
@@ -821,15 +1128,15 @@ public class FragmentInputItem extends CustomFragment{
                 }
             }
 
-            if(lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
-                checkContainerInput((LinearLayout)lnl.getChildAt(j));
+            if (lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
+                checkContainerInput((LinearLayout) lnl.getChildAt(j));
             }
         }
     }
 
-    private void disableNestedData(LinearLayout lnl, boolean b){
+    private void disableNestedData(LinearLayout lnl, boolean b) {
 
-        if(lnl.getId() == R.id.lnlFirstPlan) {
+        if (lnl.getId() == R.id.lnlFirstPlan) {
 //            if (!b)
 //                lnl.setBackground(getResources().getDrawable(R.drawable.border_disable));
 //            else
@@ -837,21 +1144,21 @@ public class FragmentInputItem extends CustomFragment{
         }
 
         for (int j = 0; j < lnl.getChildCount(); j++) {
-            if(lnl.getChildAt(j) instanceof EditText){
+            if (lnl.getChildAt(j) instanceof EditText) {
                 lnl.getChildAt(j).setEnabled(b); // for edittext
             }
 
-            if(lnl.getChildAt(j) instanceof MaterialBetterSpinner){
-                if(b)
+            if (lnl.getChildAt(j) instanceof MaterialBetterSpinner) {
+                if (b)
                     lnl.getChildAt(j).setEnabled(true);
                 else
                     lnl.getChildAt(j).setEnabled(false);
             }
 
-            if(lnl.getChildAt(j) instanceof ImageView){
+            if (lnl.getChildAt(j) instanceof ImageView) {
                 ImageView img = (ImageView) lnl.getChildAt(j);
-                if(img.getTag() != null) {
-                    if(img.getTag().toString().length() > 15) {
+                if (img.getTag() != null) {
+                    if (img.getTag().toString().length() > 15) {
                         Logger.error("disable img tag: " + img.getTag().toString());
                         img.setEnabled(b);
                         img.setAlpha(b ? 1f : 0.6f);
@@ -867,11 +1174,11 @@ public class FragmentInputItem extends CustomFragment{
 //                disableNestedData(lnlInputIcon, b);
 //            }
 
-            if(lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
-                disableNestedData((LinearLayout)lnl.getChildAt(j), b);
+            if (lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
+                disableNestedData((LinearLayout) lnl.getChildAt(j), b);
             }
 
-            if(lnl.getChildAt(j) instanceof HorizontalScrollView) {
+            if (lnl.getChildAt(j) instanceof HorizontalScrollView) {
                 Logger.error("found scrollview");
                 HorizontalScrollView scroll = (HorizontalScrollView) lnl.getChildAt(j);
                 disableNestedData((LinearLayout) scroll.getChildAt(0), b);
