@@ -13,7 +13,7 @@ import de.greenrobot.dao.internal.DaoConfig;
 
 /**
  * {@inheritDoc}
- * 
+ *
  * @see de.greenrobot.dao.AbstractDaoSession
  */
 public class DaoSession extends AbstractDaoSession {
@@ -22,7 +22,9 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig roadInformationDaoConfig;
     private final DaoConfig itemDaoConfig;
     private final DaoConfig dataTypeItemDaoConfig;
+    private final DaoConfig blueToothDataDaoConfig;
 
+    private final BlueToothDataDao blueToothDataDao;
     private final DataDao dataDao;
     private final RoadInformationDao roadInformationDao;
     private final ItemDao itemDao;
@@ -44,22 +46,29 @@ public class DaoSession extends AbstractDaoSession {
         dataTypeItemDaoConfig = daoConfigMap.get(DataTypeItemDao.class).clone();
         dataTypeItemDaoConfig.initIdentityScope(type);
 
+        blueToothDataDaoConfig = daoConfigMap.get(BlueToothDataDao.class).clone();
+        blueToothDataDaoConfig.initIdentityScope(type);
+
         dataDao = new DataDao(dataDaoConfig, this);
         roadInformationDao = new RoadInformationDao(roadInformationDaoConfig, this);
         itemDao = new ItemDao(itemDaoConfig, this);
         dataTypeItemDao = new DataTypeItemDao(dataTypeItemDaoConfig, this);
+        blueToothDataDao = new BlueToothDataDao(blueToothDataDaoConfig, this);
+
 
         registerDao(Data.class, dataDao);
         registerDao(RoadInformation.class, roadInformationDao);
         registerDao(Item.class, itemDao);
         registerDao(DataTypeItem.class, dataTypeItemDao);
+        registerDao(BlueToothData.class, blueToothDataDao);
     }
-    
+
     public void clear() {
         dataDaoConfig.getIdentityScope().clear();
         roadInformationDaoConfig.getIdentityScope().clear();
         itemDaoConfig.getIdentityScope().clear();
         dataTypeItemDaoConfig.getIdentityScope().clear();
+        blueToothDataDaoConfig.getIdentityScope().clear();
     }
 
     public DataDao getDataDao() {
@@ -76,5 +85,9 @@ public class DaoSession extends AbstractDaoSession {
 
     public DataTypeItemDao getDataTypeItemDao() {
         return dataTypeItemDao;
+    }
+
+    public BlueToothDataDao getBlueToothDataDao() {
+        return blueToothDataDao;
     }
 }

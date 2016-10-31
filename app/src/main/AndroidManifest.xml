@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
@@ -72,6 +73,7 @@
 
         <activity
             android:name="com.example.macos.activities.AcInput"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
         <activity
@@ -120,13 +122,19 @@
         <activity
             android:name="com.example.macos.activities.AcVideo"
             android:label="@string/title_activity_ac_video"
-            android:theme="@style/AppTheme"></activity>
-
+            android:theme="@style/AppTheme" />
         <activity
             android:name="com.example.macos.adapter.DeviceListActivity"
-            android:theme="@android:style/Theme.Dialog"/>
+            android:theme="@android:style/Theme.Dialog" />
 
-        <service android:enabled="true" android:name="com.example.macos.service.UartService" />
+        <service
+            android:name="com.example.macos.service.UartService"
+            android:enabled="true" />
+
+        <activity
+            android:name="com.example.macos.report.GraphReport"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"/>
     </application>
 
 </manifest>

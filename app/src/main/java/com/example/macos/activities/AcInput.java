@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -78,6 +79,8 @@ public class AcInput extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_input);
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         pref = new SharedPreferenceManager(AcInput.this);
         Gson gson = new Gson();
@@ -352,7 +355,7 @@ public class AcInput extends FragmentActivity {
                             .fadeinTextDuration(400)
                             .headingTvColor(Color.parseColor("#eb273f"))
                             .headingTvSize(32)
-                            .headingTvText("Xoá ảnh")
+                            .headingTvText("Định vị vị trí thất bại!")
                             .subHeadingTvColor(Color.parseColor("#ffffff"))
                             .subHeadingTvSize(16)
                             .subHeadingTvText("Hệ thống đôi lúc ko lấy được vị trí của bạn trên máy chủ google, thử lại bằng cách nhấn vào nút \""
@@ -507,6 +510,7 @@ public class AcInput extends FragmentActivity {
             for (int i = 0; i < lnlAll.getChildCount(); i++) {
                 dataTypeItem = new DataTypeItem();
                 dataTypeItem.setLocationItem(locationItem);
+                dataTypeItem.setDataUUID(((FragmentInputItem) f).getUUID());
                 dataTypeItem.setTenDuong(roadInformation.getTenDuong());
                 dataTypeItem.setDataName(dataViewList.getDataList().get(k).getItemName());
                 dataTypeItem.setThoiGianNhap("" + System.currentTimeMillis());

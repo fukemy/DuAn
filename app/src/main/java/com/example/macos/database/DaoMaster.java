@@ -22,6 +22,7 @@ public class DaoMaster extends AbstractDaoMaster {
         RoadInformationDao.createTable(db, ifNotExists);
         ItemDao.createTable(db, ifNotExists);
         DataTypeItemDao.createTable(db, ifNotExists);
+        BlueToothDataDao.createTable(db, ifNotExists);
     }
     
     /** Drops underlying database table using DAOs. */
@@ -30,6 +31,7 @@ public class DaoMaster extends AbstractDaoMaster {
         RoadInformationDao.dropTable(db, ifExists);
         ItemDao.dropTable(db, ifExists);
         DataTypeItemDao.dropTable(db, ifExists);
+        BlueToothDataDao.dropTable(db, ifExists);
     }
     
     public static abstract class OpenHelper extends SQLiteOpenHelper {
@@ -65,6 +67,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(RoadInformationDao.class);
         registerDaoClass(ItemDao.class);
         registerDaoClass(DataTypeItemDao.class);
+        registerDaoClass(BlueToothDataDao.class);
     }
     
     public DaoSession newSession() {

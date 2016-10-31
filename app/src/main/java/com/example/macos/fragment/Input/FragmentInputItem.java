@@ -20,11 +20,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.speech.RecognizerIntent;
-import android.support.annotation.IntegerRes;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.NestedScrollView;
@@ -44,7 +42,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,6 +49,8 @@ import android.widget.Toast;
 import com.example.macos.activities.AcImageInformation;
 import com.example.macos.activities.AcInput;
 import com.example.macos.adapter.DeviceListActivity;
+import com.example.macos.database.BlueToothData;
+import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
@@ -67,9 +66,8 @@ import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.gson.Gson;
 import com.gun0912.tedpicker.Config;
 import com.gun0912.tedpicker.ImagePickerActivity;
+import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
-import com.jjoe64.graphview.LegendRenderer;
-import com.jjoe64.graphview.helper.StaticLabelsFormatter;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 import com.mlsdev.rximagepicker.RxImagePicker;
@@ -80,16 +78,10 @@ import com.squareup.picasso.Picasso;
 import com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner;
 import com.wooplr.spotlight.SpotlightView;
 
-import org.achartengine.GraphicalView;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import rx.functions.Action1;
 import tyrantgit.explosionfield.ExplosionField;
@@ -139,6 +131,8 @@ public class FragmentInputItem extends CustomFragment {
     private BluetoothDevice mDevice = null;
     private BluetoothAdapter mBtAdapter = null;
 
+    private final String UUID = FunctionUtils.generateUUID();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -163,6 +157,10 @@ public class FragmentInputItem extends CustomFragment {
         return rootView;
     }
 
+    public String getUUID(){
+        return UUID;
+    }
+
     private void initGraphView() {
         graph = (GraphView) rootView.findViewById(R.id.graph);
         graph.getViewport().setScrollable(true); // enables horizontal scrolling
@@ -171,13 +169,24 @@ public class FragmentInputItem extends CustomFragment {
         graph.getViewport().setScalableY(true); // enables vertical zooming and scrollingZ
 
         graph.getGridLabelRenderer().setNumHorizontalLabels(5);
-        graph.getGridLabelRenderer().setNumVerticalLabels(5);
+        graph.getGridLabelRenderer().setNumVerticalLabels(6);
 
+        graph.getGridLabelRenderer().setTextSize(12f);
 
         graph.getViewport().setXAxisBoundsManual(true);
         graph.getViewport().setMinX(0);
-        graph.getViewport().setMaxX(40);
+        graph.getViewport().setMaxX(60);
 
+        graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
+            @Override
+            public String formatLabel(double value, boolean isValueX) {
+                if (isValueX) {
+                    return DateFormat.getTimeInstance().format(new Date());
+                } else {
+                    return super.formatLabel(value, isValueX);
+                }
+            }
+        });
 
         series = new LineGraphSeries<>();
         series.setColor(Color.RED);
@@ -204,7 +213,6 @@ public class FragmentInputItem extends CustomFragment {
                 {
                     mService.disconnect();
                     btnGraph.setText("Dung bieu do!");
-                    generateNoteOnSD(getActivity(), "tuan duong", stringBuilder.toString());
                 }else{
 
                 }
@@ -231,7 +239,7 @@ public class FragmentInputItem extends CustomFragment {
                     public void run() {
                         String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
                         Log.d(TAG, "UART_CONNECT_MSG");
-                        btnGraph.setText(mDevice.getName() + " - ready");
+                        btnGraph.setText(mDevice.getName() + " - connecting...");
                         Logger.error("[" + currentDateTimeString + "] Connected to: " + mDevice.getName());
                         mState = UART_PROFILE_CONNECTED;
                         stringBuilder = new StringBuilder();
@@ -274,6 +282,11 @@ public class FragmentInputItem extends CustomFragment {
 
                             if (text.contains("\n")) {
                                 count++;
+                                if(count <= 2){
+                                    btnGraph.setText("THEHEGEO - ready");
+                                    btnGraph.setClickable(true);
+                                }
+
                                 BleTemp.append(text); // add last data
                                 stringBuilder.append(currentDateTimeString + " - " + BleTemp.toString() ); // add lastdata to total
 
@@ -282,9 +295,18 @@ public class FragmentInputItem extends CustomFragment {
                                 if (zData < 1500 && zData > -1500) {
                                     zData = 0;
                                 }
-                                Logger.error(" count: " + count + " z data: " + zData + "-BleData: " + BleTemp);
-                                if(count % 5 == 0) {
+                                if(count % 2 == 0) {
                                     series.appendData(new DataPoint(count, zData / 100), true, count);
+
+                                    BlueToothData blData = new BlueToothData();
+                                    blData.setInputID(UUID);
+                                    blData.setIsUploaded(false);
+                                    blData.setTime("" + System.currentTimeMillis());
+                                    blData.setZValue((long)zData);
+                                    blData.setLatValue(100.100);
+                                    blData.setLongValue(100.100);
+
+                                    DatabaseHelper.insertBlueToothData(blData);
                                 }
                             } else {
                                 BleTemp = new StringBuilder(); //refresh single data
@@ -322,24 +344,6 @@ public class FragmentInputItem extends CustomFragment {
             mService = null;
         }
     };
-
-
-    public void generateNoteOnSD(Context context, String sFileName, String sBody) {
-        try {
-            File root = new File(Environment.getExternalStorageDirectory(), "Notes");
-            if (!root.exists()) {
-                root.mkdirs();
-            }
-            File gpxfile = new File(root, sFileName);
-            FileWriter writer = new FileWriter(gpxfile);
-            writer.append(sBody);
-            writer.flush();
-            writer.close();
-            Toast.makeText(context, "Saved", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private void service_init() {
         Intent bindIntent = new Intent(getActivity(), UartService.class);
@@ -380,8 +384,12 @@ public class FragmentInputItem extends CustomFragment {
         } catch (Exception ignore) {
             Log.e(TAG, ignore.toString());
         }
-        getActivity().unbindService(mServiceConnection);
-        mService.stopSelf();
+        try {
+            getActivity().unbindService(mServiceConnection);
+            mService.stopSelf();
+        }catch (Exception e){
+            Logger.error("Chua dang ki service");
+        }
     }
 
     public void setCurrentLocation(EnLocationItem lo) {

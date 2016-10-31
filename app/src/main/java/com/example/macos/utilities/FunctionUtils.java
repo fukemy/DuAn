@@ -61,6 +61,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 /**
  * Created by macos on 6/16/16.
@@ -1198,4 +1199,7 @@ public class FunctionUtils {
         return (bitmap);
     }
 
+    public static String generateUUID(){
+        return UUID.randomUUID().toString();
+    }
 }

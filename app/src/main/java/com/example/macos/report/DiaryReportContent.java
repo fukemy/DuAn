@@ -33,6 +33,7 @@ import com.example.macos.activities.AcImageInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.FunctionUtils;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -48,7 +49,7 @@ import com.google.gson.Gson;
 import java.io.IOException;
 
 public class DiaryReportContent extends AppCompatActivity {
-    private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary, tvJusticeProcess;
+    private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary, tvJusticeProcess, tvGraph;
     LinearLayout lnlInput;
     private EnDataModel data;
     private GoogleMap gMap;
@@ -141,11 +142,29 @@ public class DiaryReportContent extends AppCompatActivity {
         tvTime = (TextView) findViewById(R.id.tvTime);
         tvSummary = (TextView) findViewById(R.id.tvSummary);
         tvJusticeProcess = (TextView) findViewById(R.id.tvJusticeProcess);
+        tvGraph = (TextView) findViewById(R.id.tvGraph);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 onBackPressed();
+            }
+        });
+
+        tvGraph.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Logger.error("send UUID: " + data.getDaValue().getDataUUID());
+                final Intent in = new Intent(DiaryReportContent.this, GraphReport.class);
+                in.putExtra("dataUUID", data.getDaValue().getDataUUID());
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ActivityOptionsCompat options =
+                            ActivityOptionsCompat.makeSceneTransitionAnimation(DiaryReportContent.this, tvGraph,
+                                    "showgraph");
+                    startActivity(in, options.toBundle());
+                }else{
+                    startActivity(in);
+                }
             }
         });
 
@@ -198,7 +217,14 @@ public class DiaryReportContent extends AppCompatActivity {
         } catch (Exception e) {
             tvCalalog.setText(tvCalalog.getText().toString() + " : " + "Chưa cập nhập!");
         }
-        tvRoadName.setText(tvRoadName.getText().toString() + " : " + data.getDaValue().getTenDuong());
+
+        try {
+            tvRoadName.setText(tvRoadName.getText().toString() + " : " + (data.getDaValue().getTenDuong().equals("")
+                    || data.getDaValue().getTenDuong().equals("null") ? "Chưa cập nhập!" : data.getDaValue().getTenDuong()));
+        } catch (Exception e) {
+            tvRoadName.setText(tvRoadName.getText().toString() + " : " + "Chưa cập nhập!");
+        }
+
 
         try {
             tvJusticeProcess.setText(tvJusticeProcess.getText().toString() + " : " + (data.getDaValue().getLyTrinh().equals("")

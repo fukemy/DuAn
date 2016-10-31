@@ -1,6 +1,7 @@
 package com.example.macos.entities;
 
 import com.example.macos.database.DataTypeItem;
+import com.example.macos.database.DataTypeItemDao;
 import com.google.gson.annotations.SerializedName;
 
 /**

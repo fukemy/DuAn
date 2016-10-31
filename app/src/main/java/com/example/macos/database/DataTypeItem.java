@@ -21,6 +21,7 @@ public class DataTypeItem {
     private String ThoiGianNhap;
     private String ThangDanhGia;
     private String LyTrinh;
+    private String dataUUID;
 
     public String getLyTrinh() {
         return LyTrinh;
@@ -122,7 +123,8 @@ public class DataTypeItem {
     public DataTypeItem() {
     }
 
-    public DataTypeItem(Long DataID, Integer DataType, Integer MaDuong, Integer TuyenSo, String MoTaTinhTrang, String KinhDo, String ViDo, String CaoDo, String NguoiNhap, String ThoiGianNhap, String ThangDanhGia) {
+    public DataTypeItem(Long DataID, Integer DataType, Integer MaDuong, Integer TuyenSo, String MoTaTinhTrang, String KinhDo,
+                        String ViDo, String CaoDo, String NguoiNhap, String ThoiGianNhap, String ThangDanhGia, String dataUUID) {
         this.DataID = DataID;
         this.DataType = DataType;
         this.MaDuong = MaDuong;
@@ -134,6 +136,7 @@ public class DataTypeItem {
         this.NguoiNhap = NguoiNhap;
         this.ThoiGianNhap = ThoiGianNhap;
         this.ThangDanhGia = ThangDanhGia;
+        this.dataUUID = dataUUID;
     }
 
     public Long getDataID() {
@@ -222,6 +225,15 @@ public class DataTypeItem {
 
     public void setThangDanhGia(String ThangDanhGia) {
         this.ThangDanhGia = ThangDanhGia;
+    }
+
+
+    public String getDataUUID() {
+        return dataUUID;
+    }
+
+    public void setDataUUID(String dataUUID) {
+        this.dataUUID = dataUUID;
     }
 
 }

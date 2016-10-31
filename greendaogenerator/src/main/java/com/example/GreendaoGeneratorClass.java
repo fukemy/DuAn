@@ -15,7 +15,7 @@ public class GreendaoGeneratorClass {
 
     public static void createDatabase(){
         Schema schema = new Schema(1, "com.example.macos.database.new");
-        addInputDb(schema);
+        addDataTypeItemDb(schema);
         try{
             new DaoGenerator().generateAll(schema, PROJECT_DIR + "//app//src//main//java");
             System.out.println(PROJECT_DIR + "//app//src//main//java");
@@ -23,13 +23,24 @@ public class GreendaoGeneratorClass {
             JOptionPane.showMessageDialog(null, e.getMessage());
         }
     }
-//
-//    public static void addDb(Schema schema)
-//    {
-//        Entity en = schema.addEntity("MaDuong");
-//        en.addLongProperty("ID").primaryKey().autoincrement();
-//        en.addStringProperty("TenDuong");
-//    }
+
+    public static void addDb(Schema schema)
+    {
+        Entity en = schema.addEntity("MaDuong");
+        en.addLongProperty("ID").primaryKey().autoincrement();
+        en.addStringProperty("TenDuong");
+    }
+
+    public static void addBlueToothData(Schema schema){
+        Entity en = schema.addEntity("BlueToothData");
+        en.addLongProperty("ID").primaryKey().autoincrement();
+        en.addStringProperty("inputID");
+        en.addStringProperty("time");
+        en.addDoubleProperty("latValue");
+        en.addDoubleProperty("longValue");
+        en.addLongProperty("zValue");
+        en.addBooleanProperty("isUploaded");
+    }
 
     public static void addInputDb(Schema schema)
     {
@@ -61,6 +72,7 @@ public class GreendaoGeneratorClass {
         en.addStringProperty("NguoiNhap");
         en.addStringProperty("ThoiGianNhap");
         en.addIntProperty("ThangDanhGia");
+        en.addStringProperty("dataUUID");
     }
 
     public static void addRoadInformationDb(Schema schema)

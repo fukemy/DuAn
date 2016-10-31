@@ -139,5 +139,6 @@
     <string name="ble_not_supported">Bluetooth Low Energy not supported</string>
     <string name="scan">Scan</string>
     <string name="cancel">Cancel</string>
+    <string name="title_activity_graph_report">GraphReport</string>
 
 </resources>

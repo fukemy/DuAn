@@ -42,7 +42,7 @@
                     android:layout_height="200dp"
                     android:visibility="gone"
                     app:seriesType="line"
-                    android:layout_marginLeft="5dp"
+                    android:layout_marginLeft="10dp"
                     app:seriesColor="#ee0000"
                     android:id="@+id/graph" />
 

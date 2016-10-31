@@ -581,4 +581,10 @@
         <item name="1">Báo cáo sự cố</item>
         <item name="1">Báo cáo cuối ngày</item>
     </string-array>
+
+
+    <string-array name="tuychonbando">
+        <item name="1">Xem toàn bộ quá trình</item>
+        <item name="1">Các vị trí cần lưu ý</item>
+    </string-array>
 </resources>

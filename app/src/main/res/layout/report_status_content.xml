@@ -105,6 +105,17 @@
                 android:layout_marginTop="8dp"
                 android:padding="10dp"
                 android:text="@string/vitri" />
+
+            <TextView
+                android:id="@+id/tvGraph"
+                android:layout_gravity="right"
+                android:textColor="#7bc9c2"
+                android:layout_marginRight="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="10dp"
+                android:text="Xem quá trình tuần bằng đồ thị" />
         </LinearLayout>
 
         <LinearLayout
