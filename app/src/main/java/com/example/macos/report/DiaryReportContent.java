@@ -154,9 +154,10 @@ public class DiaryReportContent extends AppCompatActivity {
         tvGraph.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Logger.error("send UUID: " + data.getDaValue().getDataUUID());
+
+                Logger.error("send data to graph: " + data.toString());
                 final Intent in = new Intent(DiaryReportContent.this, GraphReport.class);
-                in.putExtra("dataUUID", data.getDaValue().getDataUUID());
+                in.putExtra("dataUUID", data.getDaValue().getDataID());
                 if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                     ActivityOptionsCompat options =
                             ActivityOptionsCompat.makeSceneTransitionAnimation(DiaryReportContent.this, tvGraph,
@@ -258,7 +259,7 @@ public class DiaryReportContent extends AppCompatActivity {
             tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa cập nhập!");
         }
         try {
-            tvStatus.setText(tvStatus.getText().toString() + " : " + (data.getDaValue().getThangDanhGia().equals("") ? "Chưa cập nhập!" : data.getDaValue().getThangDanhGia()));
+            tvStatus.setText(tvStatus.getText().toString() + " : " + (data.getDaValue().getDanhGia().equals("") ? "Chưa cập nhập!" : data.getDaValue().getDanhGia()));
         } catch (Exception e) {
             tvStatus.setText(tvStatus.getText().toString() + " : " + "Chưa cập nhập!");
         }

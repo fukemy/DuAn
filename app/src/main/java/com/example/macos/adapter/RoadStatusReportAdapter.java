@@ -111,8 +111,8 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
         }
 
         try {
-            tvStatus.setText((getChild(groupPosition, childPosition).getDaValue().getThangDanhGia().equals("")?
-                    "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getThangDanhGia()));
+            tvStatus.setText((getChild(groupPosition, childPosition).getDaValue().getDanhGia().equals("")?
+                    "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getDanhGia()));
         }catch(Exception e){
             tvStatus.setText("Chưa có dữ liệu!");
         }

@@ -107,8 +107,10 @@ public class DeviceListActivity extends Activity {
             	
             	if (mScanning==false)
                     scanLeDevice(true);
-            	else
+            	else {
+                    setResult(RESULT_CANCELED);
                     finish();
+                }
             }
         });
 

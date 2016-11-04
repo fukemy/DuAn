@@ -1,5 +1,6 @@
 package com.example.macos.entities;
 
+import com.example.macos.database.Data;
 import com.example.macos.database.DataTypeItem;
 
 import java.io.Serializable;
@@ -23,10 +24,11 @@ public class EnDataModel implements Serializable{
 
     @Override
     public String toString() {
-        return "\n{" +
-                "\"DataValue\":" + DataValue +
-                ", \"ListImageData\":" + ListImageData +
-                "\n}";
+//        return "\n{" +
+//                "\"DataValue\":" + DataValue +
+//                "\"ListImageData\":" + ListImageData +
+//                "\n}";
+        return DataValue.toString();
     }
 
     public DataTypeItem getDaValue() {

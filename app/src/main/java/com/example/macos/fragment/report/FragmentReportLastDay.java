@@ -363,7 +363,7 @@ public class FragmentReportLastDay extends CustomFragment {
             dataTypeItem.setMaDuong(99);
             dataTypeItem.setDataType(99);
             dataTypeItem.setTuyenSo(99);
-            dataTypeItem.setDataID((long)99);
+            dataTypeItem.setDataID(FunctionUtils.generateUUID());
 
             imgModalList = new ArrayList<>();
             LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);

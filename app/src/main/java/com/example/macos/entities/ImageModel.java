@@ -6,9 +6,17 @@ import com.google.gson.annotations.SerializedName;
  * Created by devil2010 on 7/22/16.
  */
 public class ImageModel {
-    @SerializedName("ImageName")
     private String ImageName;
-    @SerializedName("ImageDataByte")
+
+    public String getDataID() {
+        return DataID;
+    }
+
+    public void setDataID(String dataID) {
+        DataID = dataID;
+    }
+
+    private String DataID;
     private String ImageDataByte;
     private String ImagePath;
 
@@ -42,10 +50,11 @@ public class ImageModel {
 
     @Override
     public String toString() {
-        return "\n{" +
+        return "\n[{" +
+                " \n\"DataID\":\"" + DataID + "\"," +
                 " \n\"ImageName\":\"" + ImageName + "\"," +
-                "\n\"ImageDataByte\":\"" + ImageDataByte.trim() + "\"" +
-                "\n}\n";
+                "\n\"ImageDataByte\":\"" + ImageDataByte + "\"" +
+                "\n}]\n";
     }
 
     public ImageModel(String ImageDataByte, String imageName) {

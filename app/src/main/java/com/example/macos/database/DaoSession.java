@@ -23,7 +23,9 @@ public class DaoSession extends AbstractDaoSession {
     private final DaoConfig itemDaoConfig;
     private final DaoConfig dataTypeItemDaoConfig;
     private final DaoConfig blueToothDataDaoConfig;
+    private final DaoConfig positionDataDaoConfig;
 
+    private final PositionDataDao positionDataDao;
     private final BlueToothDataDao blueToothDataDao;
     private final DataDao dataDao;
     private final RoadInformationDao roadInformationDao;
@@ -49,18 +51,22 @@ public class DaoSession extends AbstractDaoSession {
         blueToothDataDaoConfig = daoConfigMap.get(BlueToothDataDao.class).clone();
         blueToothDataDaoConfig.initIdentityScope(type);
 
+        positionDataDaoConfig = daoConfigMap.get(PositionDataDao.class).clone();
+        positionDataDaoConfig.initIdentityScope(type);
+
         dataDao = new DataDao(dataDaoConfig, this);
         roadInformationDao = new RoadInformationDao(roadInformationDaoConfig, this);
         itemDao = new ItemDao(itemDaoConfig, this);
         dataTypeItemDao = new DataTypeItemDao(dataTypeItemDaoConfig, this);
         blueToothDataDao = new BlueToothDataDao(blueToothDataDaoConfig, this);
-
+        positionDataDao = new PositionDataDao(positionDataDaoConfig, this);
 
         registerDao(Data.class, dataDao);
         registerDao(RoadInformation.class, roadInformationDao);
         registerDao(Item.class, itemDao);
         registerDao(DataTypeItem.class, dataTypeItemDao);
         registerDao(BlueToothData.class, blueToothDataDao);
+        registerDao(PositionData.class, positionDataDao);
     }
 
     public void clear() {
@@ -69,6 +75,7 @@ public class DaoSession extends AbstractDaoSession {
         itemDaoConfig.getIdentityScope().clear();
         dataTypeItemDaoConfig.getIdentityScope().clear();
         blueToothDataDaoConfig.getIdentityScope().clear();
+        positionDataDaoConfig.getIdentityScope().clear();
     }
 
     public DataDao getDataDao() {
@@ -89,5 +96,8 @@ public class DaoSession extends AbstractDaoSession {
 
     public BlueToothDataDao getBlueToothDataDao() {
         return blueToothDataDao;
+    }
+    public PositionDataDao getPositionDataDao() {
+        return positionDataDao;
     }
 }

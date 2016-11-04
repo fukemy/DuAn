@@ -101,7 +101,6 @@ public class FragmentInputItem extends CustomFragment {
     public String ACTION_BUTTON_ITEM = "Done";
     private NestedScrollView scroll;
     private int currentDiffheight = 0;
-    RoadInformation roadInformation;
 
     public void setCatalog(String s) {
         this.catalog = s;
@@ -118,6 +117,8 @@ public class FragmentInputItem extends CustomFragment {
     private SharedPreferenceManager pref;
     private Button btnGraph;
     AsyncTaskHelper helper;
+
+    RoadInformation roadInformation;
 
     //UART STATUS
     private static final int REQUEST_SELECT_DEVICE = 11;
@@ -163,10 +164,10 @@ public class FragmentInputItem extends CustomFragment {
 
     private void initGraphView() {
         graph = (GraphView) rootView.findViewById(R.id.graph);
-        graph.getViewport().setScrollable(true); // enables horizontal scrolling
-        graph.getViewport().setScrollableY(true); // enables vertical scrolling
-        graph.getViewport().setScalable(true); // enables horizontal zooming and scrolling
-        graph.getViewport().setScalableY(true); // enables vertical zooming and scrollingZ
+        graph.getViewport().setScrollable(false); // enables horizontal scrolling
+        graph.getViewport().setScrollableY(false); // enables vertical scrolling
+        graph.getViewport().setScalable(false); // enables horizontal zooming and scrolling
+        graph.getViewport().setScalableY(false); // enables vertical zooming and scrollingZ
 
         graph.getGridLabelRenderer().setNumHorizontalLabels(5);
         graph.getGridLabelRenderer().setNumVerticalLabels(6);
@@ -224,7 +225,6 @@ public class FragmentInputItem extends CustomFragment {
         }
     }
 
-    StringBuilder stringBuilder;
     StringBuilder BleTemp;
     int count = 0;
     private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
@@ -242,7 +242,6 @@ public class FragmentInputItem extends CustomFragment {
                         btnGraph.setText(mDevice.getName() + " - connecting...");
                         Logger.error("[" + currentDateTimeString + "] Connected to: " + mDevice.getName());
                         mState = UART_PROFILE_CONNECTED;
-                        stringBuilder = new StringBuilder();
                         BleTemp = new StringBuilder();
                     }
                 });
@@ -282,16 +281,19 @@ public class FragmentInputItem extends CustomFragment {
 
                             if (text.contains("\n")) {
                                 count++;
-                                if(count <= 2){
+                                if(!btnGraph.isClickable()){
                                     btnGraph.setText("THEHEGEO - ready");
                                     btnGraph.setClickable(true);
                                 }
 
                                 BleTemp.append(text); // add last data
-                                stringBuilder.append(currentDateTimeString + " - " + BleTemp.toString() ); // add lastdata to total
 
                                 String[] stk = BleTemp.toString().split(",");
-                                int zData = (int) Float.parseFloat(stk[1]);
+                                double zData = (int) Double.parseDouble(stk[1]);
+                                double latitude = (int) Double.parseDouble(stk[3]);
+                                double longtitude = (int) Double.parseDouble(stk[5]);
+                                //long zData = new Double(d).longValue();
+                                Logger.error("zData: " + zData);
                                 if (zData < 1500 && zData > -1500) {
                                     zData = 0;
                                 }
@@ -299,12 +301,14 @@ public class FragmentInputItem extends CustomFragment {
                                     series.appendData(new DataPoint(count, zData / 100), true, count);
 
                                     BlueToothData blData = new BlueToothData();
-                                    blData.setInputID(UUID);
-                                    blData.setIsUploaded(false);
-                                    blData.setTime("" + System.currentTimeMillis());
-                                    blData.setZValue((long)zData);
-                                    blData.setLatValue(100.100);
-                                    blData.setLongValue(100.100);
+
+                                    blData.setId(UUID);
+                                    blData.setRoadId((int) (long) roadInformation.getID());
+                                    blData.setDateTimeLoging("" + System.currentTimeMillis());
+                                    blData.setZaxisValue(zData);
+                                    blData.setLatitude("" + latitude);
+                                    blData.setLongitude("" + longtitude);
+                                    blData.setUserLoging(pref.getString(GlobalParams.USERNAME,"User"));
 
                                     DatabaseHelper.insertBlueToothData(blData);
                                 }
@@ -314,7 +318,7 @@ public class FragmentInputItem extends CustomFragment {
                             }
 
                         } catch (Exception e) {
-                            Log.e(TAG, e.toString());
+                            Logger.error(e.toString());
                         }
                     }
                 });
@@ -924,6 +928,8 @@ public class FragmentInputItem extends CustomFragment {
                     btnGraph.setText(mDevice.getName() + " - connecting");
                     mService.connect(deviceAddress);
                     graph.setVisibility(View.VISIBLE);
+                }else{
+                    btnGraph.setClickable(true);
                 }
                 break;
             case REQUEST_ENABLE_BT:

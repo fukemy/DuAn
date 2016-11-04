@@ -1,19 +1,10 @@
 package com.example.macos.report;
 
-import android.app.SharedElementCallback;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.transition.Explode;
 import android.transition.Fade;
 import android.transition.Transition;
@@ -37,15 +28,11 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.jjoe64.graphview.series.OnDataPointTapListener;
 import com.jjoe64.graphview.series.Series;
 
-import java.lang.reflect.Array;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
 
 public class GraphReport extends AppCompatActivity {
     private GraphView graph;
@@ -135,6 +122,7 @@ public class GraphReport extends AppCompatActivity {
                 } else {
                     loadAllDataBarGraph();
                 }
+                spnGraphType.setEnabled(false);
             }
 
             @Override
@@ -205,7 +193,7 @@ public class GraphReport extends AppCompatActivity {
         if (blData.size() > 0) {
             for (Iterator<BlueToothData> iterator = blData.iterator(); iterator.hasNext(); ) {
                 BlueToothData value = iterator.next();
-                if (value.getZValue() == 0) {
+                if (value.getZaxisValue() == 0) {
                     iterator.remove();
                 }
             }
@@ -223,7 +211,7 @@ public class GraphReport extends AppCompatActivity {
         i = 0;
         dp = new long[blData.size()];
         for (int j = 0; j < blData.size(); j++) {
-            dp[j] = Long.parseLong(blData.get(j).getTime());
+            dp[j] = Long.parseLong(blData.get(j).getDateTimeLoging());
         }
 
         graph.removeAllSeries();
@@ -238,10 +226,12 @@ public class GraphReport extends AppCompatActivity {
                 @Override
                 public void run() {
 
-                    series.appendData(new DataPoint(i, blData.get(i).getZValue()), false, blData.size());
+                    series.appendData(new DataPoint(i, blData.get(i).getZaxisValue()), false, blData.size());
                     mHandler.postDelayed(this, 5);
-                    if (i == blData.size() - 1)
+                    if (i == blData.size() - 1) {
                         mHandler.removeCallbacks(mTimer);
+                        spnGraphType.setEnabled(true);
+                    }
                     i++;
                 }
             };
@@ -271,11 +261,13 @@ public class GraphReport extends AppCompatActivity {
             mTimer = new Runnable() {
                 @Override
                 public void run() {
-                    barSeries.appendData(new DataPoint(i, blData.get(i).getZValue()), false, blData.size());
+                    barSeries.appendData(new DataPoint(i, blData.get(i).getZaxisValue()), false, blData.size());
                     mHandler.postDelayed(this, 5);
 
-                    if (i == blData.size() - 1)
+                    if (i == blData.size() - 1) {
                         mHandler.removeCallbacks(mTimer);
+                        spnGraphType.setEnabled(true);
+                    }
                     i++;
                 }
             };

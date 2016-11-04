@@ -192,7 +192,7 @@ public class FragmentReportMap extends CustomFragment{
                     }
 
                     try {
-                        status = (e.getDaValue().getThangDanhGia().equals("null") && e.getDaValue().getThangDanhGia().equals("")) ? "Chưa có dữ liệu" : e.getDaValue().getThangDanhGia();
+                        status = (e.getDaValue().getDanhGia().equals("null") && e.getDaValue().getDanhGia().equals("")) ? "Chưa có dữ liệu" : e.getDaValue().getDanhGia();
                     }catch(Exception ex){
                         ex.printStackTrace();
                         status = "Chưa có dữ liệu";

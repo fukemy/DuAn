@@ -23,6 +23,11 @@ public class DatabaseHelper {
         dao.insertOrReplaceInTx(blData);
     }
 
+    public static void insertPositionData(PositionData pxData){
+        PositionDataDao dao = Application.getInstance().daoSession.getPositionDataDao();
+        dao.insertOrReplaceInTx(pxData);
+    }
+
     public static List<Data> getData(){
         DataDao dao = Application.getInstance().daoSession.getDataDao();
         return dao.queryBuilder().list();
@@ -32,9 +37,18 @@ public class DatabaseHelper {
         BlueToothDataDao dao = Application.getInstance().daoSession.getBlueToothDataDao();
 
         QueryBuilder queryBuilder = dao.queryBuilder()
-                .where(BlueToothDataDao.Properties.InputID.eq(dataUUID));
+                .where(BlueToothDataDao.Properties.Id.eq(dataUUID));
         return queryBuilder.list();
     }
+
+    public static List<PositionData> getPositionDataByID(String dataUUID){
+        PositionDataDao dao = Application.getInstance().daoSession.getPositionDataDao();
+
+        QueryBuilder queryBuilder = dao.queryBuilder()
+                .where(PositionDataDao.Properties.Id.eq(dataUUID));
+        return queryBuilder.list();
+    }
+
 
 
     public static void updateData(Data d){
@@ -49,6 +63,11 @@ public class DatabaseHelper {
 
     public static void clearBlueToothData(){
         BlueToothDataDao dao = Application.getInstance().daoSession.getBlueToothDataDao();
+        dao.deleteAll();
+    }
+
+    public static void clearPositionData(){
+        PositionDataDao dao = Application.getInstance().daoSession.getPositionDataDao();
         dao.deleteAll();
     }
 

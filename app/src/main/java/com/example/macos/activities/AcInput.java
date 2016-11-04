@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.os.StrictMode;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -32,6 +33,7 @@ import com.example.macos.adapter.MainScreenAdapter;
 import com.example.macos.database.DataTypeItem;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.Item;
+import com.example.macos.database.PositionData;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
@@ -74,6 +76,7 @@ public class AcInput extends FragmentActivity {
     private FloatingActionButton fab;
     private SharedPreferenceManager pref;
     RoadInformation roadInformation;
+    Gson gson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +84,11 @@ public class AcInput extends FragmentActivity {
         setContentView(R.layout.ac_input);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         pref = new SharedPreferenceManager(AcInput.this);
+        gson = new Gson();
         Gson gson = new Gson();
         SharedPreferenceManager pref = new SharedPreferenceManager(AcInput.this);
         roadInformation = gson.fromJson(pref.getString(GlobalParams.ROAD_CHOOSEN, ""), RoadInformation.class);
@@ -190,14 +196,6 @@ public class AcInput extends FragmentActivity {
                 alert.show();
             }
         }
-    }
-
-    public String getACTION_TYPE() {
-        return ACTION_TYPE;
-    }
-
-    public EnLocationItem getLocationItem(){
-        return locationItem;
     }
 
     boolean isBack = false;
@@ -378,45 +376,70 @@ public class AcInput extends FragmentActivity {
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
-        public void onMyLocationChange(Location location) {
+        public void onMyLocationChange(final Location location) {
+            locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
             if(!IS_FOUND_LOCATION) {
                 Logger.error("found location :" + location.toString());
                 title.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
-                locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
                 if(locationItem.getAddress() == null){
                     addGoogleMapShowcase();
                 }
+
+                //TODO VERY IMPORTAIN, still now I only can change location in all fragment, so hard.
                 ((FragmentInputItem)((MainScreenAdapter)viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
 //                System.out.println("got location : " + locationItem.toString());
                 IS_FOUND_LOCATION = true;
-                if(location != null) {
-                    gMap.setOnMyLocationChangeListener(null);
-                    CameraPosition cameraPosition = new CameraPosition.Builder()
-                            .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                            .zoom(17)                   // Sets the zoom
-                            .bearing(90)                // Sets the orientation of the camera to east
-                            .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                            .build();                   // Creates a CameraPosition from the builder
-                    gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1000, new GoogleMap.CancelableCallback() {
-                        @Override
-                        public void onFinish() {
-                            try {
-                                if (dialog != null && dialog.isShowing())
-                                    dialog.dismiss();
-                                gMap.setOnMyLocationChangeListener(null);
-                            } catch (Exception e) {
-                            }
-                        }
-
-                        @Override
-                        public void onCancel() {
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                        .zoom(18)                   // Sets the zoom
+                        .build();
+                gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 1000, new GoogleMap.CancelableCallback() {
+                    @Override
+                    public void onFinish() {
+                        try {
                             if (dialog != null && dialog.isShowing())
                                 dialog.dismiss();
+                            //gMap.setOnMyLocationChangeListener(null);
+//                                Marker nowPosition = gMap.addMarker(new MarkerOptions()
+//                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+//                                        .snippet("Vị trí hiện tại")
+//                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.engineer)));
+                        } catch (Exception e) {
                         }
-                    });
-                }
-                gMap.setOnMyLocationChangeListener(null);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        if (dialog != null && dialog.isShowing())
+                            dialog.dismiss();
+                    }
+                });
+                //gMap.setOnMyLocationChangeListener(null);
+            }
+
+            if(location != null) {
+
+                //TODO VERY IMPORTAIN, still now I only can get first fragment UUID, so hard.
+                Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0);
+
+                PositionData positionData = new PositionData();
+                positionData.setId(((FragmentInputItem) f).getUUID());
+                positionData.setLattitude("" + location.getLatitude());
+                positionData.setLongitude("" + location.getLongitude());
+                positionData.setLogTime("" + System.currentTimeMillis());
+                positionData.setUserName(pref.getString(GlobalParams.USERNAME,"User"));
+
+                Logger.error("save position update: " + positionData);
+
+                //MOVE CAMERA
+                DatabaseHelper.insertPositionData(positionData);
+
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                        .zoom(18)                   // Sets the zoom
+                        .build();                   // Creates a CameraPosition from the builder
+                gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         }
     };
@@ -436,13 +459,13 @@ public class AcInput extends FragmentActivity {
                     String text = ((EditText) lnl.getChildAt(j)).getText().toString();
                     if (tag.equals("promptCatalog")) {   // for catalog spin
                         int selectionId = Integer.parseInt("" + text.charAt(0));
-                        int dataId = (int) (long) dataTypeItem.getDataID();
+                        int dataId = (int) (long) dataTypeItem.getDataTypeID();
                         dataTypeItem.setDataType(selectionId + FunctionUtils.getDataTypedByDataId(dataId));
                         dataTypeItem.setDataTypeName(text.replace("" + text.charAt(0), "").replace("" + text.charAt(1), ""));
                     }
 
                     if (tag.equals("status")) {        // for statuc spin
-                        dataTypeItem.setThangDanhGia(text);
+                        dataTypeItem.setDanhGia(text);
                     }
                     if (tag.equals("information")) {     // for edittext
                         dataTypeItem.setMoTaTinhTrang(text);
@@ -454,7 +477,7 @@ public class AcInput extends FragmentActivity {
 
                     if (tag.equals("otherStatus")) {     // for edittext
                         if(text != null && !text.equals(""))
-                            dataTypeItem.setThangDanhGia(text);
+                            dataTypeItem.setDanhGia(text);
                     }
                 }
 
@@ -503,31 +526,33 @@ public class AcInput extends FragmentActivity {
             return;
         }
 
-        Gson gson = new Gson();
         for(int k = 0; k < ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().size(); k++){
             Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(k);
             LinearLayout lnlAll = (LinearLayout) f.getView().findViewById(R.id.lnlAll);
             for (int i = 0; i < lnlAll.getChildCount(); i++) {
                 dataTypeItem = new DataTypeItem();
-                dataTypeItem.setLocationItem(locationItem);
-                dataTypeItem.setDataUUID(((FragmentInputItem) f).getUUID());
                 dataTypeItem.setTenDuong(roadInformation.getTenDuong());
+                dataTypeItem.setLocationItem(locationItem);
                 dataTypeItem.setDataName(dataViewList.getDataList().get(k).getItemName());
                 dataTypeItem.setThoiGianNhap("" + System.currentTimeMillis());
-                dataTypeItem.setAction(getResources().getString(R.string.road_test));
                 dataTypeItem.setKinhDo("" + (locationItem.getLocation() != null ? locationItem.getLocation().getLongitude() : ""));
                 dataTypeItem.setViDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getLatitude() : ""));
                 dataTypeItem.setMaDuong(Integer.parseInt(roadInformation.getMaDuong().trim()));
                 dataTypeItem.setCaoDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getAltitude() : ""));
                 dataTypeItem.setTuyenSo(Integer.parseInt(roadInformation.getTuyenSo()));
                 dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME,"User"));
-                dataTypeItem.setDataID(dataViewList.getDataList().get(k).getItemID());
+                dataTypeItem.setDataTypeID((int) (long)dataViewList.getDataList().get(k).getItemID());
+                dataTypeItem.setDataID(((FragmentInputItem) f).getUUID());
+                dataTypeItem.setAction(getResources().getString(R.string.road_test));
+
+
 
                 imgModalList = new ArrayList<>();
                 LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);
                 if(lnl != null) {
                     collectNestedData(lnl);
                 }
+
 
                 if(dataTypeItem.getDataType() == null) {
                     AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
@@ -542,16 +567,21 @@ public class AcInput extends FragmentActivity {
                 enDataModel.setListImageData(imgModalList);
                 DatabaseHelper.insertData(gson.toJson(enDataModel));
 
-//                Logger.error("dataTypeItem:  " + enDataModel.toString());
+                Logger.error("save data success: " + enDataModel);
+
             }
             pref.saveBoolean(GlobalParams.IS_WORKED_TODAY, true);
+
+            Intent in = new Intent(AcInput.this, MainScreen.class);
+            in.putExtra(GlobalParams.IS_REINPUT_ROADNAME, true);
+            in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            finish();
+            startActivity(in);
         }
-        Intent in = new Intent(AcInput.this, MainScreen.class);
-        in.putExtra(GlobalParams.IS_REINPUT_ROADNAME, true);
-        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        finish();
-        startActivity(in);
 
     }
+
+
+
 }

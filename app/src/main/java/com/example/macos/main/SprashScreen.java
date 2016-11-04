@@ -51,6 +51,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -249,6 +250,7 @@ public class SprashScreen extends AppCompatActivity {
                 }catch(InterruptedException e){
                     e.printStackTrace();
                 }finally {
+                    FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
                     login(GlobalParams.BASED_LOGIN_URL);
                 }
 
@@ -427,8 +429,7 @@ public class SprashScreen extends AppCompatActivity {
                 btLogin.setEnabled(false);
             }
         });
-
-        FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
+        Logger.error("login url: " + url);
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(url);
         HttpResponse response;
@@ -440,11 +441,21 @@ public class SprashScreen extends AppCompatActivity {
             if (entity != null) {
                 InputStream instream = entity.getContent();
                 result = FunctionUtils.convertStreamToString(instream).replace("\"","");
+                if(result == null){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            btLogin.setEnabled(true);
+                            Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                            prLogin.setVisibility(View.GONE);
+                            return;
+                        }
+                    });
+                }
                 Logger.error("login response:" + result);
                 USER_TOKEN = result;
                 instream.close();
                 loadRoadName();
-
             }else{
                 runOnUiThread(new Runnable() {
                     @Override
@@ -479,6 +490,7 @@ public class SprashScreen extends AppCompatActivity {
     }
     class LoadRoadName extends AsyncTask<String, Void, String>{
 
+        List<RoadInformation> roadInformationList;
         @Override
         protected String doInBackground(String... urls) {
             String responseResult = "";
@@ -504,8 +516,10 @@ public class SprashScreen extends AppCompatActivity {
         @Override
         protected void onPostExecute(String result) {
             Gson gson = new Gson();
-            List<RoadInformation> roadInformationList = gson.fromJson(result,new TypeToken<List<RoadInformation>>(){}.getType());
+            roadInformationList = new ArrayList<>();
+            roadInformationList = gson.fromJson(result,new TypeToken<List<RoadInformation>>(){}.getType());
 
+            Logger.error("roadInformationList: " + roadInformationList);
             DatabaseHelper.insertListRoadInformation(roadInformationList);
             for(RoadInformation e : roadInformationList)
                 Logger.error("Road: " + e.toString());

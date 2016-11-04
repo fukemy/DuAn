@@ -22,6 +22,7 @@ public class DaoMaster extends AbstractDaoMaster {
         RoadInformationDao.createTable(db, ifNotExists);
         ItemDao.createTable(db, ifNotExists);
         DataTypeItemDao.createTable(db, ifNotExists);
+        PositionDataDao.createTable(db, ifNotExists);
         BlueToothDataDao.createTable(db, ifNotExists);
     }
     
@@ -31,6 +32,7 @@ public class DaoMaster extends AbstractDaoMaster {
         RoadInformationDao.dropTable(db, ifExists);
         ItemDao.dropTable(db, ifExists);
         DataTypeItemDao.dropTable(db, ifExists);
+        PositionDataDao.dropTable(db, ifExists);
         BlueToothDataDao.dropTable(db, ifExists);
     }
     
@@ -67,6 +69,7 @@ public class DaoMaster extends AbstractDaoMaster {
         registerDaoClass(RoadInformationDao.class);
         registerDaoClass(ItemDao.class);
         registerDaoClass(DataTypeItemDao.class);
+        registerDaoClass(PositionDataDao.class);
         registerDaoClass(BlueToothDataDao.class);
     }
     

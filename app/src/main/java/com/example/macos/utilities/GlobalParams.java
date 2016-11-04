@@ -11,6 +11,7 @@ public class GlobalParams {
     public static final int MAX_UPLOAD_IMAGE_AMOUNT = 3;
     public static final String LIST_DATATYE = "list datatype name";
     public static final String ROAD_CHOOSEN = "road choosen";
+    public static final String IMAGE_DATA_BASE64 = "road choosen";
     public static final String MA_DUONG = "ma duong";
     public static final String DANH_MUC = "danh muc";
     public static final String GOOGLE_MAP_CLICK_SHOWCASE = "google map click show case";
@@ -33,11 +34,14 @@ public class GlobalParams {
     public static final String IS_ACCEPT_NOTIFICATION = "is accept notification";
     public static final String BASED_URL = "http://khaosatdiachat.com:8887/api";
     public static final String USER_TOKEN = "";
-    public static final String BASED_LOGIN_URL = "http://khaosatdiachat.com:8887/api/users/login/thangdv/123456";
-    public static final String BASED_POST_URL = "http://khaosatdiachat.com:8887/api/datas/uploaddata/thangdv/";
-    public static final String BASED_GET_ROAD = "http://khaosatdiachat.com:8887/api/roads/getall/thangdv/";
-    public static final String BASED_GET_DANHMUC = "http://khaosatdiachat.com:8887/api/items/getall/thangdv/";
-    public static final String BASED_GET_DATATYPE_BY_ID = "khaosatdiachat.com:8887/api/items/getbyitem/thangdv/token/itemid";
+    public static final String BASED_LOGIN_URL = "http://khaosatdiachat.com:8887/api/users/login/dungdv/123456";
+    public static final String BASED_POST_DATA_URL = "http://khaosatdiachat.com:8887/api/datas/savedatalist/dungdv/";
+    public static final String BASED_GET_ROAD = "http://khaosatdiachat.com:8887/api/roads/getall/dungdv/";
+    public static final String BASED_GET_DANHMUC = "http://khaosatdiachat.com:8887/api/items/getall/dungdv/";
+    public static final String BASED_GET_DATATYPE_BY_ID = "khaosatdiachat.com:8887/api/items/getbyitem/dungdv/token/itemid";
+    public static final String BASED_UPLOAD_BLUETOOTH_URL = "http://khaosatdiachat.com:8887/api/viberatedatas/uploaddata/dungdv/";
+    public static final String BASED_UPLOAD_POSITION_URL = "http://khaosatdiachat.com:8887/api/userposition/uploaddata/dungdv/";
+    public static final String BASED_UPLOAD_IMAGE_URL = "http://khaosatdiachat.com:8887/api/datas/UploadImage/dungdv/";
 
     public static final int NOTIFICATION_ID = 6969;
 

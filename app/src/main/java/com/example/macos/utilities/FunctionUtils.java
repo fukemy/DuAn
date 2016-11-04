@@ -764,9 +764,8 @@ public class FunctionUtils {
 
         // First decode with inJustDecodeBounds=true to check dimensions
         final BitmapFactory.Options options = new BitmapFactory.Options();
-//        options.inJustDecodeBounds = true;
-        options.inPreferredConfig = Bitmap.Config.RGB_565;
-//        options.inPreferredConfig = Bitmap.Config.ARGB_8888 ;
+        //options.inPreferredConfig = Bitmap.Config.RGB_565;
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888 ;
         options.inDither = true;
         BitmapFactory.decodeFile(path, options);
 
@@ -923,7 +922,7 @@ public class FunctionUtils {
         imageStream.close();
 
         // Calculate inSampleSize
-        options.inSampleSize = calculateInSampleSize(options, MAX_WIDTH, MAX_HEIGHT);
+        //options.inSampleSize = calculateInSampleSize(options, MAX_WIDTH, MAX_HEIGHT);
 
         // Decode bitmap with inSampleSize set
         options.inJustDecodeBounds = false;

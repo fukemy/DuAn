@@ -13,7 +13,7 @@ import de.greenrobot.dao.internal.DaoConfig;
 
 /**
  * DAO for table "DATA_TYPE_ITEM".
-*/
+ */
 public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
 
     public static final String TABLENAME = "DATA_TYPE_ITEM";
@@ -21,9 +21,9 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
     /**
      * Properties of entity DataTypeItem.<br/>
      * Can be used for QueryBuilder and for referencing column names.
-    */
+     */
     public static class Properties {
-        public final static Property DataID = new Property(0, Long.class, "DataID", false, "DATA_ID");
+        public final static Property DataID = new Property(0, String.class, "DataID", false, "DATA_ID");
         public final static Property DataType = new Property(1, Integer.class, "DataType", false, "DATA_TYPE");
         public final static Property MaDuong = new Property(2, Integer.class, "MaDuong", false, "MA_DUONG");
         public final static Property TuyenSo = new Property(3, Integer.class, "TuyenSo", false, "TUYEN_SO");
@@ -41,7 +41,7 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
     public DataTypeItemDao(DaoConfig config) {
         super(config);
     }
-    
+
     public DataTypeItemDao(DaoConfig config, DaoSession daoSession) {
         super(config, daoSession);
     }
@@ -50,7 +50,7 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"DATA_TYPE_ITEM\" (" + //
-                "\"DATA_ID\" INTEGER," + // 0: DataID
+                "\"DATA_ID\" TEXT," + // 0: DataID
                 "\"DATA_TYPE\" INTEGER," + // 1: DataType
                 "\"MA_DUONG\" INTEGER," + // 2: MaDuong
                 "\"TUYEN_SO\" INTEGER," + // 3: TuyenSo
@@ -74,62 +74,62 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
     @Override
     protected void bindValues(SQLiteStatement stmt, DataTypeItem entity) {
         stmt.clearBindings();
- 
-        Long DataID = entity.getDataID();
+
+        String DataID = entity.getDataID();
         if (DataID != null) {
-            stmt.bindLong(1, DataID);
+            stmt.bindString(1, DataID);
         }
- 
+
         Integer DataType = entity.getDataType();
         if (DataType != null) {
             stmt.bindLong(2, DataType);
         }
- 
+
         Integer MaDuong = entity.getMaDuong();
         if (MaDuong != null) {
             stmt.bindLong(3, MaDuong);
         }
- 
+
         Integer TuyenSo = entity.getTuyenSo();
         if (TuyenSo != null) {
             stmt.bindLong(4, TuyenSo);
         }
- 
+
         String MoTaTinhTrang = entity.getMoTaTinhTrang();
         if (MoTaTinhTrang != null) {
             stmt.bindString(5, MoTaTinhTrang);
         }
- 
+
         String KinhDo = entity.getKinhDo();
         if (KinhDo != null) {
             stmt.bindString(6, KinhDo);
         }
- 
+
         String ViDo = entity.getViDo();
         if (ViDo != null) {
             stmt.bindString(7, ViDo);
         }
- 
+
         String CaoDo = entity.getCaoDo();
         if (CaoDo != null) {
             stmt.bindString(8, CaoDo);
         }
- 
+
         String NguoiNhap = entity.getNguoiNhap();
         if (NguoiNhap != null) {
             stmt.bindString(9, NguoiNhap);
         }
- 
+
         String ThoiGianNhap = entity.getThoiGianNhap();
         if (ThoiGianNhap != null) {
             stmt.bindString(10, ThoiGianNhap);
         }
 
-        String ThangDanhGia = entity.getThangDanhGia();
+        String ThangDanhGia = entity.getDanhGia();
         if (ThangDanhGia != null) {
             stmt.bindString(11, ThangDanhGia);
         }
- 
+
         String dataUUID = entity.getDataUUID();
         if (dataUUID != null) {
             stmt.bindString(12, dataUUID);
@@ -140,32 +140,32 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
     @Override
     public Void readKey(Cursor cursor, int offset) {
         return null;
-    }    
+    }
 
     /** @inheritdoc */
     @Override
     public DataTypeItem readEntity(Cursor cursor, int offset) {
         DataTypeItem entity = new DataTypeItem( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // DataID
-            cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // DataType
-            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // MaDuong
-            cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // TuyenSo
-            cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // MoTaTinhTrang
-            cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // KinhDo
-            cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // ViDo
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // CaoDo
-            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // NguoiNhap
-            cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // ThoiGianNhap
-            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // ThangDanhGia
-            cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // dataUUID
+                cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0), // DataID
+                cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1), // DataType
+                cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // MaDuong
+                cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3), // TuyenSo
+                cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // MoTaTinhTrang
+                cursor.isNull(offset + 5) ? null : cursor.getString(offset + 5), // KinhDo
+                cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // ViDo
+                cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // CaoDo
+                cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // NguoiNhap
+                cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9), // ThoiGianNhap
+                cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10), // ThangDanhGia
+                cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11) // dataUUID
         );
         return entity;
     }
-     
+
     /** @inheritdoc */
     @Override
     public void readEntity(Cursor cursor, DataTypeItem entity, int offset) {
-        entity.setDataID(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setDataID(cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0));
         entity.setDataType(cursor.isNull(offset + 1) ? null : cursor.getInt(offset + 1));
         entity.setMaDuong(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
         entity.setTuyenSo(cursor.isNull(offset + 3) ? null : cursor.getInt(offset + 3));
@@ -175,17 +175,17 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
         entity.setCaoDo(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setNguoiNhap(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setThoiGianNhap(cursor.isNull(offset + 9) ? null : cursor.getString(offset + 9));
-        entity.setThangDanhGia(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
+        entity.setDanhGia(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
         entity.setDataUUID(cursor.isNull(offset + 11) ? null : cursor.getString(offset + 11));
-     }
-    
+    }
+
     /** @inheritdoc */
     @Override
     protected Void updateKeyAfterInsert(DataTypeItem entity, long rowId) {
         // Unsupported or missing PK type
         return null;
     }
-    
+
     /** @inheritdoc */
     @Override
     public Void getKey(DataTypeItem entity) {
@@ -193,9 +193,9 @@ public class DataTypeItemDao extends AbstractDao<DataTypeItem, Void> {
     }
 
     /** @inheritdoc */
-    @Override    
+    @Override
     protected boolean isEntityUpdateable() {
         return true;
     }
-    
+
 }

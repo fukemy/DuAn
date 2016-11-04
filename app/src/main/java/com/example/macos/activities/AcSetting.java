@@ -26,6 +26,7 @@ import com.example.macos.database.Data;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
+import com.example.macos.main.Application;
 import com.example.macos.main.SprashScreen;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -179,16 +180,18 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
                 onBackPressed();
                 break;
             case R.id.btnDeleteData:
-                List<Data> dataList = DatabaseHelper.getData();
-                if(dataList.size() > 0) {
+//                List<Data> dataList = DatabaseHelper.getData();
+//                if(dataList.size() > 0) {
                     builder = new AlertDialog.Builder(AcSetting.this);
                     builder.setTitle("Warning");
-                    builder.setMessage("Bạn có chắc chắn muốn xoá mọi dữ liệu?");
+                    builder.setMessage("Bạn có chắc chắn muốn xoá mọi dữ liệu đã nhập?");
 
                     builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             DatabaseHelper.clearData();
+                            DatabaseHelper.clearBlueToothData();
+                            DatabaseHelper.clearPositionData();
                             Intent in = new Intent(AcSetting.this, MainScreen.class);
                             in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             in.putExtra("isDeleteData", true);
@@ -199,9 +202,9 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
 
                     builder.setNegativeButton("Cancel", null);
                     builder.show();
-                }else{
-                    Toast.makeText(AcSetting.this, "Chưa có dữ liệu để xoá!", Toast.LENGTH_SHORT).show();
-                }
+//                }else{
+//                    Toast.makeText(AcSetting.this, "Chưa có dữ liệu để xoá!", Toast.LENGTH_SHORT).show();
+//                }
                 break;
         }
     }

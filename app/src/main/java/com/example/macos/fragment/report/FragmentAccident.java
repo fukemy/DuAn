@@ -518,7 +518,7 @@ public class FragmentAccident extends CustomFragment {
             dataTypeItem.setDataName(getResources().getString(R.string.report));
             dataTypeItem.setDataType(99);
             dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME, "User"));
-            dataTypeItem.setDataID((long) 99);
+            dataTypeItem.setDataID(FunctionUtils.generateUUID());
 
             imgModalList = new ArrayList<>();
             LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);

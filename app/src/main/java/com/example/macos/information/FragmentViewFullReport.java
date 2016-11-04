@@ -150,8 +150,8 @@ public class FragmentViewFullReport extends DialogFragment {
             tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa có dữ liệu!");
         }
         try{
-            tvStatus.setText(tvStatus.getText().toString() + " : " + ((data.getDaValue().getThangDanhGia() == null || data.getDaValue().getThangDanhGia().equals("null") || data.getDaValue().getThangDanhGia().equals(""))?
-                    "Chưa có dữ liệu!" : data.getDaValue().getThangDanhGia()));
+            tvStatus.setText(tvStatus.getText().toString() + " : " + ((data.getDaValue().getDanhGia() == null || data.getDaValue().getDanhGia().equals("null") || data.getDaValue().getDanhGia().equals(""))?
+                    "Chưa có dữ liệu!" : data.getDaValue().getDanhGia()));
         }catch (Exception e){
             tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa có dữ liệu!");
         }

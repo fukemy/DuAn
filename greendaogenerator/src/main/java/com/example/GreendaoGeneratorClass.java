@@ -15,7 +15,7 @@ public class GreendaoGeneratorClass {
 
     public static void createDatabase(){
         Schema schema = new Schema(1, "com.example.macos.database.new");
-        addDataTypeItemDb(schema);
+        addPositionDb(schema);
         try{
             new DaoGenerator().generateAll(schema, PROJECT_DIR + "//app//src//main//java");
             System.out.println(PROJECT_DIR + "//app//src//main//java");
@@ -31,15 +31,26 @@ public class GreendaoGeneratorClass {
         en.addStringProperty("TenDuong");
     }
 
+
+    public static void addPositionDb(Schema schema)
+    {
+        Entity en = schema.addEntity("PositionData");
+        en.addStringProperty("Id");
+        en.addStringProperty("UserName");
+        en.addStringProperty("LogTime");
+        en.addStringProperty("Lattitude");
+        en.addStringProperty("Longitude");
+    }
+
     public static void addBlueToothData(Schema schema){
         Entity en = schema.addEntity("BlueToothData");
-        en.addLongProperty("ID").primaryKey().autoincrement();
-        en.addStringProperty("inputID");
-        en.addStringProperty("time");
-        en.addDoubleProperty("latValue");
-        en.addDoubleProperty("longValue");
-        en.addLongProperty("zValue");
-        en.addBooleanProperty("isUploaded");
+        en.addStringProperty("Id");
+        en.addIntProperty("RoadId");
+        en.addStringProperty("DateTimeLoging");
+        en.addStringProperty("Latitude");
+        en.addStringProperty("Longitude");
+        en.addDoubleProperty("ZaxisValue");
+        en.addStringProperty("UserLoging");
     }
 
     public static void addInputDb(Schema schema)
@@ -58,10 +69,11 @@ public class GreendaoGeneratorClass {
         en.addStringProperty("Description");
     }
 
+
     public static void addDataTypeItemDb(Schema schema)
     {
         Entity en = schema.addEntity("DataTypeItem");
-        en.addLongProperty("DataID");
+        en.addStringProperty("DataID");
         en.addIntProperty("DataType");
         en.addIntProperty("MaDuong");
         en.addIntProperty("TuyenSo");
@@ -71,8 +83,8 @@ public class GreendaoGeneratorClass {
         en.addStringProperty("CaoDo");
         en.addStringProperty("NguoiNhap");
         en.addStringProperty("ThoiGianNhap");
-        en.addIntProperty("ThangDanhGia");
-        en.addStringProperty("dataUUID");
+        en.addStringProperty("DanhGia");
+        en.addStringProperty("LyTrinh");
     }
 
     public static void addRoadInformationDb(Schema schema)

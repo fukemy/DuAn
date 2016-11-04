@@ -26,8 +26,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.macos.adapter.RoadStatusReportAdapter;
+import com.example.macos.database.BlueToothData;
 import com.example.macos.database.Data;
 import com.example.macos.database.DatabaseHelper;
+import com.example.macos.database.PositionData;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
@@ -68,6 +70,9 @@ public class FragmentReportStatus extends CustomFragment {
     private FloatingActionButton fab;
     private SharedPreferenceManager pref;
     List<EnDataModel>  failUploadData;
+    List<String> failBlueToothData;
+    List<String> failPositonData;
+    List<Uri> failImageData;
     private LinearLayout lnlOptions;
     boolean isShowFab = true;
     ProgressDialog dialog;
@@ -248,6 +253,10 @@ public class FragmentReportStatus extends CustomFragment {
             return;
         }
         failUploadData = new ArrayList<>();
+        failBlueToothData = new ArrayList<>();
+        failImageData = new ArrayList<>();
+        failPositonData = new ArrayList<>();
+
         syncData = new ArrayList<>();
         dialog= new ProgressDialog(getActivity());
         dialog.setMessage("Đang chuyển đổi dữ liệu trước khi upload...");
@@ -325,7 +334,6 @@ public class FragmentReportStatus extends CustomFragment {
                 pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
                 instream.close();
 
-//                new UploadData().execute();
                 failUploadData.clear();
                 syncAndUploadData();
             }
@@ -339,61 +347,19 @@ public class FragmentReportStatus extends CustomFragment {
             return;
 
         final EnDataModel uploadData = syncData.get(order);
+        new UploadData(uploadData).execute();
 
-        final Thread thread = new Thread() {
-            public void run() {
-                try {
-//                    ContentResolver cr = getActivity().getContentResolver();
-                    for (ImageModel imgUri : uploadData.getListImageData()) {
-                        Uri uri = Uri.parse(imgUri.getImagePath());
-                        try {
-//                            Bitmap bitmap = android.provider.MediaStore.Images.Media.getBitmap(cr, uri);
-//                            Bitmap b = FunctionUtils.scaleBitmap(bitmap, 200, 200);
-//                            String base64value = FunctionUtils.convertBitMapToString(b);
-//                            Bitmap bitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(), dm.widthPixels, dm.widthPixels);
-                            Bitmap bitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(), 800, 1100);
-                            Logger.error("decode size: " + FunctionUtils.sizeOf(bitmap));
-                            String base64value = FunctionUtils.convertBitMapToString(bitmap);
-                            imgUri.setImageDataByte(base64value);
-                            bitmap = null;
-                        } catch (Exception e) {
-                            Logger.error("Exception get Image: " + e.getMessage());
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (Exception e) {
-                    Logger.error("Error sync data: " + e.toString());
-                    e.printStackTrace();
-                } finally {
-                    new UploadData(uploadData).execute();
-                }
-            }
-        };
-
-        final Thread threadSleep = new Thread() {
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                }catch(Exception e){
-                }finally {
-                    thread.start();
-                }
-            }
-        };
-        threadSleep.start();
     }
 
-    int order;
-    boolean IS_UPLOAD_SUSSCESS = true;
+    int order, order_upload_image;
     private class UploadData extends AsyncTask<Void, Void, String> {
         String url;
         EnDataModel uploadData;
 
-        public UploadData(EnDataModel uploadData){
-            url = FunctionUtils.encodeUrl(GlobalParams.BASED_POST_URL + USER_TOKEN);
-//            url = "http://192.168.1.142:8080/UploadSample/Upload";
-//            url = "http://10.0.2.2:8080/UploadSample/Upload";
-            Logger.error("Url: " + url);
+        public UploadData(EnDataModel uploadData) {
+            url = FunctionUtils.encodeUrl(GlobalParams.BASED_POST_DATA_URL + USER_TOKEN);
+            Logger.error("Url to upload: " + url);
+            Logger.error("data to upload: " + "[\n" + uploadData.toString() + "\n]");
             this.uploadData = uploadData;
         }
 
@@ -414,14 +380,10 @@ public class FragmentReportStatus extends CustomFragment {
             HttpClient httpclient = new DefaultHttpClient();
             HttpPost post = new HttpPost(url);
             post.setHeader("Content-Type", "application/json; charset=utf-8");
-            post.setHeader("Accept","application/json");
+            post.setHeader("Accept", "application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity(uploadData.toString(), HTTP.UTF_8);
-//                EnDataModelUpload enDataModelUpload = new EnDataModelUpload(uploadData);
-//                StringEntity entityData = new StringEntity(gson.toJson(enDataModelUpload), HTTP.UTF_8);
-//                Logger.error("push: " + gson.toJson(enDataModelUpload));
-//                StringEntity entityData = new StringEntity(uploadData.toString(), HTTP.UTF_8);
+                StringEntity entityData = new StringEntity("[\n" + uploadData.toString() + "\n]", HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());
@@ -441,29 +403,251 @@ public class FragmentReportStatus extends CustomFragment {
 
         @Override
         protected void onPostExecute(final String result) {
-            Logger.error("response: " + result);
-            if(result.contains("Successfull") || result.contains("Image List")){
+            Logger.error("response upload road data: " + result);
+            if (result.contains("Successfull") || result.contains("Image List")) {
                 syncDataOffline(uploadData);
-            }else{
-                uploadData = null;
-                IS_UPLOAD_SUSSCESS = false;
+            } else {
                 failUploadData.add(uploadData);
             }
+            order_upload_image = 0;
+            List<Uri> listImgUri = new ArrayList<>();
+            for (ImageModel imgUri : uploadData.getListImageData()) {
+                listImgUri.add(Uri.parse(imgUri.getImagePath()));
+            }
+
+//            if(listImgUri.size() > 0)
+                new UploadImageData(listImgUri, uploadData).execute();
+//            else
+//                new UploadBlueToothData(uploadData.getDaValue().getDataID()).execute();
+        }
+    }
+    /*
+        UPLOAD IMAGE DATA
+    */
+    private class UploadImageData extends AsyncTask<Void, Void, String>{
+        List<Uri> listUri;
+        String url;
+        ImageModel imageModel;
+        EnDataModel uploadData;
+
+        public UploadImageData(List<Uri> listImgUri, EnDataModel uploadData) {
+            this.uploadData = uploadData;
+            this.listUri = listImgUri;
+            url = FunctionUtils.encodeUrl(GlobalParams.BASED_UPLOAD_IMAGE_URL + USER_TOKEN);
+            Logger.error("Url image to upload: " + url);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Logger.error("Order: " + order + " in size: " + syncData.size());
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    dialog.setMessage("Đang upload dữ liệu ảnh!");
+                }
+            });
+
+            try {
+                Bitmap bitmap = FunctionUtils.decodeSampledBitmap(getActivity(), listUri.get(order_upload_image));
+                String base64value = FunctionUtils.convertBitMapToString(bitmap);
+                imageModel = new ImageModel();
+                imageModel.setImageDataByte(base64value);
+                imageModel.setDataID(uploadData.getDaValue().getDataID());
+                imageModel.setImageName(System.currentTimeMillis() + ".png");
+                Logger.error("image to upload: " + "[\n" + gson.toJson(imageModel) + "\n]");
+            } catch (Exception e) {
+                Logger.error("Exception get Image: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            if(imageModel == null)
+                return "imageModel == null";
+
+            String responseResult = "";
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost post = new HttpPost(url);
+            post.setHeader("Content-Type", "application/json; charset=utf-8");
+            post.setHeader("Accept", "application/json");
+            HttpResponse response;
+            try {
+                StringEntity entityData = new StringEntity("[\n" + gson.toJson(imageModel) + "\n]", HTTP.UTF_8);
+                post.setEntity(entityData);
+                response = httpclient.execute(post);
+                Logger.error("status code:" + response.getStatusLine().toString());
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    InputStream instream = entity.getContent();
+                    responseResult = FunctionUtils.convertStreamToString(instream);
+                    instream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Logger.error("exception:  " + e.getMessage());
+                return "wrong";
+            }
+            return responseResult;
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            Logger.error("response upload image: " + result);
+            if (result.contains("Image List null")) {
+                //store uri that upload fail
+                failImageData.add(listUri.get(order_upload_image));
+            } else {
+            }
+
+            if(order_upload_image < listUri.size() - 1){
+                order_upload_image++;
+                new UploadImageData(listUri, uploadData).execute();
+            }else{
+                order_upload_image = 0;
+                new UploadBlueToothData(uploadData.getDaValue().getDataID()).execute();
+            }
+        }
+    }
+
+    /*
+        UPLOAD VIBERATION DATA VIA BLUETOOTH
+     */
+    private class UploadBlueToothData extends AsyncTask<Void, Void, String>{
+        private String result,UUID;
+        private List<BlueToothData> blueToothData;
+        String url;
+
+        public UploadBlueToothData(String UUID){
+            this.UUID = UUID;
+            this.result = "";
+            url = FunctionUtils.encodeUrl(GlobalParams.BASED_UPLOAD_BLUETOOTH_URL + USER_TOKEN);
+            Logger.error("Url bluetooth to upload: " + url);
+        }
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage("Đang upload dữ liệu độ sóc!");
+            blueToothData = DatabaseHelper.getBlueToothDataByID(UUID);
+            Logger.error("bluetooth data to upload: " + gson.toJson(blueToothData));
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+
+            if(blueToothData.size() == 0){
+                //return "blueToothData.size() == 0";
+            }
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost post = new HttpPost(url);
+            post.setHeader("Content-Type", "application/json; charset=utf-8");
+            post.setHeader("Accept","application/json");
+            HttpResponse response;
+            try {
+                StringEntity entityData = new StringEntity(gson.toJson(blueToothData), HTTP.UTF_8);
+                post.setEntity(entityData);
+                response = httpclient.execute(post);
+                Logger.error("status code:" + response.getStatusLine().toString());
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    InputStream instream = entity.getContent();
+                    result = FunctionUtils.convertStreamToString(instream);
+                    instream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Logger.error("exception:  " + e.getMessage());
+                return "wrong";
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            Logger.error("result upload bluetooth: " + result);
+            if (result.contains("Image List null")) {
+                //store UUID of bluetooth when upload fail
+                failBlueToothData.add(UUID);
+            } else {
+            }
+
+            if (result.contains("Successfull") || result.contains("Image List")) {
+                Logger.error("upload bluetooth fail");
+            } else {
+                Logger.error("upload bluetooth success");
+            }
+
+            new UploadUserPositionTrackingData(UUID).execute();
+        }
+    }
+
+    /*
+        UPLOAD POSITION DATA
+    */
+    private class UploadUserPositionTrackingData extends AsyncTask<Void, Void, String> {
+        private String result,UUID;
+        private List<PositionData> positionDatas;
+        String url;
+
+        public UploadUserPositionTrackingData(String UUID){
+            this.UUID = UUID;
+            this.result = "";
+            url = FunctionUtils.encodeUrl(GlobalParams.BASED_UPLOAD_POSITION_URL + USER_TOKEN);
+            Logger.error("Url position to upload: " + url);
+        }
+        @Override
+        protected void onPreExecute() {
+            dialog.setMessage("Đang upload dữ liệu vị trí tuần đường!");
+            positionDatas = DatabaseHelper.getPositionDataByID(UUID);
+            Logger.error("positionDatas to upload: " + gson.toJson(positionDatas));
+        }
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            if(positionDatas.size() == 0){
+                //return "positionDatas.size() == 0";
+            }
+
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost post = new HttpPost(url);
+            post.setHeader("Content-Type", "application/json; charset=utf-8");
+            post.setHeader("Accept","application/json");
+            HttpResponse response;
+            try {
+                StringEntity entityData = new StringEntity(gson.toJson(positionDatas), HTTP.UTF_8);
+                post.setEntity(entityData);
+                response = httpclient.execute(post);
+                Logger.error("status code:" + response.getStatusLine().toString());
+                HttpEntity entity = response.getEntity();
+                if (entity != null) {
+                    InputStream instream = entity.getContent();
+                    result = FunctionUtils.convertStreamToString(instream);
+                    instream.close();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Logger.error("exception:  " + e.getMessage());
+                return "wrong";
+            }
+            return result;
+        }
+
+        @Override
+        protected void onPostExecute(final String result) {
+            Logger.error("result upload vibration : " + result);
+            if (result.contains("Image List null")) {
+                //store UUID of bluetooth when upload fail
+                failPositonData.add(UUID);
+            } else {
+            }
+
             if (order < syncData.size() - 1) {
                 order = order + 1;
                 syncAndUploadData();
+
             } else{
-//                    Toast.makeText(getActivity(), "Đã upload xong dữ liệu cuối cùng mới nhất!", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
                 pref.saveBoolean(GlobalParams.IS_SYNC_TODAY, true);
-
-//                getActivity().runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        dialog.setMessage("Đang đồng bộ lại dữ liệu...");
-//                    }
-//                });
-
-
                 final Thread thread = new Thread() {
                     public void run() {
                         try {
@@ -489,8 +673,9 @@ public class FragmentReportStatus extends CustomFragment {
                                         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                                         builder.setTitle("Thông tin upload dữ liệu.");
                                         builder.setMessage("Có " + failUploadData.size() + " trên " + syncData.size() + " dữ liệu upload không thành công."
-                                                + "\nKết quả cuối cùng trả về: " + result.replace(" ","").replace(".","").replace("\"","") + "."
-                                                + "\nBạn có muốn upload lại không?");
+                                                + "\nKết quả cuối cùng trả về: " + result.replace(" ","").replace(".","").replace("\"","").replace(".","")
+                                                .replace("\n","") + "." + "\nBạn có muốn upload lại không?");
+
                                         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                                             @Override
                                             public void onClick(DialogInterface dialog, int which) {
@@ -511,32 +696,24 @@ public class FragmentReportStatus extends CustomFragment {
             }
         }
     }
-
     private void syncDataOffline(EnDataModel dataModel){
         List<Data> listData = DatabaseHelper.getData();
         if(listData!= null) {
             if (listData.size() != 0) {
-//                Logger.error("syncDataOffline");
                 for (Data d : listData) {
 
                     EnDataModel e = gson.fromJson(d.getInput(), EnDataModel.class);
                     if(e.getDaValue().getDataID().equals(dataModel.getDaValue().getDataID())
                             && e.getDaValue().getMaDuong().equals(dataModel.getDaValue().getMaDuong())
-                            && e.getDaValue().getThangDanhGia().equals(dataModel.getDaValue().getThangDanhGia())
+                            && e.getDaValue().getDanhGia().equals(dataModel.getDaValue().getDanhGia())
                             && e.getDaValue().getTuyenSo().equals(dataModel.getDaValue().getTuyenSo())
                             && e.getDaValue().getDataType().equals(dataModel.getDaValue().getDataType())) {
                         d.setIsUploaded(true);
-//                        dataList.add(e);
                         DatabaseHelper.updateData(d);
                     }
                 }
             }
         }
-
-//        DatabaseHelper.clearData();
-//        for(EnDataModel e : dataList){
-//            DatabaseHelper.insertData(gson.toJson(e));
-//        }
     }
 
     private void summaryData(List<EnDataModel> data){
@@ -565,5 +742,7 @@ public class FragmentReportStatus extends CustomFragment {
             }
         }
     }
+
+
 
 }

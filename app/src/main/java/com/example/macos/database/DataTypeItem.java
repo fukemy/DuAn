@@ -9,7 +9,7 @@ import com.example.macos.entities.EnLocationItem;
  */
 public class DataTypeItem {
 
-    private Long DataID;
+    private String DataID;
     private Integer DataType;
     private Integer MaDuong;
     private Integer TuyenSo;
@@ -19,7 +19,7 @@ public class DataTypeItem {
     private String CaoDo;
     private String NguoiNhap;
     private String ThoiGianNhap;
-    private String ThangDanhGia;
+    private String DanhGia;
     private String LyTrinh;
     private String dataUUID;
 
@@ -34,7 +34,7 @@ public class DataTypeItem {
     @Override
     public String toString() {
         return "\n{" +
-                "\n\"DataID\":" + DataID +
+                "\n\"DataID\":\"" + DataID + "\"" +
                 ", \n\"DataType\":" + DataType +
                 ", \n\"MaDuong\":" + MaDuong +
                 ", \n\"TuyenSo\":" + TuyenSo +
@@ -45,7 +45,7 @@ public class DataTypeItem {
                 ", \n\"LyTrinh\":\"" + LyTrinh + "\"" +
                 ", \n\"NguoiNhap\":\"" + NguoiNhap + "\"" +
                 ", \n\"ThoiGianNhap\":\"" + ThoiGianNhap + "\""+
-                ", \n\"DanhGia\":\"" + ThangDanhGia + "\""+
+                ", \n\"DanhGia\":\"" + DanhGia + "\""+
                 "\n}";
     }
 
@@ -63,7 +63,7 @@ public class DataTypeItem {
 //                ",\n CaoDo='" + CaoDo + '\'' +
 //                ",\n NguoiNhap='" + NguoiNhap + '\'' +
 //                ",\n ThoiGianNhap='" + ThoiGianNhap + '\'' +
-//                ",\n ThangDanhGia='" + ThangDanhGia + '\'' +
+//                ",\n DanhGia='" + DanhGia + '\'' +
 //                ",\n DataTypeName='" + DataTypeName + '\'' +
 //                ",\n Action='" + Action + '\'' +
 //                ",\n TenDuong='" + TenDuong + '\'' +
@@ -74,6 +74,16 @@ public class DataTypeItem {
 
     //sub data
     private String DataTypeName;
+
+    public int getDataTypeID() {
+        return DataTypeID;
+    }
+
+    public void setDataTypeID(int dataTypeID) {
+        DataTypeID = dataTypeID;
+    }
+
+    private int DataTypeID;
     private String Action;
     private String TenDuong;
 
@@ -123,8 +133,8 @@ public class DataTypeItem {
     public DataTypeItem() {
     }
 
-    public DataTypeItem(Long DataID, Integer DataType, Integer MaDuong, Integer TuyenSo, String MoTaTinhTrang, String KinhDo,
-                        String ViDo, String CaoDo, String NguoiNhap, String ThoiGianNhap, String ThangDanhGia, String dataUUID) {
+    public DataTypeItem(String DataID, Integer DataType, Integer MaDuong, Integer TuyenSo, String MoTaTinhTrang, String KinhDo,
+                        String ViDo, String CaoDo, String NguoiNhap, String ThoiGianNhap, String DanhGia, String dataUUID) {
         this.DataID = DataID;
         this.DataType = DataType;
         this.MaDuong = MaDuong;
@@ -135,15 +145,15 @@ public class DataTypeItem {
         this.CaoDo = CaoDo;
         this.NguoiNhap = NguoiNhap;
         this.ThoiGianNhap = ThoiGianNhap;
-        this.ThangDanhGia = ThangDanhGia;
+        this.DanhGia = DanhGia;
         this.dataUUID = dataUUID;
     }
 
-    public Long getDataID() {
+    public String getDataID() {
         return DataID;
     }
 
-    public void setDataID(Long DataID) {
+    public void setDataID(String DataID) {
         this.DataID = DataID;
     }
 
@@ -219,12 +229,12 @@ public class DataTypeItem {
         this.ThoiGianNhap = ThoiGianNhap;
     }
 
-    public String getThangDanhGia() {
-        return ThangDanhGia;
+    public String getDanhGia() {
+        return DanhGia;
     }
 
-    public void setThangDanhGia(String ThangDanhGia) {
-        this.ThangDanhGia = ThangDanhGia;
+    public void setDanhGia(String ThangDanhGia) {
+        this.DanhGia = ThangDanhGia;
     }
 
 

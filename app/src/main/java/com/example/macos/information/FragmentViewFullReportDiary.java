@@ -148,7 +148,7 @@ public class FragmentViewFullReportDiary extends DialogFragment {
             tvPromptItem.setText(tvPromptItem.getText().toString() + " : " + "Chưa cập nhập!");
         }
         try {
-            tvStatus.setText(tvStatus.getText().toString() + " : " + (data.getDaValue().getThangDanhGia().equals("") ? "Chưa cập nhập!" : data.getDaValue().getThangDanhGia()));
+            tvStatus.setText(tvStatus.getText().toString() + " : " + (data.getDaValue().getDanhGia().equals("") ? "Chưa cập nhập!" : data.getDaValue().getDanhGia()));
         } catch (Exception e) {
             tvStatus.setText(tvStatus.getText().toString() + " : " + "Chưa cập nhập!");
         }
