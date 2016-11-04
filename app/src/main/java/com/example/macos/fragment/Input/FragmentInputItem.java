@@ -277,7 +277,6 @@ public class FragmentInputItem extends CustomFragment {
                     public void run() {
                         try {
                             String text = new String(txValue, "UTF-8");
-                            String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
 
                             if (text.contains("\n")) {
                                 count++;
@@ -289,11 +288,16 @@ public class FragmentInputItem extends CustomFragment {
                                 BleTemp.append(text); // add last data
 
                                 String[] stk = BleTemp.toString().split(",");
-                                double zData = (int) Double.parseDouble(stk[1]);
-                                double latitude = (int) Double.parseDouble(stk[3]);
-                                double longtitude = (int) Double.parseDouble(stk[5]);
-                                //long zData = new Double(d).longValue();
-                                Logger.error("zData: " + zData);
+                                double zData = 0.0, latitude = 0.0, longitude = 0.0;
+
+                                if(stk[1].length() > 0)
+                                    zData = (int) Double.parseDouble(stk[1]);
+                                if(stk[3].length() > 0)
+                                    latitude = (int) Double.parseDouble(stk[3]);
+                                if(stk[5].length() > 0)
+                                    longitude = (int) Double.parseDouble(stk[5]);
+
+                                Logger.error("zData: " + zData + "lat-long: " + latitude + " - " + longitude);
                                 if (zData < 1500 && zData > -1500) {
                                     zData = 0;
                                 }
@@ -307,7 +311,7 @@ public class FragmentInputItem extends CustomFragment {
                                     blData.setDateTimeLoging("" + System.currentTimeMillis());
                                     blData.setZaxisValue(zData);
                                     blData.setLatitude("" + latitude);
-                                    blData.setLongitude("" + longtitude);
+                                    blData.setLongitude("" + longitude);
                                     blData.setUserLoging(pref.getString(GlobalParams.USERNAME,"User"));
 
                                     DatabaseHelper.insertBlueToothData(blData);
