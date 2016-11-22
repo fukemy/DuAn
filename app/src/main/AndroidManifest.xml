@@ -67,6 +67,10 @@
             android:name="com.gun0912.tedpicker.ImagePickerActivity"
             android:screenOrientation="portrait" />
 
+        <activity
+            android:name="com.example.macos.activities.AcICIChecking"
+            android:screenOrientation="portrait" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />

@@ -17,6 +17,7 @@ import android.graphics.Paint;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Build;
@@ -1200,5 +1201,13 @@ public class FunctionUtils {
 
     public static String generateUUID(){
         return UUID.randomUUID().toString();
+    }
+    public static boolean checkLocationEnabled(Context mContext){
+        final LocationManager manager = (LocationManager) mContext.getSystemService( Context.LOCATION_SERVICE );
+        if (manager.isProviderEnabled(LocationManager.GPS_PROVIDER) || manager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)) {
+            return true;
+        }else{
+            return false;
+        }
     }
 }

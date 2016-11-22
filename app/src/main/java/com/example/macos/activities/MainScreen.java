@@ -607,10 +607,17 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             getSupportActionBar().setTitle(title);
             initLayoutAndData();
             FunctionUtils.hideMenu(menu, true);
+
         } else if (id != currrentID && id == R.id.nav_report) {
             getSupportActionBar().setTitle(title);
             initReportScreen();
             FunctionUtils.hideMenu(menu, false);
+
+        } else if (id != currrentID && id == R.id.nav_ici) {
+            getSupportActionBar().setTitle(title);
+            Intent in = new Intent(MainScreen.this, AcICIChecking.class);
+            startActivity(in);
+
         } else if (id == R.id.nav_logout) {
             Intent in = new Intent(MainScreen.this, AcSetting.class);
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){

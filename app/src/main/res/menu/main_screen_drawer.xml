@@ -8,6 +8,11 @@
             android:id="@+id/nav_input"
             android:icon="@mipmap/input"
             android:title="@string/enter_infor" />
+
+        <item
+            android:id="@+id/nav_ici"
+            android:icon="@mipmap/check_road_flat"
+            android:title="@string/check_road_flat" />
         <item
             android:id="@+id/nav_report"
             android:icon="@mipmap/report"

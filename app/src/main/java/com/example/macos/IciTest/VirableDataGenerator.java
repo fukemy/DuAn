@@ -32,7 +32,7 @@ public class VirableDataGenerator {
         StringBuilder builder = new StringBuilder();
         builder.append("[\n");
         builder.append("[\n");
-        int sec = 3;
+        int sec = 1;
         Date date = new Date();
 
         Calendar cal = Calendar.getInstance();
@@ -57,8 +57,12 @@ public class VirableDataGenerator {
             builder.append("\"UserLoging\":\"dungdv\",\n");
 
             int zValue;
-            if (i == 200){
-                zValue = generatRandomPositiveNegitiveValue(17000, 12000);
+            if (i == 700){
+                zValue = generatRandomPositiveNegitiveValue(16000, 8000);
+            } if (i == 1500){
+                zValue = generatRandomPositiveNegitiveValue(24000, 20000);
+            }else if (i == 200){
+                zValue = generatRandomPositiveNegitiveValue(18000, 12000);
             }else{
                 zValue = generatRandomPositiveNegitiveValue(4000, 1000);
             }
@@ -103,7 +107,7 @@ public class VirableDataGenerator {
         int ii = rand.nextInt(max + 1 -min) + min;
         return ii;
     }
-    
+
     public void read_location_input() throws Exception{
         locations = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader("virable_example_location_input.txt"));
