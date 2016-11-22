@@ -88,11 +88,11 @@ public class AcICIChecking extends AppCompatActivity {
         initLayout();
         initGraphView();
         initGoogleMap();
-        initData();
 
         if(!FunctionUtils.checkLocationEnabled(this)){
             buildAlertMessageNoGps();
         }else{
+            initData();
         }
 
 
@@ -350,6 +350,7 @@ public class AcICIChecking extends AppCompatActivity {
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
                     Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
+                    initData();
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");

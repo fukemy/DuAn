@@ -614,7 +614,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             FunctionUtils.hideMenu(menu, false);
 
         } else if (id != currrentID && id == R.id.nav_ici) {
-            getSupportActionBar().setTitle(title);
             Intent in = new Intent(MainScreen.this, AcICIChecking.class);
             startActivity(in);
 
