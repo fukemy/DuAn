@@ -154,8 +154,8 @@ public class AcICIChecking extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(blueToothDatas.size() > 0 && isCreateNewBlueToothData)
-                {
+//                if(blueToothDatas.size() > 0 && isCreateNewBlueToothData)
+//                {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
                     builder.setTitle("Chú ý");
                     builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
@@ -173,9 +173,9 @@ public class AcICIChecking extends AppCompatActivity {
                             });
                     final AlertDialog alert = builder.create();
                     alert.show();
-                }else{
-                    finish();
-                }
+//                }else{
+//                    finish();
+//                }
             }
         });
     }

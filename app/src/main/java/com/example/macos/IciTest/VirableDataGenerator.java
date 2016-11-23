@@ -105,15 +105,15 @@ public class VirableDataGenerator {
         builder.append("]\n");
         builder.append("]\n");
 
-        System.out.println("data: " + builder.toString());
-        try{
-            PrintWriter writer = new PrintWriter("virable_generator_data.txt", "UTF-8");
-            writer.println(builder.toString());
-            writer.close();
-            System.out.println("write to file success!");
-        } catch (Exception e) {
-
-        }
+//        System.out.println("data: " + builder.toString());
+//        try{
+//            PrintWriter writer = new PrintWriter("virable_generator_data.txt", "UTF-8");
+//            writer.println(builder.toString());
+//            writer.close();
+//            System.out.println("write to file success!");
+//        } catch (Exception e) {
+//
+//        }
         return blueToothDatas;
     }
 
