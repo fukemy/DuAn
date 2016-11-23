@@ -6,18 +6,54 @@
     android:orientation="vertical"
     android:transitionName="showgraph">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/mainColor">
+
+        <Button
+            android:id="@+id/btnBack"
+            android:layout_width="20dp"
+            android:layout_height="28dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:background="@mipmap/back_button" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="Quá trình tuần đường chi tiết"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="18sp" />
+    </RelativeLayout>
+
     <Spinner
         android:id="@+id/spnChooseGraphType"
-        android:layout_margin="10dp"
-        android:padding="10dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:padding="10dp" />
 
     <com.jjoe64.graphview.GraphView
-        android:layout_marginTop="8dp"
         android:id="@+id/graph"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="0.4"
         app:seriesColor="#ee0000"
         app:seriesType="line" />
+
+    <fragment
+        android:id="@+id/mapp"
+        class="com.example.macos.libraries.WorkaroundMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_marginTop="20dp"
+        android:layout_weight="0.4"
+        android:background="@color/mainColor30" />
 </LinearLayout>

@@ -1,23 +1,33 @@
 package com.example.macos.report;
 
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Explode;
 import android.transition.Fade;
 import android.transition.Transition;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.macos.database.BlueToothData;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
+import com.example.macos.libraries.WorkaroundMapFragment;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.Marker;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.ValueDependentColor;
@@ -41,6 +51,8 @@ public class GraphReport extends AppCompatActivity {
     private BarGraphSeries<DataPoint> barSeries;
     private final Handler mHandler = new Handler();
     private Runnable mTimer;
+    private Button btnBack;
+    private GoogleMap gMap;
 
     List<BlueToothData> blData;
     String dataUUID;
@@ -71,6 +83,7 @@ public class GraphReport extends AppCompatActivity {
                 public void onTransitionEnd(Transition transition) {
                     try {
 //                        loadAllDataGraph();
+                        initMap();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -97,6 +110,7 @@ public class GraphReport extends AppCompatActivity {
         } else {
             try {
 //                loadAllDataGraph();
+                initMap();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -104,11 +118,54 @@ public class GraphReport extends AppCompatActivity {
 
     }
 
+    LinearLayout infoWindow;
+    private void initMap(){
+        gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
+        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+            @Override
+            public void onTouch() {
+            }
+        });
+
+        if(gMap != null){
+            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                public View getInfoWindow(Marker arg0) {
+                    return null;
+                }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+
+                    infoWindow = new LinearLayout(GraphReport.this);
+                    infoWindow.setOrientation(LinearLayout.VERTICAL);
+
+                    TextView title = new TextView(GraphReport.this);
+                    title.setTextColor(Color.BLACK);
+                    title.setGravity(Gravity.CENTER);
+                    title.setTypeface(null, Typeface.BOLD);
+                    title.setText(marker.getTitle());
+
+                    TextView snippet = new TextView(GraphReport.this);
+                    snippet.setTextColor(Color.GRAY);
+                    snippet.setText(marker.getSnippet());
+
+                    infoWindow.addView(title);
+                    infoWindow.addView(snippet);
+                    return infoWindow;
+                }
+            });
+
+        }
+    }
+
+
+
     private void initViewAndData() {
         if (getIntent() != null)
             dataUUID = getIntent().getStringExtra("dataUUID");
 
         spnGraphType = (Spinner) findViewById(R.id.spnChooseGraphType);
+        btnBack = (Button) findViewById(R.id.btnBack);
 
         ArrayAdapter<String> spnGraphAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item,
                 getResources().getStringArray(R.array.tuychonbando));
@@ -117,17 +174,24 @@ public class GraphReport extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 Logger.error("selected :" + i);
+                spnGraphType.setEnabled(false);
                 if (i == 0) {
                     loadAllDataGraph();
                 } else {
                     loadAllDataBarGraph();
                 }
-                spnGraphType.setEnabled(false);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
 
+            }
+        });
+
+        btnBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
             }
         });
     }
@@ -182,6 +246,18 @@ public class GraphReport extends AppCompatActivity {
 
         if (blData.size() > 0) {
             setGraphData(GraphViewMode.Line);
+        }else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Không tìm thấy dữ liệu độ sóc cho bản ghi này!");
+            builder.setCancelable(false);
+            builder.setPositiveButton("ok", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.dismiss();
+                    finish();
+                }
+            });
+            builder.show();
         }
     }
 
@@ -222,20 +298,10 @@ public class GraphReport extends AppCompatActivity {
             series.setColor(Color.RED);
             series.setThickness(1);
             graph.addSeries(series);
-            mTimer = new Runnable() {
-                @Override
-                public void run() {
 
-                    series.appendData(new DataPoint(i, blData.get(i).getZaxisValue()), false, blData.size());
-                    mHandler.postDelayed(this, 5);
-                    if (i == blData.size() - 1) {
-                        mHandler.removeCallbacks(mTimer);
-                        spnGraphType.setEnabled(true);
-                    }
-                    i++;
-                }
-            };
-            mHandler.postDelayed(mTimer, 700);
+            for(int i = 0; i < blData.size(); i++){
+                series.appendData(new DataPoint(i, blData.get(i).getZaxisValue()), false, blData.size());
+            }
         } else {
 
             barSeries = new BarGraphSeries<>();
@@ -258,21 +324,12 @@ public class GraphReport extends AppCompatActivity {
 
             graph.addSeries(barSeries);
 
-            mTimer = new Runnable() {
-                @Override
-                public void run() {
-                    barSeries.appendData(new DataPoint(i, blData.get(i).getZaxisValue()), false, blData.size());
-                    mHandler.postDelayed(this, 5);
-
-                    if (i == blData.size() - 1) {
-                        mHandler.removeCallbacks(mTimer);
-                        spnGraphType.setEnabled(true);
-                    }
-                    i++;
-                }
-            };
-            mHandler.postDelayed(mTimer, 800);
+            for(int i = 0; i < blData.size(); i++){
+                barSeries.appendData(new DataPoint(i, blData.get(i).getZaxisValue()), false, blData.size());
+            }
         }
+
+        spnGraphType.setEnabled(true);
     }
 
 }

@@ -13,8 +13,10 @@ import android.widget.TextView;
 
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
+import com.example.macos.interfaces.iLongClickInterace;
 import com.example.macos.interfaces.iRippleControl;
 import com.example.macos.libraries.AnimatedExpandableListview;
+import com.example.macos.libraries.Logger;
 import com.example.macos.report.DiaryReportContent;
 import com.google.gson.Gson;
 
@@ -30,7 +32,7 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
     List<String> listHeader;
     LayoutInflater inflater;
     FragmentManager manager;
-    private iRippleControl rippleControl;
+    private iLongClickInterace longClickInterace;
 
     public RoadStatusReportAdapter(FragmentManager manager, List<String> listHeader, HashMap<String, List<EnDataModel>>data, Activity mContext) {
         this.listChild = data;
@@ -40,9 +42,10 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
         inflater = LayoutInflater.from(mContext);
     }
 
-    public void setRippleControl(iRippleControl rippleControl){
-        this.rippleControl = rippleControl;
+    public void setInterface(iLongClickInterace longClickInterace){
+        this.longClickInterace = longClickInterace;
     }
+
     @Override
     public int getGroupCount() {
         return listHeader.size();
@@ -51,7 +54,6 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
     @Override
     public int getRealChildrenCount(int groupPosition) {
         return listChild.get(listHeader.get(groupPosition)).size();
-
     }
 
     @Override
@@ -151,6 +153,13 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
             }
         });
 
+        animatedView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                longClickInterace.onLongClick(getChild(groupPosition, childPosition), animatedView);
+                return false;
+            }
+        });
         return convertView;
     }
 
@@ -159,8 +168,4 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
         return true;
     }
 
-    @Override
-    public boolean isChildSelectable(int groupPosition, int childPosition) {
-        return true;
-    }
 }

@@ -5,8 +5,11 @@ import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.Typeface;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -26,15 +29,21 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.macos.activities.AcImageInformation;
+import com.example.macos.database.DatabaseHelper;
+import com.example.macos.database.PositionData;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
+import com.example.macos.libraries.CustomScrollView;
 import com.example.macos.libraries.Logger;
+import com.example.macos.libraries.WorkaroundMapFragment;
 import com.example.macos.utilities.FunctionUtils;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -43,19 +52,25 @@ import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DiaryReportContent extends AppCompatActivity {
-    private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary, tvJusticeProcess, tvGraph;
+    private TextView tvCalalog, tvRoadName, tvCurrentLocation, tvTime, tvSummary, tvJusticeProcess, tvGraph, tvDataStatus;
     LinearLayout lnlInput;
     private EnDataModel data;
     private GoogleMap gMap;
     private DisplayMetrics dm;
-    SupportMapFragment mSupportMapFragment;
     private Button btnBack;
+    private ScrollView scrollContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -143,6 +158,8 @@ public class DiaryReportContent extends AppCompatActivity {
         tvSummary = (TextView) findViewById(R.id.tvSummary);
         tvJusticeProcess = (TextView) findViewById(R.id.tvJusticeProcess);
         tvGraph = (TextView) findViewById(R.id.tvGraph);
+        tvDataStatus = (TextView) findViewById(R.id.tvDataStatus);
+        scrollContainer = (ScrollView) findViewById(R.id.scrollContainer);
 
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -168,43 +185,107 @@ public class DiaryReportContent extends AppCompatActivity {
                 }
             }
         });
-
-
     }
 
+    LinearLayout infoWindow;
     private void initMap(){
-        mSupportMapFragment = new SupportMapFragment();
-        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-        trans.add(R.id.mapp, mSupportMapFragment).commit();
-        getFragmentManager().beginTransaction();
+        gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
+        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+            @Override
+            public void onTouch() {
+                scrollContainer.requestDisallowInterceptTouchEvent(true);
+            }
+        });
 
-        if (mSupportMapFragment != null) {
-            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
+        if(gMap != null){
+            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                public View getInfoWindow(Marker arg0) {
+                    return null;
+                }
+
                 @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    if (googleMap != null) {
-                        gMap = googleMap;
-                        if(data.getDaValue().getLocationItem() != null && data.getDaValue().getLocationItem().getLocation() != null) {
-                            CameraPosition cameraPosition = new CameraPosition.Builder()
-                                    .target(new LatLng(data.getDaValue().getLocationItem().getLocation().getLatitude(), data.getDaValue().getLocationItem().getLocation().getLongitude()))
-                                    .zoom(17)                   // Sets the zoom
-                                    .bearing(90)                // Sets the orientation of the camera to east
-                                    .tilt(40)                   // Sets the tilt of the camera to 30 degrees
-                                    .build();                   // Creates a CameraPosition from the builder
-                            gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                public View getInfoContents(Marker marker) {
 
-                            BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
-                            MarkerOptions options = new MarkerOptions();
-                            options.position(new LatLng(data.getDaValue().getLocationItem().getLocation().getLatitude(), data.getDaValue().getLocationItem().getLocation().getLongitude()));
-                            options.draggable(true);
-                            options.icon(icon);
-                            gMap.addMarker(options);
-                        }else{
-                            Toast.makeText(DiaryReportContent.this, "Có lỗi xảy ra khi hiển thị vị trí!", Toast.LENGTH_SHORT).show();
-                        }
-                    }
+                    infoWindow = new LinearLayout(DiaryReportContent.this);
+                    infoWindow.setOrientation(LinearLayout.VERTICAL);
+
+                    TextView title = new TextView(DiaryReportContent.this);
+                    title.setTextColor(Color.BLACK);
+                    title.setGravity(Gravity.CENTER);
+                    title.setTypeface(null, Typeface.BOLD);
+                    title.setText(marker.getTitle());
+
+                    TextView snippet = new TextView(DiaryReportContent.this);
+                    snippet.setTextColor(Color.GRAY);
+                    snippet.setText(marker.getSnippet());
+
+                    infoWindow.addView(title);
+                    infoWindow.addView(snippet);
+                    return infoWindow;
                 }
             });
+
+            drawRoadTestProgress();
+        }
+    }
+
+    private void drawRoadTestProgress(){
+        PolylineOptions lineOptions = new PolylineOptions().width(3).color(Color.BLUE).geodesic(true);
+        BitmapDescriptor icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED);
+        String UUID = data.getDaValue().getDataID();
+        List<PositionData> positionDataList = DatabaseHelper.getPositionDataByID(UUID);
+        List<LatLng> latLngs = new ArrayList<>();
+
+        for(int i = 0 ; i < positionDataList.size() ; i++){
+            double lat = Double.parseDouble(positionDataList.get(i).getLattitude());
+            double lng = Double.parseDouble(positionDataList.get(i).getLongitude());
+            LatLng position = new LatLng(lat, lng);
+            latLngs.add(position);
+
+            if(i == 0 && positionDataList.size() > 1){
+                MarkerOptions options = new MarkerOptions();
+                options.icon(icon);
+                options.title("Vị trí bắt đầu.");
+                options.snippet("Vị trí : " + lat + "-" + lng
+                        + "\nThời gian: " + FunctionUtils.timeStampToTime(Long.parseLong(positionDataList.get(i).getLogTime())));
+                options.position(position);
+                gMap.addMarker(options);
+            }
+
+            if(i == positionDataList.size() - 1){
+                MarkerOptions options = new MarkerOptions();
+                options.icon(icon);
+                options.title("Vị trí kết thúc.");
+                options.snippet("Vị trí : " + lat + "-" + lng
+                        + "\nThời gian: " + FunctionUtils.timeStampToTime(Long.parseLong(positionDataList.get(i).getLogTime())));
+                options.position(position);
+                gMap.addMarker(options);
+
+
+            }
+        }
+
+        lineOptions.addAll(latLngs);
+        if(lineOptions != null) {
+            gMap.addPolyline(lineOptions);
+
+            /**
+             *  Android map v2 zoom to show all the markers
+             *  http://stackoverflow.com/questions/16416041/zoom-to-fit-all-markers-on-map-google-maps-v2
+             */
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            builder.include(latLngs.get(0));
+            builder.include(latLngs.get(latLngs.size() - 1));
+            LatLngBounds bounds = builder.build();
+
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels;
+
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, 25);
+            gMap.animateCamera(cu);
+
+        }else {
+            Logger.error("No position data found");
         }
     }
 
@@ -231,6 +312,13 @@ public class DiaryReportContent extends AppCompatActivity {
                     || data.getDaValue().getLyTrinh().equals("null") ? "Chưa cập nhập!" : data.getDaValue().getLyTrinh()));
         }catch (Exception e){
             tvJusticeProcess.setText(tvJusticeProcess.getText().toString() + " : " + "Chưa cập nhập!");
+        }
+
+        try {
+            tvDataStatus.setText(tvDataStatus.getText().toString() + " : " + (data.isUploaded() ? getResources().getString(R.string.uploaded)
+                    : getResources().getString(R.string.not_upload)));
+        }catch (Exception e){
+            tvDataStatus.setText(tvDataStatus.getText().toString() + " : " + "Chưa cập nhập!");
         }
 
         tvSummary.setVisibility(View.GONE);

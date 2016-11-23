@@ -584,7 +584,13 @@
 
 
     <string-array name="tuychonbando">
-        <item name="1">Xem toàn bộ quá trình</item>
-        <item name="1">Các vị trí cần lưu ý</item>
+        <item name="1">Xem toàn bộ quá trình.</item>
+        <item name="1">Các vị trí độ sóc cần lưu ý.</item>
+    </string-array>
+
+    <string-array name="status_menu_action">
+        <item name="1"> Xoá</item>
+        <item name="1"> Upload</item>
+        <item name="1"> Xem chi tiết</item>
     </string-array>
 </resources>

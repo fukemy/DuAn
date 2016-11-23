@@ -473,6 +473,8 @@ public class AnimatedExpandableListview extends ExpandableListView{
                     dummyView.setTag(STATE_COLLAPSING);
                 }
 
+                convertView.setLongClickable(true);
+
                 return convertView;
             } else {
                 return getRealChildView(groupPosition, childPosition, isLastChild, convertView, parent);
@@ -489,6 +491,10 @@ public class AnimatedExpandableListview extends ExpandableListView{
             }
         }
 
+        @Override
+        public boolean isChildSelectable(int i, int i1) {
+            return true;
+        }
     }
 
     private static class DummyView extends View {

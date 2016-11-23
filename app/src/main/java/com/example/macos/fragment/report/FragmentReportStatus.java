@@ -3,6 +3,7 @@ package com.example.macos.fragment.report;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -13,14 +14,20 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
+import android.view.ContextMenu;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -33,9 +40,11 @@ import com.example.macos.database.PositionData;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnDataModel;
 import com.example.macos.entities.ImageModel;
+import com.example.macos.interfaces.iLongClickInterace;
 import com.example.macos.interfaces.iRippleControl;
 import com.example.macos.libraries.AnimatedExpandableListview;
 import com.example.macos.libraries.Logger;
+import com.example.macos.report.DiaryReportContent;
 import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
@@ -90,7 +99,8 @@ public class FragmentReportStatus extends CustomFragment {
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
 
-        initLayoutAndData();
+        initLayout();
+        initData();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           //  lv.setNestedScrollingEnabled(true);
         }
@@ -189,7 +199,7 @@ public class FragmentReportStatus extends CustomFragment {
         lnlOptions.startAnimation(tran);
     }
 
-    private void initLayoutAndData(){
+    private void initLayout() {
         lnlOptions = (LinearLayout) rootView.findViewById(R.id.lnlOption);
         lv = (AnimatedExpandableListview) rootView.findViewById(R.id.lvExp);
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
@@ -204,7 +214,9 @@ public class FragmentReportStatus extends CustomFragment {
             }
         });
 
+    }
 
+    private void initData(){
         List<Data> listData = DatabaseHelper.getData();
         if(listData!= null) {
             if (listData.size() != 0) {
@@ -226,8 +238,9 @@ public class FragmentReportStatus extends CustomFragment {
                 summaryData(enList);
 
                 RoadStatusReportAdapter adapter = new RoadStatusReportAdapter(getChildFragmentManager(), listHeader, hashMap, getActivity());
-                adapter.setRippleControl(rippleInterface);
+                adapter.setInterface(longClickInterace);
                 lv.setAdapter(adapter);
+
 
                 if(syncData.size() == 0){
                     fab.setVisibility(View.GONE);
@@ -241,6 +254,54 @@ public class FragmentReportStatus extends CustomFragment {
         }
     }
 
+    public iLongClickInterace longClickInterace = new iLongClickInterace() {
+        @Override
+        public void onLongClick(final EnDataModel dataModel,final View v) {
+            PopupMenu popup = new PopupMenu(getActivity(), v, Gravity.CENTER_HORIZONTAL);
+            popup.getMenuInflater().inflate(R.menu.road_status_menu, popup.getMenu());
+
+            popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                public boolean onMenuItemClick(MenuItem item) {
+
+                    if(item.getItemId() == R.id.information){
+                        final Intent in = new Intent(getActivity(), DiaryReportContent.class);
+                        Gson gson = new Gson();
+                        in.putExtra("data",  gson.toJson(dataModel));
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                            v.setEnabled(false);
+                            ActivityOptionsCompat options =
+                                    ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v,
+                                            getActivity().getResources().getString(R.string.show_map));
+                            getActivity().startActivity(in, options.toBundle());
+                            v.setEnabled(true);
+                        }else{
+                            getActivity().startActivity(in);
+                        }
+
+//                    }else if(item.getItemId() == R.id.delete){
+//                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+//                        builder.setMessage("Bạn có chắc chắn muốn xoá bản ghi này?");
+//                        builder.setPositiveButton("Có", new DialogInterface.OnClickListener() {
+//                            @Override
+//                            public void onClick(DialogInterface dialogInterface, int i) {
+//                                DatabaseHelper.deleteDataTypeItem(dataModel);
+//                                initData();
+//                            }
+//                        });
+//                        builder.setNegativeButton("Huỷ", null);
+//                        builder.show();
+
+                    }else if(item.getItemId() == R.id.upload) {
+                        Toast.makeText(getActivity(),"Chưa hỗ trợ upload từng bản ghi một!",Toast.LENGTH_SHORT).show();
+                    }
+
+                    return true;
+                }
+            });
+
+            popup.show();
+        }
+    };
 
     private void uploadData(){
         ConnectivityManager cm = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -415,10 +476,7 @@ public class FragmentReportStatus extends CustomFragment {
                 listImgUri.add(Uri.parse(imgUri.getImagePath()));
             }
 
-//            if(listImgUri.size() > 0)
-                new UploadImageData(listImgUri, uploadData).execute();
-//            else
-//                new UploadBlueToothData(uploadData.getDaValue().getDataID()).execute();
+            new UploadImageData(listImgUri, uploadData).execute();
         }
     }
     /*
@@ -449,6 +507,7 @@ public class FragmentReportStatus extends CustomFragment {
 
             try {
                 Bitmap bitmap = FunctionUtils.decodeSampledBitmap(getActivity(), listUri.get(order_upload_image));
+//                Bitmap b = FunctionUtils.decodeSampledBitmapFromFile(listUri.get(order_upload_image).getPath(), 800, 1000);
                 String base64value = FunctionUtils.convertBitMapToString(bitmap);
                 imageModel = new ImageModel();
                 imageModel.setImageDataByte(base64value);
@@ -535,7 +594,7 @@ public class FragmentReportStatus extends CustomFragment {
         protected String doInBackground(Void... voids) {
 
             if(blueToothData.size() == 0){
-                //return "blueToothData.size() == 0";
+                return "blueToothData.size() == 0";
             }
 
             HttpClient httpclient = new DefaultHttpClient();
@@ -544,7 +603,7 @@ public class FragmentReportStatus extends CustomFragment {
             post.setHeader("Accept","application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity(gson.toJson(blueToothData), HTTP.UTF_8);
+                StringEntity entityData = new StringEntity("[\n" + gson.toJson(blueToothData) + "\n]", HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());
@@ -605,7 +664,7 @@ public class FragmentReportStatus extends CustomFragment {
         @Override
         protected String doInBackground(Void... voids) {
             if(positionDatas.size() == 0){
-                //return "positionDatas.size() == 0";
+                return "positionDatas.size() == 0";
             }
 
             HttpClient httpclient = new DefaultHttpClient();
@@ -614,7 +673,7 @@ public class FragmentReportStatus extends CustomFragment {
             post.setHeader("Accept","application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity(gson.toJson(positionDatas), HTTP.UTF_8);
+                StringEntity entityData = new StringEntity("[\n" + gson.toJson(positionDatas) + "\n]", HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());
@@ -735,7 +794,7 @@ public class FragmentReportStatus extends CustomFragment {
                         String key = (String) myVeryOwnIterator.next();
                         if (key.equals(en.getDaValue().getDataName())) {
                             List<EnDataModel> listCurrently = hashMap.get(key);
-                                listCurrently.add(en);
+                            listCurrently.add(en);
                         }
                     }
                 }

@@ -4,6 +4,7 @@
     android:layout_height="match_parent"
     android:minHeight="1000dp"
     android:minWidth="1000dp"
+    android:id="@+id/scrollContainer"
     android:orientation="vertical">
 
     <LinearLayout
@@ -36,9 +37,9 @@
                 android:textSize="18sp" />
         </RelativeLayout>
 
-        <FrameLayout
+        <fragment
             android:id="@+id/mapp"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+            class="com.example.macos.libraries.WorkaroundMapFragment"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:transitionName="@string/show_map"
@@ -107,6 +108,14 @@
                 android:text="@string/vitri" />
 
             <TextView
+                android:id="@+id/tvDataStatus"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:padding="10dp"
+                android:text="@string/datastatus" />
+
+            <TextView
                 android:id="@+id/tvGraph"
                 android:layout_gravity="right"
                 android:textColor="#7bc9c2"
@@ -116,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="10dp"
-                android:text="Xem quá trình tuần bằng đồ thị" />
+                android:text="Xem quá trình tuần đường chi tiết." />
         </LinearLayout>
 
         <LinearLayout

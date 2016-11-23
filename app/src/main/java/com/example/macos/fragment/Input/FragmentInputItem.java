@@ -109,6 +109,7 @@ public class FragmentInputItem extends CustomFragment {
     private NestedScrollView scroll;
     private int currentDiffheight = 0;
 
+    private TextView tvGraphData;
     public void setCatalog(String s) {
         this.catalog = s;
     }
@@ -305,10 +306,12 @@ public class FragmentInputItem extends CustomFragment {
                                     longitude = (int) Double.parseDouble(stk[5]);
 
                                 Logger.error("zData: " + zData + "lat-long: " + latitude + " - " + longitude);
+                                tvGraphData.setText(BleTemp);
                                 if (zData < 1500 && zData > -1500) {
                                     zData = 0;
                                 }
                                 if(count % 2 == 0) {
+                                    tvGraphData.setText(text);
                                     series.appendData(new DataPoint(count, zData / 100), true, count);
 
                                     BlueToothData blData = new BlueToothData();
@@ -329,6 +332,7 @@ public class FragmentInputItem extends CustomFragment {
                             }
 
                         } catch (Exception e) {
+                            tvGraphData.setText(tvGraphData.getText().toString() + "\n error" + e.toString());
                             Logger.error(e.toString());
                         }
                     }
@@ -419,6 +423,7 @@ public class FragmentInputItem extends CustomFragment {
         listData = new ArrayList<>();
         Gson gson = new Gson();
         SharedPreferenceManager pref = new SharedPreferenceManager(getActivity());
+        tvGraphData = (TextView) rootView.findViewById(R.id.tvGraphData);
         roadInformation = gson.fromJson(pref.getString(GlobalParams.ROAD_CHOOSEN, ""), RoadInformation.class);
 
         tvRoadNameEntered = (TextView) rootView.findViewById(R.id.tvRoadNameEntered);

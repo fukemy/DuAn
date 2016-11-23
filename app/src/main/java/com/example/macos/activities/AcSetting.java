@@ -194,6 +194,7 @@ public class AcSetting extends AppCompatActivity implements OnCheckedChangeListe
                             DatabaseHelper.clearPositionData();
                             Intent in = new Intent(AcSetting.this, MainScreen.class);
                             in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             in.putExtra("isDeleteData", true);
                             startActivity(in);
                             finish();

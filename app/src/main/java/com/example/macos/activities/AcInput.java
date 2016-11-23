@@ -10,8 +10,11 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -30,6 +33,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.example.macos.adapter.MainScreenAdapter;
+import com.example.macos.database.BlueToothData;
 import com.example.macos.database.DataTypeItem;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.Item;
@@ -58,6 +62,7 @@ import com.wooplr.spotlight.SpotlightView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class AcInput extends FragmentActivity {
@@ -281,7 +286,7 @@ public class AcInput extends FragmentActivity {
                                 if(dialog != null && !dialog.isShowing())
                                     dialog.show();
                                 IS_FOUND_LOCATION = false;
-                                gMap.setOnMyLocationChangeListener(myLocationChangeListener);
+//                                gMap.setOnMyLocationChangeListener(myLocationChangeListener);
                                 return false;
                             }
                         });
@@ -374,20 +379,73 @@ public class AcInput extends FragmentActivity {
         }
     }
 
+    private class GeoDecodeLotaion extends AsyncTask<Void, Void, EnLocationItem> {
+        Geocoder geocoder;
+        EnLocationItem en;
+        Location location;
+        public GeoDecodeLotaion(Location mLocation){
+            en = new EnLocationItem();
+            geocoder = new Geocoder(AcInput.this, Locale.getDefault());
+            location = mLocation;
+        }
+
+        @Override
+        protected void onPreExecute() {
+        }
+
+        @Override
+        protected EnLocationItem doInBackground(Void... voids) {
+            List<Address> addresses;
+            try {
+                // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
+
+                if(addresses != null) {
+                    Address returnedAddress = addresses.get(0);
+                    StringBuilder strReturnedAddress = new StringBuilder();
+                    for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                    }
+                    en.setAddress(strReturnedAddress.toString());
+                }
+                // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
+
+                en.setCity(addresses.get(0).getLocality());
+                en.setCountry(addresses.get(0).getCountryName());
+                en.setKnownName(addresses.get(0).getFeatureName());
+                en.setPostalCode(addresses.get(0).getPostalCode());
+                en.setState(addresses.get(0).getAdminArea());
+                en.setLocation(location);
+
+                return en;
+
+            }catch (Exception e){
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(EnLocationItem locationItem) {
+            if(locationItem.getAddress() == null){
+                addGoogleMapShowcase();
+            }else {
+                ((FragmentInputItem) ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
+            }
+        }
+    }
+
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(final Location location) {
-            locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
             if(!IS_FOUND_LOCATION) {
                 Logger.error("found location :" + location.toString());
                 title.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
-                if(locationItem.getAddress() == null){
-                    addGoogleMapShowcase();
-                }
-
+//                locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
+                new GeoDecodeLotaion(location).execute();
                 //TODO VERY IMPORTAIN, still now I only can change location in all fragment, so hard.
-                ((FragmentInputItem)((MainScreenAdapter)viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
+
 //                System.out.println("got location : " + locationItem.toString());
                 IS_FOUND_LOCATION = true;
                 CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -416,30 +474,31 @@ public class AcInput extends FragmentActivity {
                     }
                 });
                 //gMap.setOnMyLocationChangeListener(null);
-            }
+            }else {
 
-            if(location != null) {
+                if (location != null) {
 
-                //TODO VERY IMPORTAIN, still now I only can get first fragment UUID, so hard.
-                Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0);
+                    //TODO VERY IMPORTAIN, still now I only can get first fragment UUID, so hard.
+                    Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0);
 
-                PositionData positionData = new PositionData();
-                positionData.setId(((FragmentInputItem) f).getUUID());
-                positionData.setLattitude("" + location.getLatitude());
-                positionData.setLongitude("" + location.getLongitude());
-                positionData.setLogTime("" + System.currentTimeMillis());
-                positionData.setUserName(pref.getString(GlobalParams.USERNAME,"User"));
+                    PositionData positionData = new PositionData();
+                    positionData.setId(((FragmentInputItem) f).getUUID());
+                    positionData.setLattitude("" + location.getLatitude());
+                    positionData.setLongitude("" + location.getLongitude());
+                    positionData.setLogTime("" + System.currentTimeMillis());
+                    positionData.setUserName(pref.getString(GlobalParams.USERNAME, "User"));
 
 //                Logger.error("save position update: " + positionData);
 
-                //MOVE CAMERA
-                DatabaseHelper.insertPositionData(positionData);
+                    //MOVE CAMERA
+                    DatabaseHelper.insertPositionData(positionData);
 
-                CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                        .zoom(18)                   // Sets the zoom
-                        .build();                   // Creates a CameraPosition from the builder
-                gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    CameraPosition cameraPosition = new CameraPosition.Builder()
+                            .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                            .zoom(18)                   // Sets the zoom
+                            .build();                   // Creates a CameraPosition from the builder
+                    gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                }
             }
         }
     };
@@ -517,14 +576,14 @@ public class AcInput extends FragmentActivity {
     }
 
     public void collectAllData() {
-        if(locationItem.getLocation() == null){
-            AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
-            builder.setTitle("Lưu dữ liệu thất bại!");
-            builder.setMessage("Hệ thống không định vị được vị trí của bạn, hãy nhấn vị trí của tôi trên bản đồ để dò lại!");
-            builder.setNegativeButton("OK", null);
-            builder.show();
-            return;
-        }
+//        if(locationItem.getLocation() == null){
+//            AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
+//            builder.setTitle("Lưu dữ liệu thất bại!");
+//            builder.setMessage("Hệ thống không định vị được vị trí của bạn, hãy nhấn vị trí của tôi trên bản đồ để dò lại!");
+//            builder.setNegativeButton("OK", null);
+//            builder.show();
+//            return;
+//        }
 
         for(int k = 0; k < ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().size(); k++){
             Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(k);
@@ -540,7 +599,7 @@ public class AcInput extends FragmentActivity {
                 dataTypeItem.setMaDuong(Integer.parseInt(roadInformation.getMaDuong().trim()));
                 dataTypeItem.setCaoDo("" +  (locationItem.getLocation() != null ? locationItem.getLocation().getAltitude() : ""));
                 dataTypeItem.setTuyenSo(Integer.parseInt(roadInformation.getTuyenSo()));
-                dataTypeItem.setNguoiNhap(pref.getString(GlobalParams.USERNAME,"User"));
+                dataTypeItem.setNguoiNhap("dungdv");
                 dataTypeItem.setDataTypeID((int) (long)dataViewList.getDataList().get(k).getItemID());
                 dataTypeItem.setDataID(((FragmentInputItem) f).getUUID());
                 dataTypeItem.setAction(getResources().getString(R.string.road_test));
@@ -568,6 +627,9 @@ public class AcInput extends FragmentActivity {
                 Logger.error("save data success: " + enDataModel);
 
             }
+
+            List<BlueToothData> blueToothData = DatabaseHelper.getBlueToothDataByID(((FragmentInputItem) f).getUUID());
+            Logger.error("bluetooth data to upload: " + gson.toJson(blueToothData));
             pref.saveBoolean(GlobalParams.IS_WORKED_TODAY, true);
 
             Intent in = new Intent(AcInput.this, MainScreen.class);

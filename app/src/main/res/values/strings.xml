@@ -56,6 +56,9 @@
     <string name="no">Không</string>
     <string name="logout">Đăng xuất</string>
     <string name="vitri"> Vị trí</string>
+    <string name="datastatus"> Trạng thái dữ liệu</string>
+    <string name="uploaded"> Đã upload lên server!</string>
+    <string name="not_upload"> Chưa upload lên server!</string>
     <string name="report">Báo cáo</string>
     <string name="common_summary">Tổng kết chung....</string>
     <string name="bancochacchandanhapdayduthongtin">Bạn có chắc chắn đã nhập đầy đủ thông tin?</string>

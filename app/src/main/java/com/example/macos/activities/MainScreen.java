@@ -613,7 +613,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             initReportScreen();
             FunctionUtils.hideMenu(menu, false);
 
-        } else if (id != currrentID && id == R.id.nav_ici) {
+        } else if (id == R.id.nav_ici) {
             Intent in = new Intent(MainScreen.this, AcICIChecking.class);
             startActivity(in);
 

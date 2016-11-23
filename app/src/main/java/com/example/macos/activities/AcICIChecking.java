@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.StrictMode;
 import android.speech.RecognizerIntent;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentTransaction;
@@ -34,6 +35,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +47,7 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
 import com.example.macos.fragment.report.FragmentReportStatus;
 import com.example.macos.libraries.Logger;
+import com.example.macos.libraries.WorkaroundMapFragment;
 import com.example.macos.report.GraphReport;
 import com.example.macos.service.UartService;
 import com.example.macos.utilities.FunctionUtils;
@@ -95,6 +98,7 @@ import java.util.UUID;
 
 public class AcICIChecking extends AppCompatActivity {
     private TextView tvTotalDistance, tvProblemFound, tvTime;
+    private ScrollView scrollContainer;
     private Button btnBack;
     private GraphView graph;
     private LineGraphSeries<DataPoint> series;
@@ -117,6 +121,7 @@ public class AcICIChecking extends AppCompatActivity {
     private BluetoothAdapter mBtAdapter = null;
     private String UUIDData;
     boolean isCreateNewBlueToothData;
+    boolean isManualDisconnectBluetooth;
 
     //GRAPH VIEW PROPERTY
     String dataUUID;
@@ -129,9 +134,14 @@ public class AcICIChecking extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.ac_ici);
 
+        isManualDisconnectBluetooth = false;
         pref = new SharedPreferenceManager(this);
         UUIDData = UUID.randomUUID().toString();
         isCreateNewBlueToothData = false;
+
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
 
         initLayout();
         initGraphView();
@@ -141,14 +151,14 @@ public class AcICIChecking extends AppCompatActivity {
         }else{
             initBlueTooth();
         }
-
-
     }
 
     private void initLayout(){
         tvTotalDistance = (TextView) findViewById(R.id.tvTotalDistance);
         tvProblemFound = (TextView) findViewById(R.id.tvProblemFounded);
         tvTime = (TextView) findViewById(R.id.tvTime);
+        scrollContainer = (ScrollView) findViewById(R.id.scrollContainer);
+
 
         btnBack = (Button) findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {
@@ -156,6 +166,8 @@ public class AcICIChecking extends AppCompatActivity {
             public void onClick(View view) {
 //                if(blueToothDatas.size() > 0 && isCreateNewBlueToothData)
 //                {
+                    isManualDisconnectBluetooth = true;
+                    mService.disconnect();
                     final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
                     builder.setTitle("Chú ý");
                     builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
@@ -180,13 +192,49 @@ public class AcICIChecking extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+
+//                if(blueToothDatas.size() > 0 && isCreateNewBlueToothData)
+//                {
+        isManualDisconnectBluetooth = true;
+        mService.disconnect();
+        final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
+        builder.setTitle("Chú ý");
+        builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        getToken();
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                        finish();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+//                }else{
+//                    finish();
+//                }
+    }
+
     private void getToken(){
         dialog = new ProgressDialog(AcICIChecking.this);
         dialog.setMessage("Đang lấy token từ server!");
+        dialog.show();
         HttpClient httpclient = new DefaultHttpClient();
         HttpGet httpget = new HttpGet(GlobalParams.BASED_LOGIN_URL);
         HttpResponse response;
         try {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//
+//                }
+//            });
             response = httpclient.execute(httpget);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
@@ -201,6 +249,25 @@ public class AcICIChecking extends AppCompatActivity {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            if(dialog != null)
+                if(dialog.isShowing())
+                    dialog.dismiss();
+            Logger.error("upload bluetooth fail");
+            final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
+            builder.setTitle("Báo cáo!");
+            builder.setMessage("Upload dữ liệu thất bại! Ấn \"OK\" để tắt thông báo này.")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog,  final int id) {
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            dialog.dismiss();
+                        }
+                    });
+            final AlertDialog alert = builder.create();
+            alert.show();
         }
     }
     /*
@@ -224,8 +291,8 @@ public class AcICIChecking extends AppCompatActivity {
                 if(dialog.isShowing())
                     dialog.setMessage("Đang upload dữ liệu độ sóc!");
 
-            blueToothData = DatabaseHelper.getBlueToothDataByID(UUID);
-            Logger.error("bluetooth data to upload: " + gson.toJson(blueToothData));
+//            blueToothData = DatabaseHelper.getBlueToothDataByID(UUID);
+            Logger.error("bluetooth data to upload: " + gson.toJson(blueToothDatas));
         }
 
         @Override
@@ -237,7 +304,11 @@ public class AcICIChecking extends AppCompatActivity {
             post.setHeader("Accept","application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity(gson.toJson(blueToothData), HTTP.UTF_8);
+                StringEntity entityData = new StringEntity(
+//                        "[\n" +
+                                gson.toJson(blueToothDatas)
+//                                + "\n]"
+                        , HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());
@@ -262,24 +333,7 @@ public class AcICIChecking extends AppCompatActivity {
                     dialog.dismiss();
             Logger.error("result upload bluetooth: " + result);
             if (result.contains("Successfull") || result.contains("Image List")) {
-                Logger.error("upload bluetooth fail");
-                final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
-                builder.setTitle("Báo cáo!");
-                builder.setMessage("Upload dữ liệu thất bại! Ấn \"Cancel\" để tắt thông báo này.")
-                        .setCancelable(false)
-                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog,  final int id) {
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog, final int id) {
-                                dialog.dismiss();
-                            }
-                        });
-                final AlertDialog alert = builder.create();
-                alert.show();
-            } else {
-                Logger.error("upload bluetooth success");
+               Logger.error("upload bluetooth success");
                 final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
                 builder.setTitle("Chú ý");
                 builder.setMessage("Dữ liệu đã được upload thành công!")
@@ -288,10 +342,18 @@ public class AcICIChecking extends AppCompatActivity {
                             public void onClick(final DialogInterface dialog,  final int id) {
                                 finish();
                             }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            public void onClick(final DialogInterface dialog, final int id) {
-                                dialog.cancel();
+                        });
+                final AlertDialog alert = builder.create();
+                alert.show();
+            } else {
+                Logger.error("upload bluetooth fail");
+                final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
+                builder.setTitle("Báo cáo!");
+                builder.setMessage("Upload dữ liệu thất bại!")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog,  final int id) {
+                                dialog.dismiss();
                             }
                         });
                 final AlertDialog alert = builder.create();
@@ -301,21 +363,29 @@ public class AcICIChecking extends AppCompatActivity {
         }
     }
     private void initGoogleMap(){
-        mSupportMapFragment = new SupportMapFragment();
-        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-        trans.add(R.id.mapp, mSupportMapFragment).commit();
-        getFragmentManager().beginTransaction();
+//        mSupportMapFragment = new SupportMapFragment();
+//        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+//        trans.add(R.id.mapp, mSupportMapFragment).commit();
+//        getFragmentManager().beginTransaction();
+//
+//        if (mSupportMapFragment != null) {
+//            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
+//                @Override
+//                public void onMapReady(GoogleMap googleMap) {
+//                    if (googleMap != null) {
+//                        gMap = googleMap;
+//                    }
+//                }
+//            });
+//        }
 
-        if (mSupportMapFragment != null) {
-            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
-                @Override
-                public void onMapReady(GoogleMap googleMap) {
-                    if (googleMap != null) {
-                        gMap = googleMap;
-                    }
-                }
-            });
-        }
+        gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
+        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+            @Override
+            public void onTouch() {
+                scrollContainer.requestDisallowInterceptTouchEvent(true);
+            }
+        });
     }
     private void initGraphView() {
         graph = (GraphView) findViewById(R.id.graph);
@@ -333,6 +403,8 @@ public class AcICIChecking extends AppCompatActivity {
 //        graph.getViewport().setMinX(0);
 //        graph.getViewport().setMaxX(60);
 
+
+        graph.getViewport().setXAxisBoundsManual(false);
         graph.getGridLabelRenderer().setTextSize(10f);
         graph.getGridLabelRenderer().setLabelFormatter(new DefaultLabelFormatter() {
             @Override
@@ -417,6 +489,7 @@ public class AcICIChecking extends AppCompatActivity {
 
     StringBuilder BleTemp;
     int count = 0;
+    long currentTime = 0;
     private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
@@ -434,6 +507,18 @@ public class AcICIChecking extends AppCompatActivity {
                         series.setColor(Color.RED);
                         series.setThickness(1);
                         graph.addSeries(series);
+
+
+                        graph.getViewport().setXAxisBoundsManual(true);
+                        graph.getViewport().setMinX(0);
+                        graph.getViewport().setMaxX(60);
+
+
+                        isManualDisconnectBluetooth = false;
+                        currentTime = System.currentTimeMillis();
+                        probleCount = 0;
+                        totalDistance = 0;
+                        tvTotalDistance.setVisibility(View.GONE);
                         String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
                         Log.d(TAG, "UART_CONNECT_MSG");
                         Logger.error("[" + currentDateTimeString + "] Connected to: " + mDevice.getName());
@@ -450,6 +535,9 @@ public class AcICIChecking extends AppCompatActivity {
                         Logger.error("[" + currentDateTimeString + "] Disconnected to: " + mDevice.getName());
                         mState = UART_PROFILE_DISCONNECTED;
                         mService.close();
+
+                        if(!isManualDisconnectBluetooth)
+                            buildAlertConnectBLueToothAgain();
                         //setUiState();
 
                     }
@@ -508,6 +596,14 @@ public class AcICIChecking extends AppCompatActivity {
 
                                             DatabaseHelper.insertBlueToothData(blData);
                                             blueToothDatas.add(blData);
+
+                                            if(zData > 15000)
+                                                probleCount ++;
+                                            if(currentTime != 0)
+                                                tvTime.setText("Tổng thời gian( ước tính): " + calculateAmountOfTime(currentTime, System.currentTimeMillis()) + " phút.");
+//                                            tvTotalDistance.setText(tvTotalDistance.getText() + ": " + (int) totalDistance + " mét.");
+                                            tvProblemFound.setText("Số lượng ổ gà( ước tính): " + +  probleCount + " .");
+
                                         }
                                     } else {
                                         BleTemp = new StringBuilder(); //refresh single data
@@ -595,6 +691,26 @@ public class AcICIChecking extends AppCompatActivity {
 
     }
 
+    private void buildAlertConnectBLueToothAgain(){
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Kết nối với mạch đã bị ngắt, bạn có muốn dò lại tín hiệu chứ?")
+                .setCancelable(false)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog,  final int id) {
+                        Intent newIntent = new Intent(AcICIChecking.this, DeviceListActivity.class);
+                        startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(final DialogInterface dialog, final int id) {
+                        dialog.cancel();
+                    }
+                });
+        final AlertDialog alert = builder.create();
+        alert.show();
+
+    }
+
 
     double totalDistance = 0;
     int probleCount = 0;
@@ -616,6 +732,7 @@ public class AcICIChecking extends AppCompatActivity {
         series.setThickness(1);
         graph.addSeries(series);
 
+        tvTotalDistance.setVisibility(View.VISIBLE);
         while (i < blueToothDatas.size()){
             series.appendData(new DataPoint(i, blueToothDatas.get(i).getZaxisValue()), false, blueToothDatas.size());
 
@@ -644,15 +761,6 @@ public class AcICIChecking extends AppCompatActivity {
             }
             i++;
         }
-//        mTimer = new Runnable() {
-//            @Override
-//            public void run() {
-//
-//
-//
-//            }
-//        };
-//        mHandler.postDelayed(mTimer, 20);
 
     }
 
@@ -673,6 +781,7 @@ public class AcICIChecking extends AppCompatActivity {
 //        return cal.get(Calendar.MINUTE);
         return (int) (long)(lastTime - firstTime) / (60 * 1000) % 60;
     }
+
     private double calculateDistanceBetweenLatlng(LatLng curentLat, LatLng newLat){
         Location locationA = new Location("point A");
 

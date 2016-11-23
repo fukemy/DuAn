@@ -27,6 +27,15 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvGraphData"
+                android:layout_width="match_parent"
+                android:visibility="gone"
+                android:layout_height="80dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="10dp" />
+
+            <TextView
                 android:id="@+id/tvRoadName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

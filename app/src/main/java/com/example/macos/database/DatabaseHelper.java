@@ -1,6 +1,11 @@
 package com.example.macos.database;
 
+import android.content.Context;
+
+import com.example.macos.duan.R;
+import com.example.macos.entities.EnDataModel;
 import com.example.macos.main.Application;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -31,6 +36,25 @@ public class DatabaseHelper {
     public static List<Data> getData(){
         DataDao dao = Application.getInstance().daoSession.getDataDao();
         return dao.queryBuilder().list();
+    }
+
+    public static void deleteDataTypeItem(EnDataModel dataModel){
+        DataDao dao = Application.getInstance().daoSession.getDataDao();
+        List<Data> listData = DatabaseHelper.getData();
+        if(listData!= null) {
+            if (listData.size() != 0) {
+                Gson gson = new Gson();
+                for (Data d : listData) {
+                    EnDataModel en = gson.fromJson(d.getInput(), EnDataModel.class);
+                    if(dataModel.getDaValue().getDataID().equalsIgnoreCase(en.getDaValue().getDataID())) {
+                        dao.deleteInTx(d);
+                        break;
+                    }
+                }
+
+            }
+        }
+
     }
 
     public static List<BlueToothData> getBlueToothDataByID(String dataUUID){
