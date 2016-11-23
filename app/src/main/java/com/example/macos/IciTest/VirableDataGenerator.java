@@ -39,7 +39,6 @@ public class VirableDataGenerator {
     public List<BlueToothData> generateVirableData(){
         StringBuilder builder = new StringBuilder();
         builder.append("[\n");
-        builder.append("[\n");
         int sec = 1;
         Date date = new Date();
 
@@ -52,13 +51,14 @@ public class VirableDataGenerator {
         }catch (Exception e){
 
         }
-        String UUid = UUID.randomUUID().toString();
+
         for(int i = 0; i < locations.size(); i++){
             cal.add(Calendar.SECOND, sec);
             Date changeDate = cal.getTime();
             builder.append("{\n");
             builder.append("\"DateTimeLoging\":\"" + changeDate.getTime() + "\",\n");
 
+            String UUid = UUID.randomUUID().toString();
             builder.append("\"Id\":\"" + UUid + "\",\n");
             builder.append("\"Latitude\":\"" + "" + locations.get(i).latitude + "\",\n");
             builder.append("\"Longitude\":\"" + "" + locations.get(i).longitude + "\",\n");
@@ -103,9 +103,8 @@ public class VirableDataGenerator {
         }
 
         builder.append("]\n");
-        builder.append("]\n");
 
-//        System.out.println("data: " + builder.toString());
+        System.out.println("data: " + builder.toString());
 //        try{
 //            PrintWriter writer = new PrintWriter("virable_generator_data.txt", "UTF-8");
 //            writer.println(builder.toString());

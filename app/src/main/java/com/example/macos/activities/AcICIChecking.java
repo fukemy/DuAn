@@ -136,7 +136,7 @@ public class AcICIChecking extends AppCompatActivity {
 
         isManualDisconnectBluetooth = false;
         pref = new SharedPreferenceManager(this);
-        UUIDData = UUID.randomUUID().toString();
+
         isCreateNewBlueToothData = false;
 
 
@@ -164,8 +164,7 @@ public class AcICIChecking extends AppCompatActivity {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                if(blueToothDatas.size() > 0 && isCreateNewBlueToothData)
-//                {
+                if (blueToothDatas.size() > 0 && isCreateNewBlueToothData) {
                     isManualDisconnectBluetooth = true;
                     mService.disconnect();
                     final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
@@ -173,7 +172,7 @@ public class AcICIChecking extends AppCompatActivity {
                     builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
                             .setCancelable(false)
                             .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                public void onClick(final DialogInterface dialog,  final int id) {
+                                public void onClick(final DialogInterface dialog, final int id) {
                                     getToken();
                                 }
                             })
@@ -185,9 +184,9 @@ public class AcICIChecking extends AppCompatActivity {
                             });
                     final AlertDialog alert = builder.create();
                     alert.show();
-//                }else{
-//                    finish();
-//                }
+                } else {
+                    finish();
+                }
             }
         });
     }
@@ -195,30 +194,29 @@ public class AcICIChecking extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-//                if(blueToothDatas.size() > 0 && isCreateNewBlueToothData)
-//                {
-        isManualDisconnectBluetooth = true;
-        mService.disconnect();
-        final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
-        builder.setTitle("Chú ý");
-        builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
-                .setCancelable(false)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        getToken();
-                    }
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(final DialogInterface dialog, final int id) {
-                        dialog.cancel();
-                        finish();
-                    }
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
-//                }else{
-//                    finish();
-//                }
+        if (blueToothDatas.size() > 0 && isCreateNewBlueToothData) {
+            isManualDisconnectBluetooth = true;
+            mService.disconnect();
+            final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
+            builder.setTitle("Chú ý");
+            builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            getToken();
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(final DialogInterface dialog, final int id) {
+                            dialog.cancel();
+                            finish();
+                        }
+                    });
+            final AlertDialog alert = builder.create();
+            alert.show();
+        } else {
+            finish();
+        }
     }
 
     private void getToken(){
@@ -245,7 +243,7 @@ public class AcICIChecking extends AppCompatActivity {
                 pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
                 instream.close();
 
-                new UploadBlueToothData(UUIDData).execute();
+                new UploadBlueToothData().execute();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -274,13 +272,12 @@ public class AcICIChecking extends AppCompatActivity {
         UPLOAD VIBERATION DATA VIA BLUETOOTH
      */
     private class UploadBlueToothData extends AsyncTask<Void, Void, String> {
-        private String result,UUID;
+        private String result;
         private List<BlueToothData> blueToothData;
         String url;
         Gson gson = new Gson();
 
-        public UploadBlueToothData(String UUID){
-            this.UUID = UUID;
+        public UploadBlueToothData(){
             this.result = "";
             url = FunctionUtils.encodeUrl(GlobalParams.BASED_UPLOAD_BLUETOOTH_URL + USER_TOKEN);
             Logger.error("Url bluetooth to upload: " + url);
@@ -564,7 +561,7 @@ public class AcICIChecking extends AppCompatActivity {
                                     if (text.contains("\n")) {
                                         count++;
 
-
+                                        UUIDData = UUID.randomUUID().toString();
                                         BleTemp.append(text); // add last data
 
                                         String[] stk = BleTemp.toString().split(",");
@@ -577,7 +574,7 @@ public class AcICIChecking extends AppCompatActivity {
                                         if (stk[5].length() > 0)
                                             longitude = (int) Double.parseDouble(stk[5]);
 
-                                        Logger.error("zData: " + zData + "lat-long: " + latitude + " - " + longitude);
+                                        Logger.error("zData: " + zData + "UUIDData: " + UUIDData);
                                         if (zData < 1500 && zData > -1500) {
                                             zData = 0;
                                         }
