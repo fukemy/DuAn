@@ -177,7 +177,6 @@ public class DiaryReportContent extends AppCompatActivity {
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         trans.add(R.id.mapp, mSupportMapFragment).commit();
         getFragmentManager().beginTransaction();
-        gMap = mSupportMapFragment.getMap();
 
         if (mSupportMapFragment != null) {
             mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {

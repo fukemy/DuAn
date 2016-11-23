@@ -281,7 +281,7 @@ public class FragmentAccident extends CustomFragment {
                         imgAdd.setVisibility(View.GONE);
                         imgSpeak.setVisibility(View.GONE);
                         imgCamera.setVisibility(View.GONE);
-                        imgGallery.setVisibility(View.GONE);
+//                        imgGallery.setVisibility(View.GONE);
                         imgVideo.setVisibility(View.GONE);
                         imgEdit.setVisibility(View.VISIBLE);
                         imgDelete.setVisibility(View.VISIBLE);
@@ -307,7 +307,7 @@ public class FragmentAccident extends CustomFragment {
                         imgEdit.setImageResource(R.mipmap.done_black);
                         imgSpeak.setVisibility(View.VISIBLE);
                         imgCamera.setVisibility(View.VISIBLE);
-                        imgGallery.setVisibility(View.VISIBLE);
+//                        imgGallery.setVisibility(View.VISIBLE);
                         imgVideo.setVisibility(View.VISIBLE);
                     } else {
                         if (imgEdit.getTag().toString().equals("done")) {
@@ -318,7 +318,7 @@ public class FragmentAccident extends CustomFragment {
                             imgEdit.setImageResource(R.mipmap.edit_black);
                             imgSpeak.setVisibility(View.GONE);
                             imgCamera.setVisibility(View.GONE);
-                            imgGallery.setVisibility(View.GONE);
+//                            imgGallery.setVisibility(View.GONE);
                             imgVideo.setVisibility(View.GONE);
                         }
                     }

@@ -17,11 +17,14 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -40,14 +43,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.macos.activities.AcImageInformation;
 import com.example.macos.activities.AcInput;
+import com.example.macos.activities.AcVideo;
 import com.example.macos.adapter.DeviceListActivity;
 import com.example.macos.database.BlueToothData;
 import com.example.macos.database.DatabaseHelper;
@@ -518,6 +525,7 @@ public class FragmentInputItem extends CustomFragment {
         final ImageView imgVoidRoadName = (ImageView) container.findViewById(R.id.imgVoidRoadName);
         final ShineButton imgEditRoadName = (ShineButton) container.findViewById(R.id.imgEditRoadName);
         final ImageView imgDeleteRoadName = (ImageView) container.findViewById(R.id.imgDeleteRoadName);
+        final ImageView imgVideo = (ImageView) container.findViewById(R.id.imgVideoRoadName);
         final EditText edtInformation = (EditText) container.findViewById(R.id.edtInformation);
         final EditText edtOtherStatus = (EditText) container.findViewById(R.id.edtOtherStatus);
         final EditText edtJusticeProcess = (EditText) container.findViewById(R.id.edtJusticeProcess);
@@ -638,6 +646,13 @@ public class FragmentInputItem extends CustomFragment {
             }
         });
 
+        imgVideo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                takeVideo(ORDER_CAMERA_POSITION);
+            }
+        });
+
         imgEditRoadName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -649,13 +664,15 @@ public class FragmentInputItem extends CustomFragment {
                         imgEditRoadName.setImageResource(R.mipmap.done_black);
                         imgVoidRoadName.setVisibility(View.VISIBLE);
                         imgCameraRoadName.setVisibility(View.VISIBLE);
-                        imgGaleryRoadName.setVisibility(View.VISIBLE);
+                        imgGaleryRoadName.setVisibility(View.GONE);
+                        imgVideo.setVisibility(View.VISIBLE);
                     } else {
                         if (imgEditRoadName.getTag().toString().equals("done")) {
                             disableNestedData(listData.get(ORDER_CAMERA_POSITION), false);
                             imgEditRoadName.setTag("edit");
                             imgEditRoadName.setImageResource(R.mipmap.edit_black);
                             imgVoidRoadName.setVisibility(View.GONE);
+                            imgVideo.setVisibility(View.GONE);
                             imgCameraRoadName.setVisibility(View.GONE);
                             imgGaleryRoadName.setVisibility(View.GONE);
                         }
@@ -750,6 +767,11 @@ public class FragmentInputItem extends CustomFragment {
         }
     }
 
+    private void takeVideo(int pos) {
+        Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+        startActivityForResult(takeVideoIntent, ACTION_TAKE_VIDEO);
+    }
+    private final int ACTION_TAKE_VIDEO = 44;
     public void takePhoto(int pos) {
         ORDER_CAMERA_POSITION = pos;
 
@@ -946,10 +968,117 @@ public class FragmentInputItem extends CustomFragment {
                     Toast.makeText(getActivity(), "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
                 }
                 break;
+            case ACTION_TAKE_VIDEO:
+                if (resultCode == Activity.RESULT_OK && data != null) {
+                    final Uri uri = data.getData();
+                    Log.e("video uri", uri.getPath());
+
+                    int size = rootView.findViewById(R.id.viewNull).getWidth();
+                    LinearLayout lnlFirstPlan = (LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.container);
+                    HorizontalScrollView scroll = (HorizontalScrollView) lnlFirstPlan.findViewById(R.id.scrImage);
+
+                    final View videoLayout = LayoutInflater.from(getActivity()).inflate(R.layout.video_view, (LinearLayout) scroll.getChildAt(0), false);
+                    videoLayout.requestLayout();
+                    videoLayout.setLayoutParams(new RelativeLayout.LayoutParams(size / 3, size / 3));
+
+                    final VideoView mVideoView = (VideoView) videoLayout.findViewById(R.id.mVideoView);
+                    final ImageButton btnPlay = (ImageButton) videoLayout.findViewById(R.id.mPlayVideo);
+                    final ImageButton btnPlayVideoInFullScreen = (ImageButton) videoLayout.findViewById(R.id.mPlayVideoInFullScreen);
+                    final ImageView imgVideo = (ImageView) videoLayout.findViewById(R.id.imgVideo);
+
+                    mVideoView.setTag(uri.toString());
+                    mVideoView.setVideoURI(uri);
+
+                    ((LinearLayout) scroll.getChildAt(0)).addView(videoLayout);
+
+
+                    MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+                    retriever.setDataSource(getActivity(), uri);
+                    Bitmap thumb = retriever.getFrameAtTime(0);
+                    imgVideo.setImageBitmap(thumb);
+
+                    //mVideoView.getHolder().setFormat(PixelFormat.TRANSPARENT);
+                    mVideoView.setZOrderOnTop(false);
+
+                    btnPlay.bringToFront();
+                    initVideoState(mVideoView, imgVideo, btnPlay, btnPlayVideoInFullScreen);
+
+                    btnPlayVideoInFullScreen.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            Intent in = new Intent(getActivity(), AcVideo.class);
+                            in.putExtra("videoUrl", uri.toString());
+                            in.putExtra("position", stopPositionForVideo);
+                            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                ActivityOptionsCompat options =
+                                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), videoLayout,
+                                                "mPlayVideoInFullScreen");
+                                getActivity().startActivity(in, options.toBundle());
+                            }else{
+                                getActivity().startActivity(in);
+                            }
+                        }
+                    });
+
+                }
+                break;
             default:
                 Log.e(TAG, "wrong request code");
                 break;
         }
+    }
+
+    int stopPositionForVideo = 0;
+    private void initVideoState(final VideoView videoView, final ImageView imgVideo, final ImageButton playButton, final ImageButton btnPlayVideoInFullScreen){
+
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                playButton.setVisibility(View.GONE);
+                btnPlayVideoInFullScreen.setVisibility(View.GONE);
+                imgVideo.setVisibility(View.GONE);
+                videoView.setVisibility(View.VISIBLE);
+                videoView.seekTo(stopPositionForVideo);
+                Logger.error("start: ", "" + stopPositionForVideo);
+                videoView.start();
+            }
+        });
+
+
+        videoView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                switch (motionEvent.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        if(videoView.isPlaying()){
+                            playButton.setVisibility(View.VISIBLE);
+                            btnPlayVideoInFullScreen.setVisibility(View.VISIBLE);
+                            imgVideo.setVisibility(View.VISIBLE);
+                            videoView.setVisibility(View.GONE);
+                            stopPositionForVideo = videoView.getCurrentPosition();
+                            Logger.error("pause: ", "" + stopPositionForVideo);
+//                            videoView.pause();
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        break;
+                }
+                return false;
+            }
+        });
+
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                playButton.setVisibility(View.VISIBLE);
+                btnPlayVideoInFullScreen.setVisibility(View.VISIBLE);
+                imgVideo.setVisibility(View.VISIBLE);
+                videoView.setVisibility(View.GONE);
+                stopPositionForVideo = 0;
+                videoView.seekTo(0);
+            }
+        });
+
     }
 
     private void moveImageToCurrent(final ImageView img, final int currentY) {

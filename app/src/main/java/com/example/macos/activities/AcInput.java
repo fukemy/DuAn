@@ -545,8 +545,6 @@ public class AcInput extends FragmentActivity {
                 dataTypeItem.setDataID(((FragmentInputItem) f).getUUID());
                 dataTypeItem.setAction(getResources().getString(R.string.road_test));
 
-
-
                 imgModalList = new ArrayList<>();
                 LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);
                 if(lnl != null) {

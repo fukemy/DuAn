@@ -84,9 +84,6 @@ public class FragmentViewFullReport extends DialogFragment {
         FragmentTransaction trans = getChildFragmentManager().beginTransaction();
         trans.add(R.id.mapp, mSupportMapFragment).commit();
         getFragmentManager().beginTransaction();
-        gMap = mSupportMapFragment.getMap();
-
-
     }
 
     private void initData() {

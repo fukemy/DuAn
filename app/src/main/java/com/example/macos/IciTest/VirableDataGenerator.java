@@ -2,6 +2,8 @@ package com.example.macos.IciTest;
 
 import android.location.Location;
 
+import com.example.macos.database.BlueToothData;
+import com.example.macos.utilities.GlobalParams;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.BufferedReader;
@@ -23,12 +25,18 @@ import java.util.UUID;
 
 public class VirableDataGenerator {
     private List<LatLng> locations;
+    private List<BlueToothData> blueToothDatas;
+
     public static void main(String[] args) {
         VirableDataGenerator main = new VirableDataGenerator();
         main.generateVirableData();
     }
 
-    private String generateVirableData(){
+    public VirableDataGenerator(){
+        blueToothDatas = new ArrayList<>();
+    }
+
+    public List<BlueToothData> generateVirableData(){
         StringBuilder builder = new StringBuilder();
         builder.append("[\n");
         builder.append("[\n");
@@ -44,13 +52,14 @@ public class VirableDataGenerator {
         }catch (Exception e){
 
         }
-
+        String UUid = UUID.randomUUID().toString();
         for(int i = 0; i < locations.size(); i++){
             cal.add(Calendar.SECOND, sec);
             Date changeDate = cal.getTime();
             builder.append("{\n");
             builder.append("\"DateTimeLoging\":\"" + changeDate.getTime() + "\",\n");
-            builder.append("\"Id\":\"" + UUID.randomUUID() + "\",\n");
+
+            builder.append("\"Id\":\"" + UUid + "\",\n");
             builder.append("\"Latitude\":\"" + "" + locations.get(i).latitude + "\",\n");
             builder.append("\"Longitude\":\"" + "" + locations.get(i).longitude + "\",\n");
             builder.append("\"RoadId\":4,\n");
@@ -60,11 +69,15 @@ public class VirableDataGenerator {
             if (i == 700){
                 zValue = generatRandomPositiveNegitiveValue(16000, 8000);
             } if (i == 1500){
-                zValue = generatRandomPositiveNegitiveValue(24000, 20000);
+                zValue = generatRandomPositiveNegitiveValue(14000, 10000);
             }else if (i == 200){
-                zValue = generatRandomPositiveNegitiveValue(18000, 12000);
+                zValue = generatRandomPositiveNegitiveValue(8000, 3000);
             }else{
-                zValue = generatRandomPositiveNegitiveValue(4000, 1000);
+//                if(i % 2 == 0)
+                    zValue = generatRandomPositiveNegitiveValue(2000, 1000);
+//                else
+//                    zValue = generatRandomPositiveNegitiveValue(4000, 1500);
+
             }
             if(zValue < 1500 && zValue > -1500)
                 zValue = 0;
@@ -74,6 +87,19 @@ public class VirableDataGenerator {
                 builder.append("}\n");
             else
                 builder.append("}\n,");
+
+
+
+            BlueToothData blueToothData = new BlueToothData();
+            blueToothData.setId(UUid);
+            blueToothData.setDateTimeLoging("" + changeDate.getTime());
+            blueToothData.setLatitude("" + locations.get(i).latitude);
+            blueToothData.setLongitude("" + locations.get(i).longitude);
+            blueToothData.setRoadId(4);
+            blueToothData.setUserLoging("dungdv");
+            blueToothData.setZaxisValue((double) zValue);
+
+            blueToothDatas.add(blueToothData);
         }
 
         builder.append("]\n");
@@ -88,7 +114,7 @@ public class VirableDataGenerator {
         } catch (Exception e) {
 
         }
-        return builder.toString();
+        return blueToothDatas;
     }
 
     //tao vi tri o? ga` - random
@@ -110,17 +136,12 @@ public class VirableDataGenerator {
 
     public void read_location_input() throws Exception{
         locations = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new FileReader("virable_example_location_input.txt"));
-        String line = br.readLine();
-        int i = 0;
-        while (line != null) {
-            i++;
-            String[] temp = line.split(",");
-            System.out.println("LatLng : " + i + " - " + line);
+        String data_location_input = GlobalParams.SAMPLE_LOCATION_INPUT_FOR_VIRABLE;
+        for(String rowData : data_location_input.split("\n")){
+            String[] temp = rowData.split(",");
+            System.out.println("LatLng : " + rowData);
             locations.add(new LatLng(Double.parseDouble(temp[1]), Double.parseDouble(temp[0])));
-            line = br.readLine();
         }
-        br.close();
 
     }
 }

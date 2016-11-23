@@ -142,9 +142,17 @@
                     android:id="@+id/imgGaleryRoadName"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
+                    android:visibility="gone"
                     android:layout_marginLeft="28dp"
                     android:layout_marginTop="2dp"
                     android:background="@mipmap/galery" />
+
+                <ImageView
+                    android:id="@+id/imgVideoRoadName"
+                    android:layout_width="28dp"
+                    android:layout_height="32dp"
+                    android:layout_marginLeft="28dp"
+                    android:background="@mipmap/video" />
 
                 <LinearLayout
                     android:layout_width="match_parent"

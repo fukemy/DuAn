@@ -56,6 +56,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -69,14 +70,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/thoigian" />
+                android:text="@string/tongthoigian" />
 
             <TextView
-                android:id="@+id/tvSpeed"
+                android:id="@+id/tvTotalDistance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="10dp"
-                android:text="@string/van_toc" />
+                android:text="@string/tongchieudaiquangduong" />
 
             <TextView
                 android:id="@+id/tvProblemFounded"

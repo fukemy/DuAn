@@ -19,7 +19,6 @@ public class Application extends android.app.Application {
     @Override
     public void onCreate() {
         super.onCreate();
-
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, "RoadProject-db",
                 null);
         db = helper.getWritableDatabase();

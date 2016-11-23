@@ -69,10 +69,11 @@
     <string name="statics">Thống kê</string>
     <string name="hangmuc">Hạng mục</string>
     <string name="dahhmuc">Danh mục</string>
-    <string name="van_toc">Vận tốc</string>
+    <string name="tongchieudaiquangduong">Chiều dài quãng đường( ước tính)</string>
     <string name="thongke">Thống kê</string>
     <string name="ghichu">Ghi chú</string>
     <string name="congviec">Công việc</string>
+    <string name="tongthoigian">Tổng thời gian( ước tính)</string>
     <string name="thoigian">Thời gian</string>
     <string name="soluongoga">Số lượng ổ gà</string>
     <string name="comment">Nhận xét chung</string>
@@ -98,19 +99,19 @@
 
     <string name="device">Device:</string>
     <string name="no_device">&lt;Select a device&gt;</string>
-    <string name="select_device">Select a device</string>
+    <string name="select_device">Chọn thiết bị</string>
     <string name="status">Status</string>
     <string name="llsWrite">LinkLossAlert</string>
     <string name="iasWrite">ImmediateAlert</string>
-    <string name="scanning">Scanning for devices...</string>
-    <string name="no_ble_devices">No LE devices found.</string>
-    <string name="connected">Connected</string>
-    <string name="disconnected">Not connected</string>
-    <string name="ready">Ready</string>
-    <string name="disconnect">Disconnect</string>
-    <string name="connect">connect</string>
-    <string name="unpair">unpair</string>
-    <string name="pair">pair</string>
+    <string name="scanning">Đang tìm kiếm thiết bị...</string>
+    <string name="no_ble_devices">Ko tìm thấy thiết bị hỗ trợ BLE.</string>
+    <string name="connected">Đã kết nối</string>
+    <string name="disconnected">Đã ngắt kết nối</string>
+    <string name="ready">Sẵn sàng</string>
+    <string name="disconnect">Ngắt kết nối</string>
+    <string name="connect">Kết nối</string>
+    <string name="unpair">Hủy ghép đôi</string>
+    <string name="pair">Ghép đôi</string>
     <string name="RadioButton1">Alert level high</string>
     <string name="RadioButton2">Alert level mid</string>
     <string name="RadioButton3">Stop alerting</string>
@@ -135,13 +136,13 @@
     <string name="Readdummy">D Read</string>
     <string name="removeBond">Remove Bond</string>
     <string name="paired">paired</string>
-    <string name="popup_title">Quit nRF UART?</string>
-    <string name="popup_message">Do you want to quit this Application?</string>
+    <string name="popup_title">Thoát khỏi trang?</string>
+    <string name="popup_message">Bạn thật sự muốn thoát khỏi trang?</string>
     <string name="popup_yes">YES</string>
     <string name="popup_no">NO</string>
-    <string name="ble_not_supported">Bluetooth Low Energy not supported</string>
-    <string name="scan">Scan</string>
-    <string name="cancel">Cancel</string>
+    <string name="ble_not_supported">Bluetooth Low Energy không hỗ trợ thiết bị này</string>
+    <string name="scan">Tìm</string>
+    <string name="cancel">Hủy</string>
     <string name="title_activity_graph_report">GraphReport</string>
 
 </resources>

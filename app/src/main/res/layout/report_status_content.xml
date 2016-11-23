@@ -110,6 +110,7 @@
                 android:id="@+id/tvGraph"
                 android:layout_gravity="right"
                 android:textColor="#7bc9c2"
+                android:visibility="gone"
                 android:layout_marginRight="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
