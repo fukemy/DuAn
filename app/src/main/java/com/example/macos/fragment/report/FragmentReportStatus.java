@@ -472,11 +472,16 @@ public class FragmentReportStatus extends CustomFragment {
             }
             order_upload_image = 0;
             List<Uri> listImgUri = new ArrayList<>();
-            for (ImageModel imgUri : uploadData.getListImageData()) {
-                listImgUri.add(Uri.parse(imgUri.getImagePath()));
-            }
+            if(uploadData.getListImageData().size() > 0) {
+                for (ImageModel imgUri : uploadData.getListImageData()) {
+                    listImgUri.add(Uri.parse(imgUri.getImagePath()));
+                }
 
-            new UploadImageData(listImgUri, uploadData).execute();
+                new UploadImageData(listImgUri, uploadData).execute();
+            }else{
+                order_upload_image = 0;
+                new UploadBlueToothData(uploadData.getDaValue().getDataID()).execute();
+            }
         }
     }
     /*
@@ -553,9 +558,9 @@ public class FragmentReportStatus extends CustomFragment {
         @Override
         protected void onPostExecute(final String result) {
             Logger.error("response upload image: " + result);
-            if (result.contains("Image List null")) {
+            if (result.contains("Image List null") || result.contains("imageModel == null")) {
                 //store uri that upload fail
-                failImageData.add(listUri.get(order_upload_image));
+//                failImageData.add(listUri.get(order_upload_image));
             } else {
             }
 
@@ -624,7 +629,7 @@ public class FragmentReportStatus extends CustomFragment {
         @Override
         protected void onPostExecute(final String result) {
             Logger.error("result upload bluetooth: " + result);
-            if (result.contains("Image List null")) {
+            if (result.contains("Image List null") || result.contains("blueToothData.size() == 0")) {
                 //store UUID of bluetooth when upload fail
                 failBlueToothData.add(UUID);
             } else {
