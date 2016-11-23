@@ -384,6 +384,7 @@ public class AcInput extends FragmentActivity {
         EnLocationItem en;
         Location location;
         public GeoDecodeLotaion(Location mLocation){
+            Logger.error("GeoDecodeLotaion:" + mLocation);
             en = new EnLocationItem();
             geocoder = new Geocoder(AcInput.this, Locale.getDefault());
             location = mLocation;
@@ -396,6 +397,7 @@ public class AcInput extends FragmentActivity {
         @Override
         protected EnLocationItem doInBackground(Void... voids) {
             List<Address> addresses;
+            Logger.error("GeoDecodeLotaion:" + "doInBackground");
             try {
                 // Here 1 represent max location result to returned, by documents it recommended 1 to 5
                 addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
@@ -426,11 +428,13 @@ public class AcInput extends FragmentActivity {
         }
 
         @Override
-        protected void onPostExecute(EnLocationItem locationItem) {
-            if(locationItem.getAddress() == null){
+        protected void onPostExecute(EnLocationItem locationItemData) {
+            if(locationItemData.getAddress() == null){
                 addGoogleMapShowcase();
             }else {
-                ((FragmentInputItem) ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
+                locationItem = locationItemData;
+                Logger.error("locationItem: " + locationItem.toString());
+                ((FragmentInputItem) ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItemData);
             }
         }
     }
