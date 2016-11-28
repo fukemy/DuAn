@@ -193,29 +193,32 @@ public class AcICIChecking extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-
-        if (blueToothDatas.size() > 0 && isCreateNewBlueToothData) {
-            isManualDisconnectBluetooth = true;
-            mService.disconnect();
-            final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
-            builder.setTitle("Chú ý");
-            builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
-                    .setCancelable(false)
-                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        public void onClick(final DialogInterface dialog, final int id) {
-                            getToken();
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(final DialogInterface dialog, final int id) {
-                            dialog.cancel();
-                            finish();
-                        }
-                    });
-            final AlertDialog alert = builder.create();
-            alert.show();
-        } else {
-            finish();
+        if(blueToothDatas == null)
+             super.onBackPressed();
+        else {
+            if (blueToothDatas.size() > 0 && isCreateNewBlueToothData) {
+                isManualDisconnectBluetooth = true;
+                mService.disconnect();
+                final AlertDialog.Builder builder = new AlertDialog.Builder(AcICIChecking.this);
+                builder.setTitle("Chú ý");
+                builder.setMessage("Thoát màn hình này sẽ mất hết dữ liệu bạn vừa đo được.\nBạn có muốn upload dữ liệu lên server ko?")
+                        .setCancelable(false)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                getToken();
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            public void onClick(final DialogInterface dialog, final int id) {
+                                dialog.cancel();
+                                finish();
+                            }
+                        });
+                final AlertDialog alert = builder.create();
+                alert.show();
+            } else {
+                finish();
+            }
         }
     }
 
@@ -816,8 +819,8 @@ public class AcICIChecking extends AppCompatActivity {
         super.onResume();
         if (mBtAdapter != null && !mBtAdapter.isEnabled()) {
             Log.e(TAG, "onResume - BT not enabled yet");
-            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+//            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+//            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
     }
 
@@ -865,11 +868,13 @@ public class AcICIChecking extends AppCompatActivity {
             case REQUEST_ENABLE_BT:
                 // When the request to enable Bluetooth returns
                 if (resultCode == Activity.RESULT_OK) {
-                    Toast.makeText(this, "Bluetooth has turned on ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Đã bật bluetooth.", Toast.LENGTH_SHORT).show();
+                    Intent newIntent = new Intent(this, DeviceListActivity.class);
+                    startActivityForResult(newIntent, REQUEST_SELECT_DEVICE);
                 } else {
                     // User did not enable Bluetooth or an error occurred
                     Log.d(TAG, "BT not enabled");
-                    Toast.makeText(this, "Problem in BT Turning ON ", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Có sự cố xảy ra khi bật bluetooth. ", Toast.LENGTH_SHORT).show();
                 }
                 break;
             case ENABLE_LOCATION:
