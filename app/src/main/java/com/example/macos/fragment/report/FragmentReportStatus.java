@@ -608,7 +608,7 @@ public class FragmentReportStatus extends CustomFragment {
             post.setHeader("Accept","application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity("[\n" + gson.toJson(blueToothData) + "\n]", HTTP.UTF_8);
+                StringEntity entityData = new StringEntity(gson.toJson(blueToothData), HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());
@@ -678,7 +678,7 @@ public class FragmentReportStatus extends CustomFragment {
             post.setHeader("Accept","application/json");
             HttpResponse response;
             try {
-                StringEntity entityData = new StringEntity("[\n" + gson.toJson(positionDatas) + "\n]", HTTP.UTF_8);
+                StringEntity entityData = new StringEntity(gson.toJson(positionDatas), HTTP.UTF_8);
                 post.setEntity(entityData);
                 response = httpclient.execute(post);
                 Logger.error("status code:" + response.getStatusLine().toString());

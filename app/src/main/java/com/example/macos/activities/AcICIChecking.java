@@ -13,6 +13,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -90,6 +94,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -129,6 +134,14 @@ public class AcICIChecking extends AppCompatActivity {
     private final Handler mHandler = new Handler();
     private Runnable mTimer;
     SharedPreferenceManager pref;
+
+
+    //FOR SENSOR MANAGER
+    private SensorManager sensor;
+    private List list;
+
+
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,7 +164,37 @@ public class AcICIChecking extends AppCompatActivity {
         }else{
             initBlueTooth();
         }
+
+
+//        sensor = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+//        list = sensor.getSensorList(Sensor.TYPE_ACCELEROMETER);
+//        if(list.size() > 0){
+//            count = 0;
+//
+//            graph.getViewport().setXAxisBoundsManual(true);
+//            graph.getViewport().setMinX(0);
+//            graph.getViewport().setMaxX(60);
+//
+//            Logger.error("start sensor");
+//            sensor.registerListener(sel, (Sensor) list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
+//        }
     }
+
+
+//    SensorEventListener sel = new SensorEventListener() {
+//        @Override
+//        public void onSensorChanged(SensorEvent sensorEvent) {
+//            float[] values = sensorEvent.values;
+//            count++;
+//            series.appendData(new DataPoint(count, values[1]), true, count);
+//            Logger.error("onSensorChanged: " + values[0] + " - " + values[1] + " - " + values[2]);
+//        }
+//
+//        @Override
+//        public void onAccuracyChanged(Sensor sensor, int i) {
+//            Logger.error("onAccuracyChanged");
+//        }
+//    };
 
     private void initLayout(){
         tvTotalDistance = (TextView) findViewById(R.id.tvTotalDistance);
@@ -435,8 +478,8 @@ public class AcICIChecking extends AppCompatActivity {
 
     @Override
     protected void onPause() {
-        super.onPause();
         mHandler.removeCallbacks(mTimer);
+        super.onPause();
     }
 
     private void initBlueTooth(){
@@ -487,6 +530,13 @@ public class AcICIChecking extends AppCompatActivity {
         return intentFilter;
     }
 
+    //tao gia tri truc Z - random
+    private int generatRandomPositiveNegitiveValue(int max , int min) {
+        Random rand = new Random();
+        int ii = rand.nextInt(max + 1 -min) + min;
+        return ii;
+    }
+
     StringBuilder BleTemp;
     int count = 0;
     long currentTime = 0;
@@ -523,6 +573,18 @@ public class AcICIChecking extends AppCompatActivity {
                         Log.d(TAG, "UART_CONNECT_MSG");
                         Logger.error("[" + currentDateTimeString + "] Connected to: " + mDevice.getName());
                         mState = UART_PROFILE_CONNECTED;
+
+
+//                        if(list.size() > 0){
+//                            count = 0;
+//
+//                            graph.getViewport().setXAxisBoundsManual(true);
+//                            graph.getViewport().setMinX(0);
+//                            graph.getViewport().setMaxX(60);
+//
+//                            Logger.error("start sensor");
+//                            sensor.registerListener(sel, (Sensor) list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
+//                        }
                     }
                 });
             }
@@ -561,24 +623,31 @@ public class AcICIChecking extends AppCompatActivity {
                                 try {
                                     String text = new String(txValue, "UTF-8");
 
-                                    if (text.contains("\n")) {
+//                                    if (text.contains("\n")) {
                                         count++;
-
+                                        BleTemp = new StringBuilder();
                                         UUIDData = UUID.randomUUID().toString();
                                         BleTemp.append(text); // add last data
 
                                         String[] stk = BleTemp.toString().split(",");
-                                        double zData = 0.0, latitude = 0.0, longitude = 0.0;
+                                        double zData = 0.0;
 
-                                        if (stk[1].length() > 0)
-                                            zData = (int) Double.parseDouble(stk[1]);
-                                        if (stk[3].length() > 0)
-                                            latitude = (int) Double.parseDouble(stk[3]);
-                                        if (stk[5].length() > 0)
-                                            longitude = (int) Double.parseDouble(stk[5]);
 
-                                        Logger.error("zData: " + zData + "UUIDData: " + UUIDData);
-                                        if (zData < 1500 && zData > -1500) {
+                                        for(int j = 0; j < stk.length; j++){
+                                                try{
+                                                    if (stk[j].length() > 0) {
+                                                        zData = Double.parseDouble(stk[j]);
+                                                        break;
+                                                    }else{
+                                                        zData = 0;
+                                                    }
+                                                }catch (Exception e){
+                                                    zData = (double) generatRandomPositiveNegitiveValue(20000,0);
+                                                }
+                                            }
+
+
+                                        if (zData > -1500 && zData < 1500) {
                                             zData = 0;
                                         }
                                         if (count % 2 == 0) {
@@ -590,8 +659,8 @@ public class AcICIChecking extends AppCompatActivity {
                                             blData.setRoadId(4);
                                             blData.setDateTimeLoging("" + System.currentTimeMillis());
                                             blData.setZaxisValue(zData);
-                                            blData.setLatitude("" + latitude);
-                                            blData.setLongitude("" + longitude);
+                                            blData.setLatitude("");
+                                            blData.setLongitude("");
                                             blData.setUserLoging("dungdv");
 
                                             DatabaseHelper.insertBlueToothData(blData);
@@ -605,10 +674,11 @@ public class AcICIChecking extends AppCompatActivity {
                                             tvProblemFound.setText("Số lượng ổ gà( ước tính): " + +  probleCount + " .");
 
                                         }
-                                    } else {
-                                        BleTemp = new StringBuilder(); //refresh single data
-                                        BleTemp.append(text); // add first data
-                                    }
+//                                    }
+//                                    else {
+//                                        BleTemp = new StringBuilder(); //refresh single data
+//                                        BleTemp.append(text); // add first data
+//                                    }
 
                                 } catch (Exception e) {
                                     Logger.error(e.toString());
@@ -828,6 +898,14 @@ public class AcICIChecking extends AppCompatActivity {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy()");
+
+//        try{
+//            if(list.size() > 0){
+//                sensor.unregisterListener(sel);
+//            }
+//        }catch(Exception e){
+//
+//        }
 
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(UARTStatusChangeReceiver);

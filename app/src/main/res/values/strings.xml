@@ -45,7 +45,7 @@
     <string name="road_name">Tên đường</string>
     <string name="prompt_item">Chọn mục cần nhập </string>
     <string name="enter_infor">Nhập dữ liệu</string>
-    <string name="check_road_flat">Đo độ bằng phẳng ICI</string>
+    <string name="check_road_flat">Đo độ bằng phẳng IRI</string>
     <string name="single_select">Chọn mục đơn giản</string>
     <string name="multi_select">Chọn nhiều mục cùng </string>
 

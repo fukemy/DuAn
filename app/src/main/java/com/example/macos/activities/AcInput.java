@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.UUID;
 
 public class AcInput extends FragmentActivity {
     private final int ENABLE_LOCATION = 1234;
@@ -486,7 +487,7 @@ public class AcInput extends FragmentActivity {
                     Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0);
 
                     PositionData positionData = new PositionData();
-                    positionData.setId(((FragmentInputItem) f).getUUID());
+                    positionData.setId(UUID.randomUUID().toString());
                     positionData.setLattitude("" + location.getLatitude());
                     positionData.setLongitude("" + location.getLongitude());
                     positionData.setLogTime("" + System.currentTimeMillis());

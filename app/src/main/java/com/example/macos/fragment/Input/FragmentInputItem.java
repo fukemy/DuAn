@@ -17,6 +17,8 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -296,14 +298,15 @@ public class FragmentInputItem extends CustomFragment {
                                 BleTemp.append(text); // add last data
 
                                 String[] stk = BleTemp.toString().split(",");
-                                double zData = 0.0, latitude = 0.0, longitude = 0.0;
+                                double zData = 0.0;
+                                String latitude = "", longitude = "";
 
                                 if(stk[1].length() > 0)
                                     zData = (int) Double.parseDouble(stk[1]);
                                 if(stk[3].length() > 0)
-                                    latitude = (int) Double.parseDouble(stk[3]);
+                                    latitude = stk[3];
                                 if(stk[5].length() > 0)
-                                    longitude = (int) Double.parseDouble(stk[5]);
+                                    longitude = stk[5];
 
                                 Logger.error("zData: " + zData + "lat-long: " + latitude + " - " + longitude);
                                 tvGraphData.setText(BleTemp);
