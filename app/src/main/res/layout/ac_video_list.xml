@@ -10,20 +10,33 @@
     <LinearLayout
         android:id="@+id/frmListVideoContainer"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="48dp"
         android:orientation="vertical">
 
-        <TextView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/green"
-            android:gravity="center"
-            android:padding="12dp"
-            android:text="@string/app_title"
-            android:textAllCaps="true"
-            android:textColor="@android:color/white"
-            android:textSize="24dp"
-            android:textStyle="bold" />
+            android:layout_height="48dp"
+            android:background="@color/mainColor">
+
+            <Button
+                android:id="@+id/btnBack"
+                android:layout_width="20dp"
+                android:layout_height="28dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:background="@mipmap/back_button" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:text="@string/app_title"
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="18sp" />
+        </RelativeLayout>
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipeLayout"

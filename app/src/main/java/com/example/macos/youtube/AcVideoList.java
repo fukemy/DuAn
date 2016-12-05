@@ -11,6 +11,8 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -30,7 +32,7 @@ import com.google.android.youtube.player.YouTubePlayerView;
 import java.util.List;
 
 public class AcVideoList extends YouTubeBaseActivity implements
-        YouTubePlayer.OnInitializedListener {
+        YouTubePlayer.OnInitializedListener, View.OnClickListener {
     private static final int RECOVERY_DIALOG_REQUEST = 1234;
     private ListView listView;
     private DraggableView draggableView;
@@ -39,6 +41,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
     private YouTubePlayer youtubePlayer;
     private TextView tvTitle, tvProvider, tvAuthor;
     private SwipeRefreshLayout swipeLayout;
+    private ImageButton btnBack;
     boolean isShowingFullscreen;
     String VIDEO_ID = "";
 
@@ -59,6 +62,8 @@ public class AcVideoList extends YouTubeBaseActivity implements
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
         videoView = (YouTubePlayerView) findViewById(R.id.videoView);
 
+        btnBack = (ImageButton) findViewById(R.id.btnBack);
+        btnBack.setOnClickListener(this);
         videoView.initialize(GlobalParams.YOUTUBE_API_KEY, this);
 
         draggableView = (DraggableView) findViewById(R.id.draggable_view);
@@ -96,6 +101,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
             }
         });
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -215,6 +221,15 @@ public class AcVideoList extends YouTubeBaseActivity implements
             } else {
                 super.onBackPressed();
             }
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.btnBack:
+                onBackPressed();
+                break;
         }
     }
 

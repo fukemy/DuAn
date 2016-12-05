@@ -16,7 +16,7 @@
             android:layout_height="48dp"
             android:background="@color/mainColor">
 
-            <Button
+            <ImageButton
                 android:id="@+id/btnBack"
                 android:layout_width="20dp"
                 android:layout_height="28dp"
