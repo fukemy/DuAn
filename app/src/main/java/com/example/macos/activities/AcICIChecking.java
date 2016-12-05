@@ -2,6 +2,7 @@ package com.example.macos.activities;
 
 import android.animation.LayoutTransition;
 import android.app.Activity;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -54,6 +55,7 @@ import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.WorkaroundMapFragment;
 import com.example.macos.report.GraphReport;
 import com.example.macos.service.UartService;
+import com.example.macos.utilities.AlertUtil;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
@@ -164,37 +166,7 @@ public class AcICIChecking extends AppCompatActivity {
         }else{
             initBlueTooth();
         }
-
-
-//        sensor = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-//        list = sensor.getSensorList(Sensor.TYPE_ACCELEROMETER);
-//        if(list.size() > 0){
-//            count = 0;
-//
-//            graph.getViewport().setXAxisBoundsManual(true);
-//            graph.getViewport().setMinX(0);
-//            graph.getViewport().setMaxX(60);
-//
-//            Logger.error("start sensor");
-//            sensor.registerListener(sel, (Sensor) list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
-//        }
     }
-
-
-//    SensorEventListener sel = new SensorEventListener() {
-//        @Override
-//        public void onSensorChanged(SensorEvent sensorEvent) {
-//            float[] values = sensorEvent.values;
-//            count++;
-//            series.appendData(new DataPoint(count, values[1]), true, count);
-//            Logger.error("onSensorChanged: " + values[0] + " - " + values[1] + " - " + values[2]);
-//        }
-//
-//        @Override
-//        public void onAccuracyChanged(Sensor sensor, int i) {
-//            Logger.error("onAccuracyChanged");
-//        }
-//    };
 
     private void initLayout(){
         tvTotalDistance = (TextView) findViewById(R.id.tvTotalDistance);
@@ -273,12 +245,6 @@ public class AcICIChecking extends AppCompatActivity {
         HttpGet httpget = new HttpGet(GlobalParams.BASED_LOGIN_URL);
         HttpResponse response;
         try {
-//            runOnUiThread(new Runnable() {
-//                @Override
-//                public void run() {
-//
-//                }
-//            });
             response = httpclient.execute(httpget);
             HttpEntity entity = response.getEntity();
             if (entity != null) {
@@ -334,7 +300,6 @@ public class AcICIChecking extends AppCompatActivity {
                 if(dialog.isShowing())
                     dialog.setMessage("Đang upload dữ liệu độ sóc!");
 
-//            blueToothData = DatabaseHelper.getBlueToothDataByID(UUID);
             Logger.error("bluetooth data to upload: " + gson.toJson(blueToothDatas));
         }
 
@@ -406,22 +371,6 @@ public class AcICIChecking extends AppCompatActivity {
         }
     }
     private void initGoogleMap(){
-//        mSupportMapFragment = new SupportMapFragment();
-//        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
-//        trans.add(R.id.mapp, mSupportMapFragment).commit();
-//        getFragmentManager().beginTransaction();
-//
-//        if (mSupportMapFragment != null) {
-//            mSupportMapFragment.getMapAsync(new OnMapReadyCallback() {
-//                @Override
-//                public void onMapReady(GoogleMap googleMap) {
-//                    if (googleMap != null) {
-//                        gMap = googleMap;
-//                    }
-//                }
-//            });
-//        }
-
         gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
         ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
             @Override
@@ -430,22 +379,13 @@ public class AcICIChecking extends AppCompatActivity {
             }
         });
     }
+
     private void initGraphView() {
         graph = (GraphView) findViewById(R.id.graph);
         graph.getViewport().setScrollable(false); // enables horizontal scrolling
         graph.getViewport().setScrollableY(false); // enables vertical scrolling
         graph.getViewport().setScalable(false); // enables horizontal zooming and scrolling
         graph.getViewport().setScalableY(false); // enables vertical zooming and scrollingZ
-
-//        graph.getGridLabelRenderer().setNumHorizontalLabels(5);
-//        graph.getGridLabelRenderer().setNumVerticalLabels(6);
-//
-//        graph.getGridLabelRenderer().setTextSize(12f);
-//
-//        graph.getViewport().setXAxisBoundsManual(true);
-//        graph.getViewport().setMinX(0);
-//        graph.getViewport().setMaxX(60);
-
 
         graph.getViewport().setXAxisBoundsManual(false);
         graph.getGridLabelRenderer().setTextSize(10f);
@@ -540,6 +480,7 @@ public class AcICIChecking extends AppCompatActivity {
     StringBuilder BleTemp;
     int count = 0;
     long currentTime = 0;
+    List<BlueToothData> problemListFound;
     private final BroadcastReceiver UARTStatusChangeReceiver = new BroadcastReceiver() {
 
         public void onReceive(Context context, Intent intent) {
@@ -563,28 +504,18 @@ public class AcICIChecking extends AppCompatActivity {
                         graph.getViewport().setMinX(0);
                         graph.getViewport().setMaxX(60);
 
-
                         isManualDisconnectBluetooth = false;
+                        problemListFound = new ArrayList<>();
+                        BleTemp = new StringBuilder();
+
                         currentTime = System.currentTimeMillis();
                         probleCount = 0;
                         totalDistance = 0;
+                        //still not calculate distance. because the data get is too many in short time
                         tvTotalDistance.setVisibility(View.GONE);
                         String currentDateTimeString = DateFormat.getTimeInstance().format(new Date());
-                        Log.d(TAG, "UART_CONNECT_MSG");
                         Logger.error("[" + currentDateTimeString + "] Connected to: " + mDevice.getName());
                         mState = UART_PROFILE_CONNECTED;
-
-
-//                        if(list.size() > 0){
-//                            count = 0;
-//
-//                            graph.getViewport().setXAxisBoundsManual(true);
-//                            graph.getViewport().setMinX(0);
-//                            graph.getViewport().setMaxX(60);
-//
-//                            Logger.error("start sensor");
-//                            sensor.registerListener(sel, (Sensor) list.get(0), SensorManager.SENSOR_DELAY_NORMAL);
-//                        }
                     }
                 });
             }
@@ -600,7 +531,6 @@ public class AcICIChecking extends AppCompatActivity {
 
                         if(!isManualDisconnectBluetooth)
                             buildAlertConnectBLueToothAgain();
-                        //setUiState();
 
                     }
                 });
@@ -611,76 +541,83 @@ public class AcICIChecking extends AppCompatActivity {
             if (action.equals(UartService.ACTION_GATT_SERVICES_DISCOVERED)) {
                 mService.enableTXNotification();
             }
+
             //*********************//
             if (action.equals(UartService.ACTION_DATA_AVAILABLE)) {
-
-                final byte[] txValue = intent.getByteArrayExtra(UartService.EXTRA_DATA);
                 runOnUiThread(new Runnable() {
                     public void run() {
                         final byte[] txValue = mIntent.getByteArrayExtra(UartService.EXTRA_DATA);
                         runOnUiThread(new Runnable() {
                             public void run() {
                                 try {
-                                    String text = new String(txValue, "UTF-8");
-
-//                                    if (text.contains("\n")) {
+                                    String text = new String(txValue, "UTF-8").replace("\n","");
+                                    Logger.error("text: " + text);
+                                    if(text.contains("ZZ")) {
+                                        BleTemp.append(text);
                                         count++;
-                                        BleTemp = new StringBuilder();
                                         UUIDData = UUID.randomUUID().toString();
-                                        BleTemp.append(text); // add last data
+
+                                        double zData;
+                                        String latitude = "", longtitude = "";
 
                                         String[] stk = BleTemp.toString().split(",");
-                                        double zData = 0.0;
+                                        if (stk.length > 3 && stk[stk.length - 1] != "") {
+                                            zData = Double.parseDouble(stk[1]);
+                                            latitude = stk[2];
+                                            longtitude = stk[4];
+                                        } else {
+                                            zData = Double.parseDouble(stk[1]);
+                                        }
 
+                                        BlueToothData blData = new BlueToothData();
 
-                                        for(int j = 0; j < stk.length; j++){
-                                                try{
-                                                    if (stk[j].length() > 0) {
-                                                        zData = Double.parseDouble(stk[j]);
-                                                        break;
-                                                    }else{
-                                                        zData = 0;
-                                                    }
-                                                }catch (Exception e){
-                                                    zData = (double) generatRandomPositiveNegitiveValue(20000,0);
+                                        blData.setId(UUIDData);
+                                        blData.setRoadId(4);
+                                        blData.setDateTimeLoging("" + System.currentTimeMillis());
+                                        blData.setZaxisValue(zData);
+                                        blData.setLatitude(latitude);
+                                        blData.setLongitude(longtitude);
+                                        blData.setUserLoging("dungdv");
+
+                                        DatabaseHelper.insertBlueToothData(blData);
+                                        blueToothDatas.add(blData);
+
+                                        /**
+                                         * this method increase problem when first found zData > 15000
+                                         * . Then until zData = 0 -> problem increase by 1
+                                         */
+                                        if (zData > 15000) {
+                                            problemListFound.add(blData);
+                                        } else {
+                                            if (zData > -1500 && zData < 1500) {
+                                                zData = 0;
+                                                //Only created new list if currentList is not created
+                                                if (problemListFound.size() > 0) {
+                                                    probleCount++;
+//                                                caculateTheMostOfProblem(problemListFound);
+                                                    problemListFound = new ArrayList<>();
+                                                } else {
                                                 }
+                                            } else {
+                                                //zData < 15000 is not problem. Avoid it
                                             }
-
-
-                                        if (zData > -1500 && zData < 1500) {
-                                            zData = 0;
                                         }
-                                        if (count % 2 == 0) {
-                                            series.appendData(new DataPoint(count, zData / 100), true, count);
 
-                                            BlueToothData blData = new BlueToothData();
-
-                                            blData.setId(UUIDData);
-                                            blData.setRoadId(4);
-                                            blData.setDateTimeLoging("" + System.currentTimeMillis());
-                                            blData.setZaxisValue(zData);
-                                            blData.setLatitude("");
-                                            blData.setLongitude("");
-                                            blData.setUserLoging("dungdv");
-
-                                            DatabaseHelper.insertBlueToothData(blData);
-                                            blueToothDatas.add(blData);
-
-                                            if(zData > 15000)
-                                                probleCount ++;
-                                            if(currentTime != 0)
-                                                tvTime.setText("Tổng thời gian( ước tính): " + calculateAmountOfTime(currentTime, System.currentTimeMillis()) + " phút.");
+                                        if (currentTime != 0)
+                                            tvTime.setText("Tổng thời gian( ước tính): " + calculateAmountOfTime(currentTime, System.currentTimeMillis()) + " phút.");
 //                                            tvTotalDistance.setText(tvTotalDistance.getText() + ": " + (int) totalDistance + " mét.");
-                                            tvProblemFound.setText("Số lượng ổ gà( ước tính): " + +  probleCount + " .");
+                                        tvProblemFound.setText("Số lượng ổ gà( ước tính): " + probleCount + " .");
 
-                                        }
-//                                    }
-//                                    else {
-//                                        BleTemp = new StringBuilder(); //refresh single data
-//                                        BleTemp.append(text); // add first data
-//                                    }
 
+                                        series.appendData(new DataPoint(count, zData / 100), true, count);
+
+                                        //refresh buffer
+                                        BleTemp = new StringBuilder();
+                                    }else{
+                                        BleTemp.append(text); // add last data
+                                    }
                                 } catch (Exception e) {
+                                    tvProblemFound.setText(e.toString());
                                     Logger.error(e.toString());
                                 }
                             }
@@ -690,13 +627,11 @@ public class AcICIChecking extends AppCompatActivity {
             }
             //*********************//
             if (action.equals(UartService.DEVICE_DOES_NOT_SUPPORT_UART)) {
-                //showMessage("Device doesn't support UART. Disconnecting");
                 mService.disconnect();
             }
-
-
         }
     };
+
     //UART service connected/disconnected
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder rawBinder) {
@@ -709,7 +644,6 @@ public class AcICIChecking extends AppCompatActivity {
         }
 
         public void onServiceDisconnected(ComponentName classname) {
-            ////     mService.disconnect(mDevice);
             mService = null;
         }
     };
@@ -803,6 +737,7 @@ public class AcICIChecking extends AppCompatActivity {
         graph.addSeries(series);
 
         tvTotalDistance.setVisibility(View.VISIBLE);
+//        AlertDialog d = AlertUtil.showSimpleAlertWithMessage(this, "Dang nap du lieu");
         while (i < blueToothDatas.size()){
             series.appendData(new DataPoint(i, blueToothDatas.get(i).getZaxisValue()), false, blueToothDatas.size());
 
@@ -814,11 +749,11 @@ public class AcICIChecking extends AppCompatActivity {
             }
 
             if (i == blueToothDatas.size() - 1) {
-//                mHandler.removeCallbacks(mTimer);calculateAmountOfTime
                 tvTime.setText(tvTime.getText() + ": " + (int) calculateAmountOfTime(Long.parseLong(blueToothDatas.get(0).getDateTimeLoging()),
                         Long.parseLong(blueToothDatas.get(i).getDateTimeLoging())) + " phút.");
                 tvTotalDistance.setText(tvTotalDistance.getText() + ": " + (int) totalDistance + " mét.");
                 tvProblemFound.setText(tvProblemFound.getText() + ": " +  probleCount + " .");
+//                d.dismiss();
                 break;
             }else{
                 if(i > 0) {
@@ -836,8 +771,8 @@ public class AcICIChecking extends AppCompatActivity {
 
     private void moveCamera(LatLng latLng){
         CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(latLng)      // Sets the center of the map to location user
-                .zoom(18)                   // Sets the zoom
+                .target(latLng)
+                .zoom(18)
                 .build();
         gMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 10, null);
     }

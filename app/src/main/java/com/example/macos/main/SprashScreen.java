@@ -2,6 +2,7 @@ package com.example.macos.main;
 
 import android.Manifest;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -60,7 +61,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class SprashScreen extends AppCompatActivity {
+public class SprashScreen extends Activity {
 
     private final int SPRASH_TIME = 3000;
     private final int LOGIN_TIME = 1000;
@@ -174,7 +175,7 @@ public class SprashScreen extends AppCompatActivity {
                         last.setTimeInMillis(LAST_LOGIN);
                         Logger.error("DIFF_LAST_LOGIN: " + (now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)));
                         int MAX_LOGIN_TIME = pref.getInt(GlobalParams.MAX_LOGIN_TIME, 9999);
-                        if ((now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > MAX_LOGIN_TIME) {
+                        if (Math.abs(now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > MAX_LOGIN_TIME) {
                             showLogin();
                         } else {
                             final Intent in = new Intent(SprashScreen.this, MainScreen.class);
