@@ -138,7 +138,13 @@
         <activity
             android:name="com.example.macos.report.GraphReport"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme"/>
+            android:theme="@style/AppTheme" />
+
+        <activity
+            android:name="com.example.macos.youtube.AcVideoList"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen"/>
     </application>
 
 </manifest>

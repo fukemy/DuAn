@@ -26,4 +26,10 @@
     <color name="background_dark">#ffb8860b</color>
     <color name="background_light">#ffd2b48c</color>
     <color name="transparent">#00b8860b</color>
+    <color name="black">#FF000000</color>
+    <color name="blue">#0033CC</color>
+    <color name="green">#006600</color>
+    <color name="red">#BB0000</color>
+    <color name="yellow">#FFFF33</color>
+    <color name="background">#FFFACD</color>
 </resources>

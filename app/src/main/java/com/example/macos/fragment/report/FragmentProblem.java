@@ -59,8 +59,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
-import com.gun0912.tedpicker.Config;
-import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
 
@@ -207,12 +205,6 @@ public class FragmentProblem  extends CustomFragment {
             @Override
             public void onClick(View v) {
                 takePhoto(ORDER_CAMERA_POSITION);
-            }
-        });
-        imgGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takeMultiPhoto(ORDER_CAMERA_POSITION);
             }
         });
         imgSpeak.setOnClickListener(new View.OnClickListener() {
@@ -701,20 +693,6 @@ public class FragmentProblem  extends CustomFragment {
             startActivityForResult(in, SHOW_IMAGE);
         }
     }
-    private void takeMultiPhoto(int pos){
-        ORDER_CAMERA_POSITION = pos;
-
-        Config config = new Config();
-        config.setSelectionLimit(4);
-        ImagePickerActivity.setConfig(config);
-
-        Intent intent  = new Intent(getContext(), ImagePickerActivity.class);
-        try {
-            startActivityForResult(intent, CHOOSEN_PICTURE);
-        }catch (Exception e){
-            Toast.makeText(getActivity() , "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     public void takePhoto(int pos) {
         ORDER_CAMERA_POSITION = pos;
@@ -774,44 +752,6 @@ public class FragmentProblem  extends CustomFragment {
                             viewingImage = null;
                         }
                     }
-                }
-                break;
-            case CHOOSEN_PICTURE:
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    ArrayList<Uri>  imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
-                    LinearLayout lnlHorizontal = null;
-                    int i = 0;
-                    if(imageUriList.size() > 0)
-                        for (Uri selectedImage : imageUriList) {
-                            i++;
-                            if(i == 1){
-                                lnlHorizontal = new LinearLayout(getActivity());
-                                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(rootView.findViewById(R.id.mapp).getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
-                                lParams.gravity = Gravity.CENTER_HORIZONTAL;
-                                lnlHorizontal.setLayoutParams(lParams);
-                                lnlHorizontal.setLayoutTransition(new LayoutTransition());
-                                ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.imagelist)).addView(lnlHorizontal);
-                            }
-                            getActivity().getContentResolver().notifyChange(selectedImage, null);
-                            selectedImage = Uri.parse("file://" + selectedImage);
-                            try {
-                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
-                                int size = rootView.findViewById(R.id.viewNull).getWidth();
-                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
-                                ImageView img = new ImageView(getActivity());
-                                img.setImageBitmap(decodedBitmap);
-                                img.setTag(selectedImage.toString());
-                                lnlHorizontal.addView(img);
-                                uriStringList.add(selectedImage.toString());
-
-                                addTouchListenerImage(img);
-                            } catch (Exception e) {
-                                Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            }
-                            if(i == 3)
-                                i = 0;
-                        }
                 }
                 break;
         }

@@ -70,8 +70,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
-import com.gun0912.tedpicker.Config;
-import com.gun0912.tedpicker.ImagePickerActivity;
 import com.mlsdev.rximagepicker.RxImagePicker;
 import com.mlsdev.rximagepicker.Sources;
 import com.sackcentury.shinebuttonlib.ShineButton;
@@ -255,12 +253,7 @@ public class FragmentAccident extends CustomFragment {
                 takeVideo(ORDER_CAMERA_POSITION);
             }
         });
-        imgGallery.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takeMultiPhoto(ORDER_CAMERA_POSITION);
-            }
-        });
+
         imgSpeak.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -838,22 +831,6 @@ public class FragmentAccident extends CustomFragment {
         }
     }
 
-    private void takeMultiPhoto(int pos) {
-        ORDER_CAMERA_POSITION = pos;
-
-        Config config = new Config();
-        config.setSelectionLimit(4);
-        ImagePickerActivity.setConfig(config);
-
-        Intent intent = new Intent(getContext(), ImagePickerActivity.class);
-        try {
-            Toast.makeText(getActivity(), "Đang khởi động camera, xin chờ 1 chút cho đến khi thông báo này tắt đi!", Toast.LENGTH_SHORT).show();
-            startActivityForResult(intent, CHOOSEN_PICTURE);
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
     public void takePhoto(int pos) {
         ORDER_CAMERA_POSITION = pos;
 
@@ -932,57 +909,6 @@ public class FragmentAccident extends CustomFragment {
                     }
                 }
                 break;
-            case CHOOSEN_PICTURE:
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    ArrayList<Uri> imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
-                    LinearLayout lnlHorizontal = null;
-                    int i = 0;
-                    if (imageUriList.size() > 0)
-                        for (Uri selectedImage : imageUriList) {
-                            i++;
-                            if (i == 1) {
-                                lnlHorizontal = new LinearLayout(getActivity());
-                                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(rootView.findViewById(R.id.mapp).getWidth(), LinearLayout.LayoutParams.WRAP_CONTENT);
-                                lParams.gravity = Gravity.CENTER_HORIZONTAL;
-                                lnlHorizontal.setLayoutParams(lParams);
-                                lnlHorizontal.setLayoutTransition(new LayoutTransition());
-                                ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.imagelist)).addView(lnlHorizontal);
-                            }
-                            selectedImage = Uri.parse("file://" + selectedImage);
-                            getActivity().getContentResolver().notifyChange(selectedImage, null);
-                            try {
-                                int size = rootView.findViewById(R.id.viewNull).getWidth();
-                                final ImageView img = new ImageView(getActivity());
-                                img.setLayoutParams(new ViewGroup.LayoutParams(size / 3, size / 3));
-                                img.setScaleType(ImageView.ScaleType.FIT_XY);
-                                img.setTag(selectedImage.toString());
-                                lnlHorizontal.addView(img);
-
-                                Picasso.with(getActivity())
-                                        .load(selectedImage)
-                                        .fit()
-                                        .into(img, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                addTouchListenerImage(img);
-                                                addImageShowcase(img);
-                                            }
-
-                                            @Override
-                                            public void onError() {
-
-                                            }
-                                        });
-                            } catch (Exception e) {
-                                Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            }
-                            if (i == 3)
-                                i = 0;
-                        }
-                }
-                break;
-
             case ACTION_TAKE_VIDEO:
                 if (resultCode == Activity.RESULT_OK && data != null) {
                     final Uri uri = data.getData();

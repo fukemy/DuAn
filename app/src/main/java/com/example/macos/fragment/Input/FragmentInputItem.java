@@ -73,8 +73,6 @@ import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.gson.Gson;
-import com.gun0912.tedpicker.Config;
-import com.gun0912.tedpicker.ImagePickerActivity;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -647,12 +645,6 @@ public class FragmentInputItem extends CustomFragment {
             }
         });
 
-        imgGaleryRoadName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                takeMultiPhoto(ORDER_CAMERA_POSITION);
-            }
-        });
 
         imgVideo.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -764,22 +756,6 @@ public class FragmentInputItem extends CustomFragment {
     private final int REQ_CODE_SPEECH_INPUT = 2;
     private final int CHOOSEN_PICTURE = 3;
     private final int SHOW_IMAGE = 5;
-
-    private void takeMultiPhoto(int pos) {
-        ORDER_CAMERA_POSITION = pos;
-
-        Config config = new Config();
-        config.setSelectionLimit(4);
-        ImagePickerActivity.setConfig(config);
-
-        Intent intent = new Intent(getContext(), ImagePickerActivity.class);
-        try {
-            Toast.makeText(getActivity(), "Đang khởi động camera, xin chờ 1 chút cho đến khi thông báo này tắt đi!", Toast.LENGTH_SHORT).show();
-            startActivityForResult(intent, CHOOSEN_PICTURE);
-        } catch (Exception e) {
-            Toast.makeText(getActivity(), "Mở camera thất bại, có thể do hệ thống không hỗ trợ camera của phần mềm!", Toast.LENGTH_SHORT).show();
-        }
-    }
 
     private void takeVideo(int pos) {
         Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
@@ -898,65 +874,6 @@ public class FragmentInputItem extends CustomFragment {
                     }
                 }
                 break;
-            case CHOOSEN_PICTURE:
-                if (resultCode == Activity.RESULT_OK && data != null) {
-                    ArrayList<Uri> imageUriList = data.getParcelableArrayListExtra(ImagePickerActivity.EXTRA_IMAGE_URIS);
-                    LinearLayout lnlHorizontal = null;
-                    int i = 0;
-                    if (imageUriList.size() > 0)
-                        for (Uri selectedImage : imageUriList) {
-                            i++;
-                            if (i == 1) {
-                                lnlHorizontal = new LinearLayout(getActivity());
-                                LinearLayout.LayoutParams lParams = new LinearLayout.LayoutParams(rootView.findViewById(R.id.viewNull).getWidth(),
-                                        LinearLayout.LayoutParams.WRAP_CONTENT);
-                                lParams.gravity = Gravity.CENTER;
-                                lnlHorizontal.setLayoutParams(lParams);
-                                lnlHorizontal.setLayoutTransition(new LayoutTransition());
-                                ((LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.lnlFirstPlan)).addView(lnlHorizontal);
-                            }
-
-                            selectedImage = Uri.parse("file://" + selectedImage);
-                            try {
-
-                                int size = rootView.findViewById(R.id.viewNull).getWidth();
-//                                Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), selectedImage);
-//                                Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
-
-                                final ImageView img = new ImageView(getActivity());
-                                img.setLayoutParams(new ViewGroup.LayoutParams(size / 3, size / 3));
-                                img.setScaleType(ImageView.ScaleType.FIT_XY);
-//                                img.setImageBitmap(decodedBitmap);
-                                img.setTag(selectedImage.toString());
-                                lnlHorizontal.addView(img);
-
-//                                helper.applyImage(getActivity(), img, selectedImage);
-                                Picasso.with(getActivity())
-                                        .load(selectedImage) // Uri of the picture
-                                        .fit()
-                                        .into(img, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                addTouchListenerImage(img);
-                                                addImageShowcase(img);
-                                            }
-
-                                            @Override
-                                            public void onError() {
-
-                                            }
-                                        });
-
-                            } catch (Exception e) {
-                                Toast.makeText(getActivity(), "Failed to load", Toast.LENGTH_SHORT).show();
-                                e.printStackTrace();
-                            }
-                            if (i == 3)
-                                i = 0;
-                        }
-                }
-                break;
-
 
             case REQUEST_SELECT_DEVICE:
                 //When the DeviceListActivity return, with the selected device address

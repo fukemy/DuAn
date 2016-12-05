@@ -72,7 +72,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.gson.Gson;
-import com.gun0912.tedpicker.ImagePickerActivity;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -617,8 +616,9 @@ public class AcICIChecking extends AppCompatActivity {
                                         BleTemp.append(text); // add last data
                                     }
                                 } catch (Exception e) {
-                                    tvProblemFound.setText(e.toString());
                                     Logger.error(e.toString());
+                                    //refresh buffer
+                                    BleTemp = new StringBuilder();
                                 }
                             }
                         });

@@ -1,6 +1,8 @@
 package com.example.macos.main;
 
+import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.multidex.MultiDex;
 
 import com.example.macos.database.DaoMaster;
 import com.example.macos.database.DaoSession;
@@ -26,5 +28,11 @@ public class Application extends android.app.Application {
         daoSession = daoMaster.newSession();
 
         instance = this;
+    }
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(base);
+        MultiDex.install(this);
     }
 }

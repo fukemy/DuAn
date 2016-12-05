@@ -49,6 +49,7 @@ import com.example.macos.utilities.CustomFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
+import com.example.macos.youtube.AcVideoList;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.gson.Gson;
 
@@ -615,6 +616,10 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         } else if (id == R.id.nav_ici) {
             Intent in = new Intent(MainScreen.this, AcICIChecking.class);
+            startActivity(in);
+
+        } else if (id == R.id.nav_video) {
+            Intent in = new Intent(MainScreen.this, AcVideoList.class);
             startActivity(in);
 
         } else if (id == R.id.nav_logout) {
