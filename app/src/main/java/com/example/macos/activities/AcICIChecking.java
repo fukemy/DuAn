@@ -38,6 +38,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -105,7 +106,7 @@ import java.util.UUID;
 public class AcICIChecking extends AppCompatActivity {
     private TextView tvTotalDistance, tvProblemFound, tvTime;
     private ScrollView scrollContainer;
-    private Button btnBack;
+    private ImageButton btnBack;
     private GraphView graph;
     private LineGraphSeries<DataPoint> series;
     private final int ENABLE_LOCATION = 1234;;
@@ -174,7 +175,7 @@ public class AcICIChecking extends AppCompatActivity {
         scrollContainer = (ScrollView) findViewById(R.id.scrollContainer);
 
 
-        btnBack = (Button) findViewById(R.id.btnBack);
+        btnBack = (ImageButton) findViewById(R.id.btnBack);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -560,7 +561,7 @@ public class AcICIChecking extends AppCompatActivity {
                                         String latitude = "", longtitude = "";
 
                                         String[] stk = BleTemp.toString().split(",");
-                                        if (stk.length > 3 && stk[stk.length - 1] != "") {
+                                        if (stk.length > 4) {
                                             zData = Double.parseDouble(stk[1]);
                                             latitude = stk[2];
                                             longtitude = stk[4];

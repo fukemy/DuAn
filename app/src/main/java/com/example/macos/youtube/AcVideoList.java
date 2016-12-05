@@ -21,6 +21,7 @@ import com.example.macos.adapter.VideoListAdapter;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnVideoItem;
 import com.example.macos.interfaces.iYoutubeQuery;
+import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.GlobalParams;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggableView;
@@ -85,7 +86,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
             public void onMinimized() {
                 draggableView.setAlpha(1.0f);
                 draggableView.bringToFront();
-                isShowingFullscreen = false;
                 if(youtubePlayer.isPlaying()){
                     youtubePlayer.pause();
                 }
@@ -207,7 +207,8 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
     @Override
     public void onBackPressed() {
-        if(VIDEO_ID != ""){
+        if(VIDEO_ID == ""){
+            Logger.error("VIDEO_ID: " + VIDEO_ID);
             //first show home screen
             super.onBackPressed();
         }else {
@@ -215,10 +216,13 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 if (isShowingFullscreen == true) {
                     isShowingFullscreen = false;
                     youtubePlayer.setFullscreen(false);
+                    Logger.error("youtubePlayer.setFullscreen(false);");
                 } else {
                     draggableView.minimize();
+                    Logger.error("draggableView.minimize()");
                 }
             } else {
+                Logger.error("onBackPressed");
                 super.onBackPressed();
             }
         }
