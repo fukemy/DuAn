@@ -144,7 +144,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
         if (errorReason.isUserRecoverableError()) {
             errorReason.getErrorDialog(this, RECOVERY_DIALOG_REQUEST).show();
         } else {
-            String errorMessage = String.format("YouTube Error (%1$s)",
+            String errorMessage = String.format("YouTube InitializationFailure Error (%1$s)",
                     errorReason.toString());
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         }
