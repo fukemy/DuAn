@@ -371,11 +371,16 @@ public class AcICIChecking extends AppCompatActivity {
         }
     }
     private void initGoogleMap(){
-        gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
-        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onTouch() {
-                scrollContainer.requestDisallowInterceptTouchEvent(true);
+            public void onMapReady(GoogleMap googleMap) {
+                gMap = googleMap;
+                ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+                    @Override
+                    public void onTouch() {
+                        scrollContainer.requestDisallowInterceptTouchEvent(true);
+                    }
+                });
             }
         });
     }

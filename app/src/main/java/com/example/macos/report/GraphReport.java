@@ -27,6 +27,7 @@ import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.WorkaroundMapFragment;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.Marker;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
@@ -120,42 +121,46 @@ public class GraphReport extends AppCompatActivity {
 
     LinearLayout infoWindow;
     private void initMap(){
-        gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
-        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onTouch() {
+            public void onMapReady(GoogleMap googleMap) {
+                gMap = googleMap;
+                ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+                    @Override
+                    public void onTouch() {
+                        if(gMap != null){
+                            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                                public View getInfoWindow(Marker arg0) {
+                                    return null;
+                                }
+
+                                @Override
+                                public View getInfoContents(Marker marker) {
+
+                                    infoWindow = new LinearLayout(GraphReport.this);
+                                    infoWindow.setOrientation(LinearLayout.VERTICAL);
+
+                                    TextView title = new TextView(GraphReport.this);
+                                    title.setTextColor(Color.BLACK);
+                                    title.setGravity(Gravity.CENTER);
+                                    title.setTypeface(null, Typeface.BOLD);
+                                    title.setText(marker.getTitle());
+
+                                    TextView snippet = new TextView(GraphReport.this);
+                                    snippet.setTextColor(Color.GRAY);
+                                    snippet.setText(marker.getSnippet());
+
+                                    infoWindow.addView(title);
+                                    infoWindow.addView(snippet);
+                                    return infoWindow;
+                                }
+                            });
+
+                        }
+                    }
+                });
             }
         });
-
-        if(gMap != null){
-            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-                public View getInfoWindow(Marker arg0) {
-                    return null;
-                }
-
-                @Override
-                public View getInfoContents(Marker marker) {
-
-                    infoWindow = new LinearLayout(GraphReport.this);
-                    infoWindow.setOrientation(LinearLayout.VERTICAL);
-
-                    TextView title = new TextView(GraphReport.this);
-                    title.setTextColor(Color.BLACK);
-                    title.setGravity(Gravity.CENTER);
-                    title.setTypeface(null, Typeface.BOLD);
-                    title.setText(marker.getTitle());
-
-                    TextView snippet = new TextView(GraphReport.this);
-                    snippet.setTextColor(Color.GRAY);
-                    snippet.setText(marker.getSnippet());
-
-                    infoWindow.addView(title);
-                    infoWindow.addView(snippet);
-                    return infoWindow;
-                }
-            });
-
-        }
     }
 
 

@@ -189,44 +189,50 @@ public class DiaryReportContent extends AppCompatActivity {
 
     LinearLayout infoWindow;
     private void initMap(){
-        gMap = ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMap();
-        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onTouch() {
-                scrollContainer.requestDisallowInterceptTouchEvent(true);
+            public void onMapReady(GoogleMap googleMap) {
+                gMap = googleMap;
+                ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+                    @Override
+                    public void onTouch() {
+                        scrollContainer.requestDisallowInterceptTouchEvent(true);
+                        if(gMap != null){
+                            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                                public View getInfoWindow(Marker arg0) {
+                                    return null;
+                                }
+
+                                @Override
+                                public View getInfoContents(Marker marker) {
+
+                                    infoWindow = new LinearLayout(DiaryReportContent.this);
+                                    infoWindow.setOrientation(LinearLayout.VERTICAL);
+
+                                    TextView title = new TextView(DiaryReportContent.this);
+                                    title.setTextColor(Color.BLACK);
+                                    title.setGravity(Gravity.CENTER);
+                                    title.setTypeface(null, Typeface.BOLD);
+                                    title.setText(marker.getTitle());
+
+                                    TextView snippet = new TextView(DiaryReportContent.this);
+                                    snippet.setTextColor(Color.GRAY);
+                                    snippet.setText(marker.getSnippet());
+
+                                    infoWindow.addView(title);
+                                    infoWindow.addView(snippet);
+                                    return infoWindow;
+                                }
+                            });
+
+                            drawRoadTestProgress();
+                        }
+                    }
+                });
             }
         });
 
-        if(gMap != null){
-            gMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
-                public View getInfoWindow(Marker arg0) {
-                    return null;
-                }
 
-                @Override
-                public View getInfoContents(Marker marker) {
-
-                    infoWindow = new LinearLayout(DiaryReportContent.this);
-                    infoWindow.setOrientation(LinearLayout.VERTICAL);
-
-                    TextView title = new TextView(DiaryReportContent.this);
-                    title.setTextColor(Color.BLACK);
-                    title.setGravity(Gravity.CENTER);
-                    title.setTypeface(null, Typeface.BOLD);
-                    title.setText(marker.getTitle());
-
-                    TextView snippet = new TextView(DiaryReportContent.this);
-                    snippet.setTextColor(Color.GRAY);
-                    snippet.setText(marker.getSnippet());
-
-                    infoWindow.addView(title);
-                    infoWindow.addView(snippet);
-                    return infoWindow;
-                }
-            });
-
-            drawRoadTestProgress();
-        }
     }
 
     private void drawRoadTestProgress(){

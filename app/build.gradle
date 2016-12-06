@@ -30,8 +30,8 @@ dependencies {
     compile 'de.greenrobot:greendao:2.1.0'
     compile ('com.android.support:support-v4:23.4.0')
     compile 'com.android.support:design:23.4.0'
-    compile 'com.google.android.gms:play-services-maps:6.5.87'
-    compile 'com.google.android.gms:play-services-location:6.5.87'
+    compile 'com.google.android.gms:play-services-maps:10.0.1'
+    compile 'com.google.android.gms:play-services-location:10.0.1'
     compile 'com.github.douglasjunior.BetterSpinner:library-material:bugfix-1.1.0-2'
 //    compile 'com.github.ParkSangGwon:TedPicker:v1.0.10' //for camera dialog
     compile 'com.mlsdev.rximagepicker:library:1.2.1'
@@ -48,4 +48,6 @@ dependencies {
     compile 'com.google.apis:google-api-services-youtube:v3-rev176-1.22.0' //youtube client
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.github.pedrovgs:draggablepanel:1.9' //dragpanel like youtube
+    compile 'com.sothree.slidinguppanel:library:3.3.1' // sliding up layout
+    compile 'com.truizlop.fabreveallayout:library:1.0.0' //https://github.com/truizlop/FABRevealLayout
 }

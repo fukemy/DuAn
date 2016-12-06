@@ -1,5 +1,6 @@
 package com.example.macos.youtube;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -8,9 +9,11 @@ import android.graphics.Point;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
+import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -25,12 +28,23 @@ import com.example.macos.interfaces.iYoutubeQuery;
 import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.SlidingUpPaneLayout;
 import com.example.macos.utilities.GlobalParams;
+import com.example.macos.utilities.Utilities;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggableView;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+import com.google.android.gms.maps.MapsInitializer;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.youtube.player.YouTubeBaseActivity;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.util.List;
 
@@ -42,10 +56,13 @@ public class AcVideoList extends YouTubeBaseActivity implements
     private VideoListAdapter adapter;
     private YouTubePlayerView videoView;
     private YouTubePlayer youtubePlayer;
-    private TextView tvTitle, tvProvider, tvAuthor;
+    private TextView tvTitle, tvProvider, tvAuthor, tvLocation;
     private SwipeRefreshLayout swipeLayout;
     private ImageButton btnBack;
-    private LinearLayout topviewSlide, bottomViewSlide;
+    private SlidingUpPanelLayout slidingLayout;
+    private MapView mMapView;
+    private GoogleMap googleMap;
+
     boolean isShowingFullscreen;
     String VIDEO_ID = "";
 
@@ -56,7 +73,49 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
         initView();
         populateData();
+
+        mMapView = (MapView) findViewById(R.id.mapView);
+        mMapView.onCreate(savedInstanceState);
+
+        try {
+            MapsInitializer.initialize(this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mMapView.getMapAsync(new OnMapReadyCallback() {
+            @Override
+            public void onMapReady(GoogleMap mMap) {
+                Logger.error("onmapReady");
+                googleMap = mMap;
+                //config google map
+                googleMap.getUiSettings().setAllGesturesEnabled(false);
+                googleMap.setMyLocationEnabled(false);
+
+                //config style
+
+                try {
+                    // Customise the styling of the base map using a JSON object defined
+                    // in a raw resource file.
+                    boolean success = googleMap.setMapStyle(
+                            MapStyleOptions.loadRawResourceStyle(AcVideoList.this, R.raw.style_json));
+
+                    if (!success) {
+                        Logger.error("Style parsing failed.");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Logger.error("Can't find style. Error: ");
+                }
+
+
+                LatLng sydney = new LatLng(10.795541, 106.795195);
+                googleMap.addMarker(new MarkerOptions().position(sydney).title("TEST").snippet("Test"));
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(18).build();
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            }
+        });
     }
+
 
     private void initView(){
         swipeLayout = (SwipeRefreshLayout) findViewById(R.id.swipeLayout);
@@ -64,6 +123,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvProvider = (TextView) findViewById(R.id.tvProvider);
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
+        tvLocation = (TextView) findViewById(R.id.tvLocation);
         videoView = (YouTubePlayerView) findViewById(R.id.videoView);
 
         btnBack = (ImageButton) findViewById(R.id.btnBack);
@@ -75,52 +135,28 @@ public class AcVideoList extends YouTubeBaseActivity implements
         draggableView.setClickToMaximizeEnabled(true);
         draggableView.setClickToMinimizeEnabled(false);
 
-        final float density = getResources().getDisplayMetrics().density;
-        SlidingUpPaneLayout slidingUpPaneLayout = (SlidingUpPaneLayout) findViewById(R.id.sliding_up_layout);
-        bottomViewSlide = (LinearLayout) findViewById(R.id.bottom_view);
-        topviewSlide = (LinearLayout) findViewById(R.id.top_view);
-        slidingUpPaneLayout.setParallaxDistance((int) (200 * density));
-        slidingUpPaneLayout.setShadowResourceTop(R.drawable.shadow_top);
-        slidingUpPaneLayout.setPanelSlideListener(new SlidingUpPaneLayout.PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-            }
+        slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
 
+        slidingLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
-            public void onPanelOpened(View panel) {
-                Logger.error("onPanelOpened");
-                bottomViewSlide.setVisibility(View.VISIBLE);
-                bottomViewSlide.setAlpha(1);
-                bottomViewSlide.setBackgroundColor(getResources().getColor(R.color.mainColor60));
-
-            }
-
-            @Override
-            public void onPanelClosed(View panel) {
-                Logger.error("onPanelClosed");
-                topviewSlide.setAlpha(1);
-                topviewSlide.setBackgroundColor(Color.parseColor("#009588"));
+            public void onGlobalLayout() {
+                if(slidingLayout.getLayoutParams().height != getResources().getDisplayMetrics().heightPixels - videoView.getHeight()) {
+                    slidingLayout.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels - videoView.getHeight();
+//                    slidingLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                }
             }
         });
-
-        /**
-         * limit scroll zone to 32dp, if you want whole view can scroll
-         * just ignore this method, don't call it
-         */
-//        slidingUpPaneLayout.setEdgeSize((int) (density * 32));
-        slidingUpPaneLayout.openPane();
 
         draggableView.setDraggableListener(new DraggableListener() {
             @Override
             public void onMaximized() {
                 draggableView.bringToFront();
                 isShowingFullscreen = false;
-                bottomViewSlide.setVisibility(View.VISIBLE);
-                bottomViewSlide.setAlpha(1);
-                bottomViewSlide.setBackgroundColor(getResources().getColor(R.color.mainColor60));
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 if(!youtubePlayer.isPlaying()){
                     youtubePlayer.play();
                 }
+
             }
 
             @Override
@@ -185,7 +221,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
         if (errorReason.isUserRecoverableError()) {
             errorReason.getErrorDialog(this, RECOVERY_DIALOG_REQUEST).show();
         } else {
-            String errorMessage = String.format("YouTube InitializationFailure Error (%1$s)",
+            String errorMessage = String.format("Lỗi khởi động youtube (%1$s)",
                     errorReason.toString());
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
         }
@@ -249,7 +285,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
     @Override
     public void onBackPressed() {
         if(VIDEO_ID == ""){
-            Logger.error("VIDEO_ID: " + VIDEO_ID);
             //first show home screen
             super.onBackPressed();
         }else {
@@ -257,16 +292,19 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 if (isShowingFullscreen == true) {
                     isShowingFullscreen = false;
                     youtubePlayer.setFullscreen(false);
-                    Logger.error("youtubePlayer.setFullscreen(false);");
                 } else {
                     draggableView.minimize();
-                    Logger.error("draggableView.minimize()");
                 }
             } else {
-                Logger.error("onBackPressed");
                 super.onBackPressed();
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        mMapView.onDestroy();
+        super.onDestroy();
     }
 
     @Override

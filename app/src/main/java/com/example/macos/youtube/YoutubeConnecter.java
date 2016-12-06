@@ -93,7 +93,7 @@ public class YoutubeConnecter {
                     item.setSnippet(result.getSnippet().toPrettyString());
                     items.add(item);
 
-                    Logger.error("found video: " + item.toString());
+//                    Logger.error("found video: " + item.toString());
                 }
             }catch(Exception e){
                 e.printStackTrace();
