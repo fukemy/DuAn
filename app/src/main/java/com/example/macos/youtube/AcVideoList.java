@@ -214,17 +214,42 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 Location caoTocLongThanhLocation = new Location("");
                 caoTocLongThanhLocation.setLatitude(caoTocLongThanhLatlng.latitude);
                 caoTocLongThanhLocation.setLongitude(caoTocLongThanhLatlng.longitude);
+
+
+                tvLocation.setText("");
                 new LocationHelper().getLocationDetail(AcVideoList.this, caoTocLongThanhLocation, new iLocationUpdate() {
                     @Override
                     public void updateLocation(EnLocationItem lo) {
-                        String address = lo.getAddress().trim().replace("\n", ", ");
-                        tvLocation.setText(getResources().getString(R.string.vitri) + ": " + address + ".");
+                        final String address = lo.getAddress().trim().replace("\n", ", ");
+                        ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
+                                .translationY(100, 0)
+                                .alpha(0.5f,1f)
+                                .accelerate()
+                                .onStart(new AnimationListener.Start() {
+                                    @Override
+                                    public void onStart() {
+                                        tvLocation.setText(getResources().getString(R.string.vitri) + ": " + address + ".");
+                                    }
+                                })
+                                .duration(500)
+                                .start();
 
                     }
 
                     @Override
                     public void onFailGetLocation() {
-                        tvLocation.setText(getResources().getString(R.string.vitri) + ": N/A");
+                        ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
+                                .translationY(100, 0)
+                                .alpha(0.5f,1f)
+                                .accelerate()
+                                .onStart(new AnimationListener.Start() {
+                                    @Override
+                                    public void onStart() {
+                                        tvLocation.setText(getResources().getString(R.string.vitri) + ": N/A");
+                                    }
+                                })
+                                .duration(500)
+                                .start();
                     }
                 });
                 draggableView.setVisibility(View.VISIBLE);
@@ -256,12 +281,11 @@ public class AcVideoList extends YouTubeBaseActivity implements
         fabRevealLayout.setOnRevealChangeListener(new OnRevealChangeListener() {
             @Override
             public void onMainViewAppeared(FABRevealLayout fabRevealLayout, View mainView) {
-                
+
             }
 
             @Override
             public void onSecondaryViewAppeared(final FABRevealLayout fabRevealLayout, View secondaryView) {
-//                AnimationControl.scaleWithBounceAnimation(AcVideoList.this, findViewById(R.id.tv_second_view_fabreveal));
                 ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
                         .scaleY(0f, 1.2f, 1f)
                         .scaleX(0f, 1.4f, 1f)
