@@ -493,7 +493,7 @@ public class AcInput extends FragmentActivity {
                     positionData.setLogTime("" + System.currentTimeMillis());
                     positionData.setUserName(pref.getString(GlobalParams.USERNAME, "User"));
 
-//                Logger.error("save position update: " + positionData);
+                    Logger.error("save position update: " + positionData);
 
                     //MOVE CAMERA
                     DatabaseHelper.insertPositionData(positionData);

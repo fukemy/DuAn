@@ -22,6 +22,7 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnVideoItem;
 import com.example.macos.interfaces.iYoutubeQuery;
 import com.example.macos.libraries.Logger;
+import com.example.macos.libraries.SlidingUpPaneLayout;
 import com.example.macos.utilities.GlobalParams;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggableView;
@@ -71,6 +72,20 @@ public class AcVideoList extends YouTubeBaseActivity implements
         draggableView.setVisibility(View.GONE);
         draggableView.setClickToMaximizeEnabled(true);
         draggableView.setClickToMinimizeEnabled(false);
+
+        final float density = getResources().getDisplayMetrics().density;
+        SlidingUpPaneLayout slidingUpPaneLayout = (SlidingUpPaneLayout) findViewById(R.id.sliding_up_layout);
+        slidingUpPaneLayout.setParallaxDistance((int) (200 * density));
+        slidingUpPaneLayout.setShadowResourceTop(R.drawable.shadow_top);
+
+        /**
+         * limit scroll zone to 32dp, if you want whole view can scroll
+         * just ignore this method, don't call it
+         */
+//        slidingUpPaneLayout.setEdgeSize((int) (density * 32));
+
+        slidingUpPaneLayout.openPane();
+
 
         draggableView.setDraggableListener(new DraggableListener() {
             @Override

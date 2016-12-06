@@ -47,9 +47,9 @@
 
             <ListView
                 android:id="@+id/list_view"
-                android:scrollbars="none"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent"
+                android:scrollbars="none" />
         </android.support.v4.widget.SwipeRefreshLayout>
 
     </LinearLayout>
@@ -60,7 +60,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:background="@color/black"
-        draggable_view:bottom_view_id="@+id/ll"
+        draggable_view:bottom_view_id="@+id/sliding_up_layout"
         draggable_view:enable_minimized_horizontal_alpha_effect="true"
         draggable_view:top_view_height="200dp"
         draggable_view:top_view_id="@+id/videoView"
@@ -69,39 +69,59 @@
         draggable_view:top_view_x_scale_factor="2.1"
         draggable_view:top_view_y_scale_factor="2.1">
 
+        <com.example.macos.libraries.SlidingUpPaneLayout
+            android:id="@+id/sliding_up_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-        <LinearLayout
-            android:id="@+id/ll"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:background="@color/background"
-            android:orientation="vertical">
-
-
-            <TextView
-                android:id="@+id/tvTitle"
+            <LinearLayout
+                android:id="@+id/bottom_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_horizontal"
-                android:padding="10dp"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_height="match_parent"
+                android:background="#FFF"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvAuthor"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BOTTOM"
+                    android:textColor="#333"
+                    android:textSize="18sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/top_view"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_horizontal"
-                android:padding="10dp" />
+                android:layout_height="match_parent"
+                android:background="#009588"
+                android:gravity="center"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvProvider"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="left|center_horizontal"
-                android:padding="10dp" />
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/tvTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_horizontal"
+                    android:padding="10dp"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
 
+                <TextView
+                    android:id="@+id/tvAuthor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_horizontal"
+                    android:padding="10dp" />
+
+                <TextView
+                    android:id="@+id/tvProvider"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="left|center_horizontal"
+                    android:padding="10dp" />
+            </LinearLayout>
+        </com.example.macos.libraries.SlidingUpPaneLayout>
 
         <com.google.android.youtube.player.YouTubePlayerView
             android:id="@+id/videoView"
