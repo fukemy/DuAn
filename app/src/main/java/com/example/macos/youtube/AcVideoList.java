@@ -89,6 +89,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
             @Override
             public void onPanelOpened(View panel) {
                 Logger.error("onPanelOpened");
+                bottomViewSlide.setVisibility(View.VISIBLE);
                 bottomViewSlide.setAlpha(1);
                 bottomViewSlide.setBackgroundColor(getResources().getColor(R.color.mainColor60));
 
@@ -114,6 +115,9 @@ public class AcVideoList extends YouTubeBaseActivity implements
             public void onMaximized() {
                 draggableView.bringToFront();
                 isShowingFullscreen = false;
+                bottomViewSlide.setVisibility(View.VISIBLE);
+                bottomViewSlide.setAlpha(1);
+                bottomViewSlide.setBackgroundColor(getResources().getColor(R.color.mainColor60));
                 if(!youtubePlayer.isPlaying()){
                     youtubePlayer.play();
                 }
