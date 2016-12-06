@@ -126,24 +126,31 @@
                 android:focusable="false">
 
 
-                <com.google.android.gms.maps.MapView
+                <com.google.android.gms.maps.MapView xmlns:map="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/mapView"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    map:cameraZoom="13"
+                    map:liteMode="true"
+                    map:mapType="normal" />
 
-
-                <TextView
-                    android:id="@+id/tvLocation"
+                <FrameLayout
                     android:layout_width="match_parent"
                     android:layout_height="68dp"
                     android:alpha="0.2"
-                    android:background="@color/black"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:gravity="left|center_horizontal"
-                    android:text="SLIDING"
-                    android:textColor="@android:color/white" />
+                    android:background="@mipmap/tranparent_bg_for_text_mapview">
 
+                    <TextView
+                        android:id="@+id/tvLocation"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clickable="true"
+                        android:alpha="1"
+                        android:focusable="false"
+                        android:gravity="left|center_horizontal"
+                        android:text="SLIDING"
+                        android:textColor="@android:color/white" />
+                </FrameLayout>
             </FrameLayout>
 
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>

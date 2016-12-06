@@ -137,7 +137,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
         draggableView.setClickToMinimizeEnabled(false);
 
         slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
-        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
         //modify height of slide panel
         slidingLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
