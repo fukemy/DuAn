@@ -93,7 +93,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 googleMap.setMyLocationEnabled(false);
 
                 //config style
-
                 try {
                     // Customise the styling of the base map using a JSON object defined
                     // in a raw resource file.
@@ -102,6 +101,8 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
                     if (!success) {
                         Logger.error("Style parsing failed.");
+                    }else{
+                        Logger.error("Style parsing success.");
                     }
                 } catch (Resources.NotFoundException e) {
                     Logger.error("Can't find style. Error: ");
@@ -110,7 +111,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
                 LatLng sydney = new LatLng(10.795541, 106.795195);
                 googleMap.addMarker(new MarkerOptions().position(sydney).title("TEST").snippet("Test"));
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(18).build();
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(13).build();
                 googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
@@ -137,11 +138,13 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
         slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
 
+        //modify height of slide panel
         slidingLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 if(slidingLayout.getLayoutParams().height != getResources().getDisplayMetrics().heightPixels - videoView.getHeight()) {
                     slidingLayout.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels - videoView.getHeight();
+                    mMapView.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels - videoView.getHeight();
 //                    slidingLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             }
