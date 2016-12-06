@@ -99,8 +99,8 @@ public class AcVideoList extends YouTubeBaseActivity implements
          * just ignore this method, don't call it
          */
 //        slidingUpPaneLayout.setEdgeSize((int) (density * 32));
-//        slidingUpPaneLayout.openPane();
-        slidingUpPaneLayout.closePane();
+        slidingUpPaneLayout.openPane();
+//        slidingUpPaneLayout.closePane();
 
         draggableView.setDraggableListener(new DraggableListener() {
             @Override
