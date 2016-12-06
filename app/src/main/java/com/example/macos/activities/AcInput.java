@@ -430,7 +430,7 @@ public class AcInput extends FragmentActivity {
 
         @Override
         protected void onPostExecute(EnLocationItem locationItemData) {
-            if(locationItemData.getAddress() == null){
+            if(locationItemData == null ||locationItemData.getAddress() == null){
                 addGoogleMapShowcase();
             }else {
                 locationItem = locationItemData;

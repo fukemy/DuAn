@@ -258,15 +258,12 @@ public class AcVideoList extends YouTubeBaseActivity implements
         super.onConfigurationChanged(newConfig);
 
         if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            Display display = AcVideoList.this.getWindowManager()
-                            .getDefaultDisplay();
-
+            Display display = AcVideoList.this.getWindowManager().getDefaultDisplay();
             Point size = new Point();
             display.getSize(size);
             draggableView.setTopViewHeight(size.y);
 
         } else if(getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-
             Resources r = getResources();
             int px = (int) TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_DIP, 200, r.getDisplayMetrics()
