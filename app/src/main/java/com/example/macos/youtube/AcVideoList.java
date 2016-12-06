@@ -155,7 +155,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
             public void onMaximized() {
                 draggableView.bringToFront();
                 isShowingFullscreen = false;
-                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 if(!youtubePlayer.isPlaying()){
                     youtubePlayer.play();
                 }
@@ -188,13 +187,18 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
                 EnVideoItem videoData = (EnVideoItem) parent.getAdapter().getItem(position);
                 VIDEO_ID = videoData.getId();
-                youtubePlayer.loadVideo(VIDEO_ID);
-                draggableView.setVisibility(View.VISIBLE);
-                draggableView.maximize();
 
                 tvTitle.setText(videoData.getTitle());
                 tvAuthor.setText(videoData.getDescription());
                 tvProvider.setText("THEHEGEO");
+
+                if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
+                    slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+                }
+
+                youtubePlayer.loadVideo(VIDEO_ID);
+                draggableView.setVisibility(View.VISIBLE);
+                draggableView.maximize();
 
             }
         });
