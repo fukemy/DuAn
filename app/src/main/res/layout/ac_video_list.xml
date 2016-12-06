@@ -82,21 +82,6 @@
                 android:gravity="center"
                 android:orientation="vertical">
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="BOTTOM"
-                    android:textColor="#333"
-                    android:textSize="18sp" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/top_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="#009588"
-                android:gravity="center"
-                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/tvTitle"
@@ -120,6 +105,23 @@
                     android:layout_height="wrap_content"
                     android:gravity="left|center_horizontal"
                     android:padding="10dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/top_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#009588"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="BOTTOM"
+                    android:textColor="#333"
+                    android:textSize="18sp" />
+
             </LinearLayout>
         </com.example.macos.libraries.SlidingUpPaneLayout>
 

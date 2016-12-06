@@ -77,13 +77,28 @@ public class AcVideoList extends YouTubeBaseActivity implements
         SlidingUpPaneLayout slidingUpPaneLayout = (SlidingUpPaneLayout) findViewById(R.id.sliding_up_layout);
         slidingUpPaneLayout.setParallaxDistance((int) (200 * density));
         slidingUpPaneLayout.setShadowResourceTop(R.drawable.shadow_top);
+        slidingUpPaneLayout.setPanelSlideListener(new SlidingUpPaneLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+
+            }
+
+            @Override
+            public void onPanelOpened(View panel) {
+                
+            }
+
+            @Override
+            public void onPanelClosed(View panel) {
+
+            }
+        });
 
         /**
          * limit scroll zone to 32dp, if you want whole view can scroll
          * just ignore this method, don't call it
          */
-//        slidingUpPaneLayout.setEdgeSize((int) (density * 32));
-
+        slidingUpPaneLayout.setEdgeSize((int) (density * 32));
         slidingUpPaneLayout.openPane();
 
 
