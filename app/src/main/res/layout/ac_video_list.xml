@@ -136,16 +136,20 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="68dp"
-                    android:alpha="0.2"
-                    android:background="@mipmap/tranparent_bg_for_text_mapview">
+                    android:layout_height="68dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:rotation="180"
+                        android:src="@mipmap/tranparent_bg_for_text_mapview" />
 
                     <TextView
                         android:id="@+id/tvLocation"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:clickable="true"
                         android:alpha="1"
+                        android:clickable="true"
                         android:focusable="false"
                         android:gravity="left|center_horizontal"
                         android:text="SLIDING"
