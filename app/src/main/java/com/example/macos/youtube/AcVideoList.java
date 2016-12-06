@@ -80,17 +80,16 @@ public class AcVideoList extends YouTubeBaseActivity implements
         slidingUpPaneLayout.setPanelSlideListener(new SlidingUpPaneLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
-
             }
 
             @Override
             public void onPanelOpened(View panel) {
-
+                Logger.error("onPanelOpened");
             }
 
             @Override
             public void onPanelClosed(View panel) {
-
+                Logger.error("onPanelClosed");
             }
         });
 
@@ -100,7 +99,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
          */
 //        slidingUpPaneLayout.setEdgeSize((int) (density * 32));
         slidingUpPaneLayout.openPane();
-//        slidingUpPaneLayout.closePane();
 
         draggableView.setDraggableListener(new DraggableListener() {
             @Override
