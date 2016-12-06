@@ -14,6 +14,7 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -69,6 +70,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.ac_video_list);
 
         initView();
@@ -94,8 +96,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
                 //config style
                 try {
-                    // Customise the styling of the base map using a JSON object defined
-                    // in a raw resource file.
                     boolean success = googleMap.setMapStyle(
                             MapStyleOptions.loadRawResourceStyle(AcVideoList.this, R.raw.style_json));
 
@@ -137,6 +137,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
         draggableView.setClickToMinimizeEnabled(false);
 
         slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
+        slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
 
         //modify height of slide panel
         slidingLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
