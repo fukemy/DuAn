@@ -154,7 +154,7 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:alpha="0.1"
+                        android:alpha="0.05"
                         android:background="@mipmap/tranparent_bg_for_text_mapview"
                         android:rotation="180" />
 
@@ -164,10 +164,10 @@
                         android:layout_height="match_parent"
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
-                        android:layout_marginTop="5dp"
                         android:background="@color/transparent"
                         android:clickable="true"
                         android:focusable="false"
+                        android:layout_gravity="center"
                         android:gravity="left|center_horizontal"
                         android:lines="3"
                         android:text=""
