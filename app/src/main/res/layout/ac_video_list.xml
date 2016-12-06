@@ -154,7 +154,7 @@
                     <ImageView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:alpha="0.2"
+                        android:alpha="0.1"
                         android:background="@mipmap/tranparent_bg_for_text_mapview"
                         android:rotation="180" />
 
@@ -214,6 +214,7 @@
                         android:layout_height="match_parent">
 
                         <TextView
+                            android:id="@+id/tv_second_view_fabreveal"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:gravity="center"

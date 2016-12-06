@@ -21,6 +21,7 @@ import android.widget.ImageView;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnMainCatalogItem;
 import com.example.macos.interfaces.iListWork;
+import com.example.macos.libraries.Logger;
 
 /**
  * Created by macos on 6/13/16.
@@ -57,6 +58,8 @@ public class AnimationControl {
         Animation anim = AnimationUtils.loadAnimation(context, R.anim.scale_with_bounce);
         if(v != null){
             v.startAnimation(anim);
+        }else{
+            Logger.error("animated view is null");
         }
     }
 

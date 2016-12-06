@@ -37,6 +37,8 @@ import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.LocationHelper;
 import com.example.macos.utilities.Utilities;
+import com.github.florent37.viewanimator.AnimationListener;
+import com.github.florent37.viewanimator.ViewAnimator;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggableView;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -253,11 +255,20 @@ public class AcVideoList extends YouTubeBaseActivity implements
     private void configureFABReveal() {
         fabRevealLayout.setOnRevealChangeListener(new OnRevealChangeListener() {
             @Override
-            public void onMainViewAppeared(FABRevealLayout fabRevealLayout, View mainView) {}
+            public void onMainViewAppeared(FABRevealLayout fabRevealLayout, View mainView) {
+                
+            }
 
             @Override
             public void onSecondaryViewAppeared(final FABRevealLayout fabRevealLayout, View secondaryView) {
-                AnimationControl.scaleWithBounceAnimation(AcVideoList.this, findViewById(R.id.tv_main_view_fabreveal));
+//                AnimationControl.scaleWithBounceAnimation(AcVideoList.this, findViewById(R.id.tv_second_view_fabreveal));
+                ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
+                        .scaleY(0f, 1.2f, 1f)
+                        .scaleX(0f, 1.4f, 1f)
+                        .alpha(0.5f,1f)
+                        .accelerate()
+                        .duration(400)
+                        .start();
                 prepareBackTransition();
             }
         });
@@ -267,7 +278,19 @@ public class AcVideoList extends YouTubeBaseActivity implements
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                fabRevealLayout.revealMainView();
+                ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
+                        .scaleY(1f, 1.2f, 0f)
+                        .scaleX(1f, 1.4f, 0f)
+                        .alpha(1f,0f)
+                        .accelerate()
+                        .duration(400)
+                        .onStop(new AnimationListener.Stop() {
+                            @Override
+                            public void onStop() {
+                                fabRevealLayout.revealMainView();
+                            }
+                        })
+                        .start();
             }
         }, 2000);
     }

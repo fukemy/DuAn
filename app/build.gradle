@@ -53,4 +53,5 @@ dependencies {
     compile 'com.sothree.slidinguppanel:library:3.3.1' // sliding up layout
     compile 'com.truizlop.fabreveallayout:library:1.0.0' //https://github.com/truizlop/FABRevealLayout
     compile 'de.hdodenhof:circleimageview:2.1.0' //https://github.com/hdodenhof/CircleImageView
+    compile 'com.github.florent37:viewanimator:1.0.4' //https://github.com/florent37/ViewAnimator
 }
