@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.location.Location;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
@@ -24,11 +25,15 @@ import android.widget.Toast;
 
 import com.example.macos.adapter.VideoListAdapter;
 import com.example.macos.duan.R;
+import com.example.macos.entities.EnLocationItem;
 import com.example.macos.entities.EnVideoItem;
+import com.example.macos.interfaces.iLocationUpdate;
 import com.example.macos.interfaces.iYoutubeQuery;
+import com.example.macos.libraries.AutoResizeTextView;
 import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.SlidingUpPaneLayout;
 import com.example.macos.utilities.GlobalParams;
+import com.example.macos.utilities.LocationHelper;
 import com.example.macos.utilities.Utilities;
 import com.github.pedrovgs.DraggableListener;
 import com.github.pedrovgs.DraggableView;
@@ -46,6 +51,8 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.truizlop.fabreveallayout.FABRevealLayout;
+import com.truizlop.fabreveallayout.OnRevealChangeListener;
 
 import java.util.List;
 
@@ -57,12 +64,14 @@ public class AcVideoList extends YouTubeBaseActivity implements
     private VideoListAdapter adapter;
     private YouTubePlayerView videoView;
     private YouTubePlayer youtubePlayer;
-    private TextView tvTitle, tvProvider, tvAuthor, tvLocation;
+    private TextView tvTitle, tvProvider, tvAuthor;
+    private AutoResizeTextView tvLocation;
     private SwipeRefreshLayout swipeLayout;
     private ImageButton btnBack;
     private SlidingUpPanelLayout slidingLayout;
     private MapView mMapView;
     private GoogleMap googleMap;
+    private FABRevealLayout fabRevealLayout;
 
     boolean isShowingFullscreen;
     String VIDEO_ID = "";
@@ -107,12 +116,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 } catch (Resources.NotFoundException e) {
                     Logger.error("Can't find style. Error: ");
                 }
-
-
-                LatLng sydney = new LatLng(10.795541, 106.795195);
-                googleMap.addMarker(new MarkerOptions().position(sydney).title("TEST").snippet("Test"));
-                CameraPosition cameraPosition = new CameraPosition.Builder().target(sydney).zoom(13).build();
-                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
     }
@@ -124,11 +127,13 @@ public class AcVideoList extends YouTubeBaseActivity implements
         tvTitle = (TextView) findViewById(R.id.tvTitle);
         tvProvider = (TextView) findViewById(R.id.tvProvider);
         tvAuthor = (TextView) findViewById(R.id.tvAuthor);
-        tvLocation = (TextView) findViewById(R.id.tvLocation);
+        tvLocation = (AutoResizeTextView) findViewById(R.id.tvLocation);
         videoView = (YouTubePlayerView) findViewById(R.id.videoView);
-
         btnBack = (ImageButton) findViewById(R.id.btnBack);
+
         btnBack.setOnClickListener(this);
+        tvLocation.setOnClickListener(this);
+
         videoView.initialize(GlobalParams.YOUTUBE_API_KEY, this);
 
         draggableView = (DraggableView) findViewById(R.id.draggable_view);
@@ -137,8 +142,12 @@ public class AcVideoList extends YouTubeBaseActivity implements
         draggableView.setClickToMinimizeEnabled(false);
 
         slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
+        slidingLayout.setParallaxOffset(200);
 
-        //modify height of slide panel
+        fabRevealLayout = (FABRevealLayout) findViewById(R.id.fab_reveal_layout);
+        configureFABReveal();
+
+        //modify height of slide panel because the slide panel not take all height of screen.
         slidingLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -155,10 +164,10 @@ public class AcVideoList extends YouTubeBaseActivity implements
             public void onMaximized() {
                 draggableView.bringToFront();
                 isShowingFullscreen = false;
+                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 if(!youtubePlayer.isPlaying()){
                     youtubePlayer.play();
                 }
-
             }
 
             @Override
@@ -192,14 +201,31 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 tvAuthor.setText(videoData.getDescription());
                 tvProvider.setText("THEHEGEO");
 
-                if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED) {
-                    slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
-                }
+                LatLng caoTocLongThanhLatlng = GlobalParams.CAO_TOC_LONG_THANH_LATLNG;
+                googleMap.clear();
+                googleMap.addMarker(new MarkerOptions().position(caoTocLongThanhLatlng).title("TEST").snippet("Test"));
+                CameraPosition cameraPosition = new CameraPosition.Builder().target(caoTocLongThanhLatlng).zoom(13).build();
+                googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
-                youtubePlayer.loadVideo(VIDEO_ID);
+                Location caoTocLongThanhLocation = new Location("");
+                caoTocLongThanhLocation.setLatitude(caoTocLongThanhLatlng.latitude);
+                caoTocLongThanhLocation.setLongitude(caoTocLongThanhLatlng.longitude);
+                new LocationHelper().getLocationDetail(AcVideoList.this, caoTocLongThanhLocation, new iLocationUpdate() {
+                    @Override
+                    public void updateLocation(EnLocationItem lo) {
+                        String address = lo.getAddress().trim().replace("\n", ", ");
+                        tvLocation.setText(getResources().getString(R.string.vitri) + ": " + address + ".");
+
+                    }
+
+                    @Override
+                    public void onFailGetLocation() {
+                        tvLocation.setText(getResources().getString(R.string.vitri) + ": N/A");
+                    }
+                });
                 draggableView.setVisibility(View.VISIBLE);
+                youtubePlayer.loadVideo(VIDEO_ID);
                 draggableView.maximize();
-
             }
         });
 
@@ -222,6 +248,27 @@ public class AcVideoList extends YouTubeBaseActivity implements
         });
     }
 
+    private void configureFABReveal() {
+        fabRevealLayout.setOnRevealChangeListener(new OnRevealChangeListener() {
+            @Override
+            public void onMainViewAppeared(FABRevealLayout fabRevealLayout, View mainView) {}
+
+            @Override
+            public void onSecondaryViewAppeared(final FABRevealLayout fabRevealLayout, View secondaryView) {
+                prepareBackTransition();
+            }
+        });
+    }
+
+    private void prepareBackTransition() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                fabRevealLayout.revealMainView();
+            }
+        }, 2000);
+    }
+
     @Override
     public void onInitializationFailure(YouTubePlayer.Provider provider,
                                         YouTubeInitializationResult errorReason) {
@@ -235,8 +282,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
     }
 
     @Override
-    public void onInitializationSuccess(YouTubePlayer.Provider provider,
-                                        YouTubePlayer player, boolean wasRestored) {
+    public void onInitializationSuccess(YouTubePlayer.Provider provider, YouTubePlayer player, boolean wasRestored) {
         if (!wasRestored) {
             draggableView.bringToFront();
             youtubePlayer = player;
@@ -253,6 +299,13 @@ public class AcVideoList extends YouTubeBaseActivity implements
         }
     }
 
+    private void switchSlideState(){
+        if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED){
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        }else if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }
+    }
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -316,6 +369,9 @@ public class AcVideoList extends YouTubeBaseActivity implements
         switch (view.getId()){
             case R.id.btnBack:
                 onBackPressed();
+                break;
+            case R.id.tvLocation:
+                switchSlideState();
                 break;
         }
     }

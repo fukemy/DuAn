@@ -814,12 +814,11 @@ public class AcICIChecking extends AppCompatActivity {
         options.position(latLng);
         options.draggable(false);
         options.icon(icon);
-        Marker marker = gMap.addMarker(options);
-
+        gMap.addMarker(options);
     }
 
     private void drawPath(LatLng curentLat, LatLng newLat){
-        Polyline line = gMap.addPolyline(new PolylineOptions()
+        gMap.addPolyline(new PolylineOptions()
                 .add(curentLat, newLat)
                 .width(3)
                 .color(Color.GREEN));
@@ -830,8 +829,6 @@ public class AcICIChecking extends AppCompatActivity {
         super.onResume();
         if (mBtAdapter != null && !mBtAdapter.isEnabled()) {
             Log.e(TAG, "onResume - BT not enabled yet");
-//            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-//            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
         }
     }
 

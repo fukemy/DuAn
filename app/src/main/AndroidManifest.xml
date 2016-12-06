@@ -63,9 +63,6 @@
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name="com.gun0912.tedpicker.ImagePickerActivity"
-            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.example.macos.activities.AcICIChecking"

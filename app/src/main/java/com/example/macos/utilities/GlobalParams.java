@@ -1,5 +1,7 @@
 package com.example.macos.utilities;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by macos on 6/23/16.
  */
@@ -55,6 +57,7 @@ public class GlobalParams {
     public static final String YOUTUBE_TITLE = "title";
     public static final String THEHEGEO_CHANNEL_ID = "UCWvYziaaakg7jCWgtSprTSw";
     public static final String YOUTUBE_BROWNSER_KEY = "AIzaSyCUHFVmM7A3xA0Z2yWrojDEr71m6NGb0Y8";
+    public static final LatLng CAO_TOC_LONG_THANH_LATLNG = new LatLng(10.795541, 106.795195);
 
     public static final String SAMPLE_LOCATION_INPUT_FOR_VIRABLE = "105.806451,21.047517,0.0 \n" +
             "105.806472,21.047542,0.0 \n" +

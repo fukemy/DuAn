@@ -46,9 +46,11 @@ import com.example.macos.entities.EnWorkList;
 import com.example.macos.entities.ImageModel;
 import com.example.macos.fragment.Input.FragmentInputItem;
 import com.example.macos.interfaces.iDialogAction;
+import com.example.macos.interfaces.iLocationUpdate;
 import com.example.macos.libraries.Logger;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
+import com.example.macos.utilities.LocationHelper;
 import com.example.macos.utilities.SharedPreferenceManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -380,66 +382,6 @@ public class AcInput extends FragmentActivity {
         }
     }
 
-    private class GeoDecodeLotaion extends AsyncTask<Void, Void, EnLocationItem> {
-        Geocoder geocoder;
-        EnLocationItem en;
-        Location location;
-        public GeoDecodeLotaion(Location mLocation){
-            Logger.error("GeoDecodeLotaion:" + mLocation);
-            en = new EnLocationItem();
-            geocoder = new Geocoder(AcInput.this, Locale.getDefault());
-            location = mLocation;
-        }
-
-        @Override
-        protected void onPreExecute() {
-        }
-
-        @Override
-        protected EnLocationItem doInBackground(Void... voids) {
-            List<Address> addresses;
-            Logger.error("GeoDecodeLotaion:" + "doInBackground");
-            try {
-                // Here 1 represent max location result to returned, by documents it recommended 1 to 5
-                addresses = geocoder.getFromLocation(location.getLatitude(), location.getLongitude(), 1);
-
-                if(addresses != null) {
-                    Address returnedAddress = addresses.get(0);
-                    StringBuilder strReturnedAddress = new StringBuilder();
-                    for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
-                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
-                    }
-                    en.setAddress(strReturnedAddress.toString());
-                }
-                // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-
-                en.setCity(addresses.get(0).getLocality());
-                en.setCountry(addresses.get(0).getCountryName());
-                en.setKnownName(addresses.get(0).getFeatureName());
-                en.setPostalCode(addresses.get(0).getPostalCode());
-                en.setState(addresses.get(0).getAdminArea());
-                en.setLocation(location);
-
-                return en;
-
-            }catch (Exception e){
-                e.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(EnLocationItem locationItemData) {
-            if(locationItemData == null ||locationItemData.getAddress() == null){
-                addGoogleMapShowcase();
-            }else {
-                locationItem = locationItemData;
-                Logger.error("locationItem: " + locationItem.toString());
-                ((FragmentInputItem) ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItemData);
-            }
-        }
-    }
-
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
         @Override
         public void onMyLocationChange(final Location location) {
@@ -448,7 +390,19 @@ public class AcInput extends FragmentActivity {
                 title.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
 //                locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
-                new GeoDecodeLotaion(location).execute();
+                LocationHelper lh = new LocationHelper();
+                lh.getLocationDetail(AcInput.this, location, new iLocationUpdate() {
+                    @Override
+                    public void updateLocation(EnLocationItem lo) {
+                        locationItem = lo;
+                        ((FragmentInputItem) ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0)).setCurrentLocation(locationItem);
+                    }
+
+                    @Override
+                    public void onFailGetLocation() {
+                        addGoogleMapShowcase();
+                    }
+                });
                 //TODO VERY IMPORTAIN, still now I only can change location in all fragment, so hard.
 
 //                System.out.println("got location : " + locationItem.toString());

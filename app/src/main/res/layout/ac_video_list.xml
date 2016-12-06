@@ -106,25 +106,37 @@
                     android:gravity="left|center_horizontal"
                     android:padding="10dp" />
 
-                <TextView
-                    android:id="@+id/tvProvider"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="horizontal"
                     android:background="@android:color/white"
-                    android:clickable="true"
-                    android:focusable="false"
-                    android:gravity="left|center_horizontal"
-                    android:padding="10dp" />
+                    android:padding="10dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@mipmap/logo_thehegeo" />
+
+                    <TextView
+                        android:id="@+id/tvProvider"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:background="@android:color/white"
+                        android:clickable="true"
+                        android:focusable="false"
+                        android:gravity="left|center_vertical"
+                        android:textColor="@color/black" />
+                </LinearLayout>
             </LinearLayout>
 
             <FrameLayout
                 android:id="@+id/dragView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@android:color/white"
                 android:clickable="true"
                 android:focusable="false">
-
 
                 <com.google.android.gms.maps.MapView xmlns:map="http://schemas.android.com/apk/res-auto"
                     android:id="@+id/mapView"
@@ -142,20 +154,58 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:alpha="0.2"
-                        android:rotation="180"
-                        android:background="@mipmap/tranparent_bg_for_text_mapview" />
+                        android:background="@mipmap/tranparent_bg_for_text_mapview"
+                        android:rotation="180" />
 
-                    <TextView
+                    <com.example.macos.libraries.AutoResizeTextView
                         android:id="@+id/tvLocation"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:alpha="1"
+                        android:layout_marginLeft="5dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_marginTop="5dp"
                         android:clickable="true"
                         android:focusable="false"
                         android:gravity="left|center_horizontal"
-                        android:text="SLIDING"
+                        android:lines="3"
+                        android:text=""
                         android:textColor="@android:color/white" />
                 </FrameLayout>
+
+                <com.truizlop.fabreveallayout.FABRevealLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/fab_reveal_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:layout_gravity="bottom">
+
+                    <android.support.design.widget.FloatingActionButton
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:src="@mipmap/upload"
+                        app:backgroundTint="@color/mainColor" />
+
+                    <TextView
+                        android:id="@+id/main_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@mipmap/tranparent_bg_for_text_mapview"
+                        android:gravity="center"
+                        android:text=" @__@ " />
+
+                    <RelativeLayout
+                        android:id="@+id/secondary_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:text=" @__@ @__@ "
+                            android:textColor="@android:color/white" />
+                    </RelativeLayout>
+                </com.truizlop.fabreveallayout.FABRevealLayout>
             </FrameLayout>
 
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>
