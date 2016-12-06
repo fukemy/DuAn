@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.macos.activities.AcVideo;
 import com.example.macos.adapter.VideoListAdapter;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
@@ -32,6 +33,7 @@ import com.example.macos.interfaces.iYoutubeQuery;
 import com.example.macos.libraries.AutoResizeTextView;
 import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.SlidingUpPaneLayout;
+import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.LocationHelper;
 import com.example.macos.utilities.Utilities;
@@ -255,6 +257,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
             @Override
             public void onSecondaryViewAppeared(final FABRevealLayout fabRevealLayout, View secondaryView) {
+                AnimationControl.scaleWithBounceAnimation(AcVideoList.this, findViewById(R.id.tv_main_view_fabreveal));
                 prepareBackTransition();
             }
         });

@@ -4,12 +4,14 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.ScaleAnimation;
@@ -49,6 +51,13 @@ public class AnimationControl {
         scale.setFillAfter(true);
         scale.setInterpolator(new LinearInterpolator());
         v.startAnimation(scale);
+    }
+
+    public static void scaleWithBounceAnimation(Context context, View v){
+        Animation anim = AnimationUtils.loadAnimation(context, R.anim.scale_with_bounce);
+        if(v != null){
+            v.startAnimation(anim);
+        }
     }
 
     public static void showIcon(View v){

@@ -109,8 +109,8 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:background="@android:color/white"
+                    android:orientation="horizontal"
                     android:padding="10dp">
 
                     <ImageView
@@ -148,7 +148,8 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="68dp">
+                    android:layout_height="68dp"
+                    android:background="@color/transparent">
 
                     <ImageView
                         android:layout_width="match_parent"
@@ -164,6 +165,7 @@
                         android:layout_marginLeft="5dp"
                         android:layout_marginRight="5dp"
                         android:layout_marginTop="5dp"
+                        android:background="@color/transparent"
                         android:clickable="true"
                         android:focusable="false"
                         android:gravity="left|center_horizontal"
@@ -185,13 +187,26 @@
                         android:src="@mipmap/upload"
                         app:backgroundTint="@color/mainColor" />
 
-                    <TextView
+                    <RelativeLayout
                         android:id="@+id/main_view"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@mipmap/tranparent_bg_for_text_mapview"
-                        android:gravity="center"
-                        android:text=" @__@ " />
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:alpha="0.2"
+                            android:background="@mipmap/tranparent_bg_for_text_mapview"
+                            android:rotation="180" />
+
+                        <TextView
+                            android:id="@+id/tv_main_view_fabreveal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@color/transparent"
+                            android:gravity="center"
+                            android:text=" @__@ " />
+                    </RelativeLayout>
 
                     <RelativeLayout
                         android:id="@+id/secondary_view"
