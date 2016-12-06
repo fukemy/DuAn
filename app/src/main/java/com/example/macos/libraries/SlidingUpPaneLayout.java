@@ -37,7 +37,7 @@ public class SlidingUpPaneLayout extends ViewGroup {
      * This indicates that there is more content available and provides
      * a "physical" edge to grab to pull it closed.
      */
-    private static final int DEFAULT_OVERHANG_SIZE = 100; // dp;
+    private static final int DEFAULT_OVERHANG_SIZE = 80; // dp;
 
     /**
      * If no fade color is given by default it will fade to 80% gray.

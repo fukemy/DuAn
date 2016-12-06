@@ -3,6 +3,7 @@ package com.example.macos.youtube;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Handler;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -11,8 +12,8 @@ import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
     private TextView tvTitle, tvProvider, tvAuthor;
     private SwipeRefreshLayout swipeLayout;
     private ImageButton btnBack;
+    private LinearLayout topviewSlide, bottomViewSlide;
     boolean isShowingFullscreen;
     String VIDEO_ID = "";
 
@@ -75,6 +77,8 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
         final float density = getResources().getDisplayMetrics().density;
         SlidingUpPaneLayout slidingUpPaneLayout = (SlidingUpPaneLayout) findViewById(R.id.sliding_up_layout);
+        bottomViewSlide = (LinearLayout) findViewById(R.id.bottom_view);
+        topviewSlide = (LinearLayout) findViewById(R.id.top_view);
         slidingUpPaneLayout.setParallaxDistance((int) (200 * density));
         slidingUpPaneLayout.setShadowResourceTop(R.drawable.shadow_top);
         slidingUpPaneLayout.setPanelSlideListener(new SlidingUpPaneLayout.PanelSlideListener() {
@@ -85,11 +89,16 @@ public class AcVideoList extends YouTubeBaseActivity implements
             @Override
             public void onPanelOpened(View panel) {
                 Logger.error("onPanelOpened");
+                bottomViewSlide.setAlpha(1);
+                bottomViewSlide.setBackgroundColor(getResources().getColor(R.color.mainColor60));
+
             }
 
             @Override
             public void onPanelClosed(View panel) {
                 Logger.error("onPanelClosed");
+                topviewSlide.setAlpha(1);
+                topviewSlide.setBackgroundColor(Color.parseColor("#009588"));
             }
         });
 
