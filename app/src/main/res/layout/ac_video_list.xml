@@ -135,6 +135,7 @@
                 android:id="@+id/dragView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:background="@color/black"
                 android:clickable="true"
                 android:focusable="false">
 
@@ -142,86 +143,88 @@
                     android:id="@+id/mapView"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:background="@color/grayColor70"
                     map:cameraZoom="13"
                     map:liteMode="true"
                     map:mapType="normal" />
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="68dp"
-                    android:background="@color/transparent">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                    <ImageView
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:alpha="0.05"
-                        android:background="@mipmap/tranparent_bg_for_text_mapview"
-                        android:rotation="180" />
-
-                    <com.example.macos.libraries.AutoResizeTextView
-                        android:id="@+id/tvLocation"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="5dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@color/transparent"
-                        android:clickable="true"
-                        android:focusable="false"
-                        android:layout_gravity="center"
-                        android:gravity="left|center_horizontal"
-                        android:lines="3"
-                        android:text=""
-                        android:textColor="@android:color/white" />
-                </FrameLayout>
-
-                <com.truizlop.fabreveallayout.FABRevealLayout xmlns:app="http://schemas.android.com/apk/res-auto"
-                    android:id="@+id/fab_reveal_layout"
-                    android:layout_width="match_parent"
-                    android:layout_height="200dp"
-                    android:layout_gravity="bottom">
-
-                    <android.support.design.widget.FloatingActionButton
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:src="@mipmap/upload"
-                        app:backgroundTint="@color/mainColor" />
-
-                    <RelativeLayout
-                        android:id="@+id/main_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                        android:layout_height="68dp">
 
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:alpha="0.2"
-                            android:background="@mipmap/tranparent_bg_for_text_mapview"
+                            android:alpha="0.1"
+                            android:background="@color/black"
                             android:rotation="180" />
 
-                        <TextView
-                            android:id="@+id/tv_main_view_fabreveal"
+                        <com.example.macos.libraries.AutoResizeTextView
+                            android:id="@+id/tvLocation"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@color/transparent"
-                            android:gravity="center"
-                            android:text=" @__@ " />
-                    </RelativeLayout>
-
-                    <RelativeLayout
-                        android:id="@+id/secondary_view"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <TextView
-                            android:id="@+id/tv_second_view_fabreveal"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:gravity="center"
-                            android:text=" @__@ @__@ "
+                            android:layout_marginLeft="5dp"
+                            android:layout_marginRight="5dp"
+                            android:clickable="true"
+                            android:focusable="false"
+                            android:gravity="left|center_vertical"
                             android:textColor="@android:color/white" />
-                    </RelativeLayout>
-                </com.truizlop.fabreveallayout.FABRevealLayout>
+                    </FrameLayout>
+
+                    <com.truizlop.fabreveallayout.FABRevealLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+                        android:id="@+id/fab_reveal_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp">
+
+                        <android.support.design.widget.FloatingActionButton
+                            android:id="@+id/fab_icon"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:src="@mipmap/upload"
+                            app:backgroundTint="@color/mainColor" />
+
+                        <RelativeLayout
+                            android:id="@+id/main_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <!--<ImageView-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="match_parent"-->
+                            <!--android:alpha="0.2"-->
+                            <!--android:background="@mipmap/tranparent_bg_for_text_mapview"-->
+                            <!--android:rotation="180" />-->
+
+                            <!--<TextView-->
+                            <!--android:id="@+id/tv_main_view_fabreveal"-->
+                            <!--android:layout_width="match_parent"-->
+                            <!--android:layout_height="match_parent"-->
+                            <!--android:background="@color/transparent"-->
+                            <!--android:gravity="center"-->
+                            <!--android:text=" @__@ " />-->
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:id="@+id/secondary_view"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <TextView
+                                android:id="@+id/tv_second_view_fabreveal"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:text=" @__@ @__@ "
+                                android:textColor="@android:color/white" />
+                        </RelativeLayout>
+                    </com.truizlop.fabreveallayout.FABRevealLayout>
+                </LinearLayout>
             </FrameLayout>
 
         </com.sothree.slidinguppanel.SlidingUpPanelLayout>

@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.location.Location;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.util.AttributeSet;
@@ -36,6 +37,7 @@ import com.example.macos.libraries.SlidingUpPaneLayout;
 import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.LocationHelper;
+import com.example.macos.utilities.NetworkUtil;
 import com.example.macos.utilities.Utilities;
 import com.github.florent37.viewanimator.AnimationListener;
 import com.github.florent37.viewanimator.ViewAnimator;
@@ -76,9 +78,10 @@ public class AcVideoList extends YouTubeBaseActivity implements
     private MapView mMapView;
     private GoogleMap googleMap;
     private FABRevealLayout fabRevealLayout;
-
+    private FloatingActionButton fabButton;
     boolean isShowingFullscreen;
     String VIDEO_ID = "";
+    int SCREEN_HEIGHT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +89,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.ac_video_list);
 
+        SCREEN_HEIGHT = getResources().getDisplayMetrics().heightPixels;
         initView();
         populateData();
 
@@ -97,7 +101,6 @@ public class AcVideoList extends YouTubeBaseActivity implements
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         mMapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap mMap) {
@@ -107,21 +110,22 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
                 googleMap.setMyLocationEnabled(false);
 
-                //config style
+                //config style only when network is accessable
                 try {
-                    boolean success = googleMap.setMapStyle(
-                            MapStyleOptions.loadRawResourceStyle(AcVideoList.this, R.raw.style_json));
+                    boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(AcVideoList.this, R.raw.style_json));
 
                     if (!success) {
                         Logger.error("Style parsing failed.");
-                    }else{
+                    } else {
                         Logger.error("Style parsing success.");
                     }
                 } catch (Resources.NotFoundException e) {
                     Logger.error("Can't find style. Error: ");
                 }
             }
+
         });
+
     }
 
 
@@ -134,6 +138,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
         tvLocation = (AutoResizeTextView) findViewById(R.id.tvLocation);
         videoView = (YouTubePlayerView) findViewById(R.id.videoView);
         btnBack = (ImageButton) findViewById(R.id.btnBack);
+        fabButton = (FloatingActionButton) findViewById(R.id.fab_icon);
 
         btnBack.setOnClickListener(this);
         tvLocation.setOnClickListener(this);
@@ -145,19 +150,47 @@ public class AcVideoList extends YouTubeBaseActivity implements
         draggableView.setClickToMaximizeEnabled(true);
         draggableView.setClickToMinimizeEnabled(false);
 
-        slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
-        slidingLayout.setParallaxOffset(200);
-
         fabRevealLayout = (FABRevealLayout) findViewById(R.id.fab_reveal_layout);
         configureFABReveal();
+
+        slidingLayout = (SlidingUpPanelLayout)findViewById(R.id.sliding_layout);
+        slidingLayout.setParallaxOffset(200);
+        slidingLayout.setAnchorPoint(0.5f);
+        fabRevealLayout.setVisibility(View.INVISIBLE);
+        slidingLayout.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+
+            }
+
+            @Override
+            public void onPanelStateChanged(View panel, SlidingUpPanelLayout.PanelState previousState, SlidingUpPanelLayout.PanelState newState) {
+                if(newState == SlidingUpPanelLayout.PanelState.ANCHORED){
+                    ViewAnimator.animate(fabButton)
+                            .scale(0f, 1.2f, 1f)
+                            .alpha(0f,1f)
+                            .accelerate()
+                            .duration(400)
+                            .onStart(new AnimationListener.Start() {
+                                @Override
+                                public void onStart() {
+                                    fabRevealLayout.setVisibility(View.VISIBLE);
+                                }
+                            })
+                            .start();
+                }else{
+                    fabRevealLayout.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
 
         //modify height of slide panel because the slide panel not take all height of screen.
         slidingLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                if(slidingLayout.getLayoutParams().height != getResources().getDisplayMetrics().heightPixels - videoView.getHeight()) {
-                    slidingLayout.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels - videoView.getHeight();
-                    mMapView.getLayoutParams().height = getResources().getDisplayMetrics().heightPixels - videoView.getHeight();
+                if(slidingLayout.getLayoutParams().height != SCREEN_HEIGHT - videoView.getHeight()) {
+                    slidingLayout.getLayoutParams().height = SCREEN_HEIGHT - videoView.getHeight();
+                    mMapView.getLayoutParams().height = SCREEN_HEIGHT - videoView.getHeight();
 //                    slidingLayout.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                 }
             }
@@ -168,7 +201,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
             public void onMaximized() {
                 draggableView.bringToFront();
                 isShowingFullscreen = false;
-                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+//                slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
                 if(!youtubePlayer.isPlaying()){
                     youtubePlayer.play();
                 }
@@ -221,8 +254,9 @@ public class AcVideoList extends YouTubeBaseActivity implements
                     @Override
                     public void updateLocation(EnLocationItem lo) {
                         final String address = lo.getAddress().trim().replace("\n", ", ");
-                        ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
-                                .translationY(100, 0)
+                        ViewAnimator.animate(tvLocation)
+                                .scaleY(0f, 1.2f, 1f)
+                                .scaleX(0f, 1.4f, 1f)
                                 .alpha(0.5f,1f)
                                 .accelerate()
                                 .onStart(new AnimationListener.Start() {
@@ -231,25 +265,14 @@ public class AcVideoList extends YouTubeBaseActivity implements
                                         tvLocation.setText(getResources().getString(R.string.vitri) + ": " + address + ".");
                                     }
                                 })
-                                .duration(500)
+                                .duration(600)
                                 .start();
 
                     }
 
                     @Override
                     public void onFailGetLocation() {
-                        ViewAnimator.animate(findViewById(R.id.tv_second_view_fabreveal))
-                                .translationY(100, 0)
-                                .alpha(0.5f,1f)
-                                .accelerate()
-                                .onStart(new AnimationListener.Start() {
-                                    @Override
-                                    public void onStart() {
-                                        tvLocation.setText(getResources().getString(R.string.vitri) + ": N/A");
-                                    }
-                                })
-                                .duration(500)
-                                .start();
+                        tvLocation.setText(getResources().getString(R.string.vitri) + ": N/A");
                     }
                 });
                 draggableView.setVisibility(View.VISIBLE);
@@ -351,9 +374,11 @@ public class AcVideoList extends YouTubeBaseActivity implements
 
     private void switchSlideState(){
         if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.COLLAPSED){
-            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
-        }else if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
+        }else if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.ANCHORED){
             slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        }else if(slidingLayout.getPanelState() == SlidingUpPanelLayout.PanelState.EXPANDED){
+            slidingLayout.setPanelState(SlidingUpPanelLayout.PanelState.ANCHORED);
         }
     }
     @Override
@@ -382,6 +407,17 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 if(swipeLayout.isRefreshing())
                     swipeLayout.setRefreshing(false);
                 if(videoList.size() > 0) {
+                    adapter = new VideoListAdapter(videoList, AcVideoList.this);
+                    listView.setAdapter(adapter);
+                }else{
+                    EnVideoItem item = new EnVideoItem();
+                    item.setDescription("");
+                    item.setTitle("");
+                    item.setId("");
+                    item.setThumbnailURL("google.com");
+
+                    videoList.add(item);
+
                     adapter = new VideoListAdapter(videoList, AcVideoList.this);
                     listView.setAdapter(adapter);
                 }
