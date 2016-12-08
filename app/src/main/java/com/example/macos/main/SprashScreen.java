@@ -619,10 +619,7 @@ public class SprashScreen extends Activity {
             pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
 
 
-            boolean IS_ACCEPT_NOTIFICATION = pref.getBoolean(GlobalParams.IS_ACCEPT_NOTIFICATION, true);
-            Logger.error("IS_ACCEPT_NOTIFICATION: " + IS_ACCEPT_NOTIFICATION);
-            if(IS_ACCEPT_NOTIFICATION)
-                FunctionUtils.setAlarm(SprashScreen.this);
+            FunctionUtils.setAlarm(SprashScreen.this);
 
             Intent in = new Intent(SprashScreen.this, MainScreen.class);
             in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

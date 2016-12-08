@@ -54,7 +54,6 @@ public class DatabaseHelper {
 
             }
         }
-
     }
 
     public static List<BlueToothData> getBlueToothDataByID(String dataUUID){
@@ -73,7 +72,21 @@ public class DatabaseHelper {
         return queryBuilder.list();
     }
 
+    public static List<PositionData> getPositionDataByUser(String user){
+        PositionDataDao dao = Application.getInstance().daoSession.getPositionDataDao();
 
+        QueryBuilder queryBuilder = dao.queryBuilder()
+                .where(PositionDataDao.Properties.UserName.eq(user));
+        return queryBuilder.list();
+    }
+
+
+    public static void deletePositionForUser(String user){
+        PositionDataDao dao = Application.getInstance().daoSession.getPositionDataDao();
+        QueryBuilder queryBuilder = dao.queryBuilder()
+                .where(PositionDataDao.Properties.UserName.eq(user));
+        dao.deleteInTx(queryBuilder.list());
+    }
 
     public static void updateData(Data d){
         DataDao dao = Application.getInstance().daoSession.getDataDao();

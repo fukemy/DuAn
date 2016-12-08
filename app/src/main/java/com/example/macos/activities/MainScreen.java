@@ -113,7 +113,7 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         ImageView imageView = (ImageView)hView.findViewById(R.id.imageView);
 
         tvUserInfor.setText("geotech@thehegeo.com");
-        tvUserFullname.setText(pref.getString(GlobalParams.USERNAME, "User"));
+        tvUserFullname.setText(pref.getString(GlobalParams.USERNAME, "dungdv"));
 
         ACTION_TYPE = getResources().getString(R.string.road_test);
 

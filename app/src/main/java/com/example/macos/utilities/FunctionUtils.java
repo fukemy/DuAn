@@ -659,7 +659,7 @@ public class FunctionUtils {
             calendar.set(Calendar.MINUTE, 0);       //MIN
 
             AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-//            am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 4000, pi);
+//            am.set(AlarmManager.RTC, System.currentTimeMillis() + 4000, pi);
             am.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pi);
         }
     }
