@@ -12,6 +12,7 @@ import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -41,12 +42,16 @@ import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.Item;
 import com.example.macos.database.RoadInformation;
 import com.example.macos.duan.R;
+import com.example.macos.interfaces.iRequestNetwork;
 import com.example.macos.libraries.Logger;
+import com.example.macos.network.NetworkHelper;
 import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.NetworkUtil;
 import com.example.macos.utilities.SharedPreferenceManager;
+import com.github.florent37.viewanimator.AnimationListener;
+import com.github.florent37.viewanimator.ViewAnimator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -79,7 +84,6 @@ public class SprashScreen extends Activity {
     String USER_TOKEN = "";
     int CENTER_OF_SCREEN = 0;
     DisplayMetrics dm;
-    ProgressDialog progressFbDialog;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 11;
 
     @Override
@@ -148,53 +152,37 @@ public class SprashScreen extends Activity {
             }
         });
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressBar.setVisibility(View.GONE);
+                IS_LOGGED_ON = pref.getBoolean(GlobalParams.IS_LOGGED_ON, false);
+                if (!IS_LOGGED_ON) {
+                    Logger.error("IS_LOGGED_ON: " + IS_LOGGED_ON);
+                    showLogin();
+                } else {
+                    LAST_LOGIN = pref.getLong(GlobalParams.LAST_LOGIN, 0);
+                    Calendar now = Calendar.getInstance();
+                    now.setTimeInMillis(System.currentTimeMillis());
 
-        final Thread thread = new Thread(){
-            public void run(){
-                try{
-                    Thread.sleep(SPRASH_TIME);
-                }catch(InterruptedException e){
-                    e.printStackTrace();
-                }finally {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setVisibility(View.GONE);
-                        }
-                    });
-                    IS_LOGGED_ON = pref.getBoolean(GlobalParams.IS_LOGGED_ON, false);
-                    if (!IS_LOGGED_ON) {
-                        Logger.error("IS_LOGGED_ON: " + IS_LOGGED_ON);
+                    Calendar last = Calendar.getInstance();
+                    last.setTimeInMillis(LAST_LOGIN);
+                    Logger.error("DIFF_LAST_LOGIN: " + (now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)));
+                    int MAX_LOGIN_TIME = pref.getInt(GlobalParams.MAX_LOGIN_TIME, 9999);
+                    if (Math.abs(now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > MAX_LOGIN_TIME) {
                         showLogin();
                     } else {
-                        LAST_LOGIN = pref.getLong(GlobalParams.LAST_LOGIN, 0);
-                        Calendar now = Calendar.getInstance();
-                        now.setTimeInMillis(System.currentTimeMillis());
-
-                        Calendar last = Calendar.getInstance();
-                        last.setTimeInMillis(LAST_LOGIN);
-                        Logger.error("DIFF_LAST_LOGIN: " + (now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)));
-                        int MAX_LOGIN_TIME = pref.getInt(GlobalParams.MAX_LOGIN_TIME, 9999);
-                        if (Math.abs(now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > MAX_LOGIN_TIME) {
-                            showLogin();
-                        } else {
-                            final Intent in = new Intent(SprashScreen.this, MainScreen.class);
-                            startActivity(in);
-                            finish();
-                        }
-                        this.interrupt();
+                        final Intent in = new Intent(SprashScreen.this, MainScreen.class);
+                        startActivity(in);
+                        finish();
                     }
-
                 }
             }
-        };
-
-        thread.start();
+        }, SPRASH_TIME);
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -295,20 +283,13 @@ public class SprashScreen extends Activity {
 
         prLogin.setVisibility(View.VISIBLE);
 
-        final Thread thread = new Thread(){
-            public void run(){
-                try{
-                    Thread.sleep(LOGIN_TIME);
-                }catch(InterruptedException e){
-                    e.printStackTrace();
-                }finally {
-                    FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
-                    login(GlobalParams.BASED_LOGIN_URL);
-                }
-
-                }
-            };
-        thread.start();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
+                login();
+            }
+        }, LOGIN_TIME);
     }
 
     private boolean validateUserName(){
@@ -337,97 +318,53 @@ public class SprashScreen extends Activity {
 
     private void requestFocus(View view) {
         if (view.requestFocus()) {
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                }
-            });
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
     }
 
     private void showLogo(){
-        AnimationSet setAnimShowLogo = new AnimationSet(true);
-        setAnimShowLogo.setDuration(1000);
-        setAnimShowLogo.setFillAfter(true);
-        setAnimShowLogo.setAnimationListener(new Animation.AnimationListener() {
-
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-            }
-        });
-
-        ScaleAnimation scaleShow = new ScaleAnimation(0f, 1.4f, 0f, 1.4f, Animation.RELATIVE_TO_SELF, 0.5f,
-                Animation.RELATIVE_TO_SELF, 0.5f);
-        scaleShow.setInterpolator(new LinearInterpolator());
-        scaleShow.setFillAfter(true);
-
-        AlphaAnimation alphaShow = new AlphaAnimation(0, 1);
-        alphaShow.setInterpolator(new LinearInterpolator());
-
-
-        setAnimShowLogo.addAnimation(scaleShow);
-        setAnimShowLogo.addAnimation(alphaShow);
-
-        imgLogo.startAnimation(setAnimShowLogo);
+        ViewAnimator.animate(imgLogo)
+                .scale(0f, 1.4f)
+                .alpha(0f, 1f)
+                .duration(1000)
+                .accelerate()
+                .start();
     }
 
     private void showLogin(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                /**
-                 * transate Logo to top and show login
-                 */
-                final AnimationSet setShowLogin = new AnimationSet(true);
-                setShowLogin.setDuration(800);
-                setShowLogin.setFillAfter(true);
-                setShowLogin.setAnimationListener(new Animation.AnimationListener() {
-
+        ViewAnimator.animate(imgLogo)
+                .scale(1.4f, 1f)
+                .translationY(0 , - lnlLogin.getTop() - imgLogo.getHeight() - 40)
+                .duration(800)
+                .accelerate()
+                .onStop(new AnimationListener.Stop() {
                     @Override
-                    public void onAnimationStart(Animation animation) {
+                    public void onStop() {
+                        ViewAnimator.animate(lnlLogin)
+                                .scale(0f, 1.2f, 1f)
+                                .duration(500)
+                                .accelerate()
+                                .onStart(new AnimationListener.Start() {
+                                    @Override
+                                    public void onStart() {
+                                        lnlLogin.setVisibility(View.VISIBLE);
+                                    }
+                                })
+                                .start();
                     }
-
+                })
+                .thenAnimate(lnlRegister)
+                .waitForHeight()
+                .translationY(lnlRegister.getHeight(), 0)
+                .accelerate()
+                .duration(800)
+                .onStart(new AnimationListener.Start() {
                     @Override
-                    public void onAnimationRepeat(Animation animation) {
-
-                    }
-
-                    @Override
-                    public void onAnimationEnd(Animation animation) {
-                        lnlLogin.setVisibility(View.VISIBLE);
+                    public void onStart() {
                         lnlRegister.setVisibility(View.VISIBLE);
-                        AnimationControl.appearLoginForm(lnlLogin);
-
-                        TranslateAnimation showRegister = new TranslateAnimation(0, 0, lnlRegister.getHeight(), 0);
-                        showRegister.setInterpolator(new LinearInterpolator());
-                        showRegister.setDuration(450);
-                        lnlRegister.startAnimation(showRegister);
                     }
-                });
-
-                ScaleAnimation scaleHide = new ScaleAnimation(1.4f, 1f, 1.4f, 1f, Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF, 0.5f);
-                scaleHide.setInterpolator(new LinearInterpolator());
-                setShowLogin.addAnimation(scaleHide);
-
-                TranslateAnimation translateHide = new TranslateAnimation(0, 0, 0, -CENTER_OF_SCREEN - 120);
-                translateHide.setFillAfter(true);
-                translateHide.setInterpolator(new LinearInterpolator());
-                setShowLogin.addAnimation(translateHide);
-
-                imgLogo.startAnimation(setShowLogin);
-            }
-        });
-
+                })
+                .start();
     }
 
     private class MyTextWatcher implements TextWatcher {
@@ -457,7 +394,7 @@ public class SprashScreen extends Activity {
     }
 
 
-    public void login(String url)
+    public void login()
     {
         if(NetworkUtil.getConnectivityStatus(this) == NetworkUtil.TYPE_NOT_CONNECTED) {
             final AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -465,71 +402,29 @@ public class SprashScreen extends Activity {
             builder.setMessage("Xin vui lòng mở mạng để đăng nhập.");
             builder.setCancelable(true);
             builder.setPositiveButton("Ok", null);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    builder.show();
-                    prLogin.setVisibility(View.GONE);
-                }
-            });
+            builder.show();
 
+            prLogin.setVisibility(View.GONE);
             return;
         }
-        runOnUiThread(new Runnable() {
+
+        btLogin.setEnabled(false);
+
+        new NetworkHelper().getToken(SprashScreen.this, new iRequestNetwork() {
             @Override
-            public void run() {
-                btLogin.setEnabled(false);
+            public void onSuccess(Object result) {
+                USER_TOKEN = (String) result;
+                loadRoadName();
+            }
+
+            @Override
+            public void onFailRequest() {
+                btLogin.setEnabled(true);
+                Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
+                prLogin.setVisibility(View.GONE);
+                return;
             }
         });
-        Logger.error("login url: " + url);
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(url);
-        HttpResponse response;
-        String result;
-        try {
-            response = httpclient.execute(httpget);
-            Logger.error("login status:" + response.getStatusLine().toString());
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                InputStream instream = entity.getContent();
-                result = FunctionUtils.convertStreamToString(instream).replace("\"","");
-                if(result == null){
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            btLogin.setEnabled(true);
-                            Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                            prLogin.setVisibility(View.GONE);
-                            return;
-                        }
-                    });
-                }
-                Logger.error("login response:" + result);
-                USER_TOKEN = result;
-                instream.close();
-                loadRoadName();
-            }else{
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        btLogin.setEnabled(true);
-                        Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                        prLogin.setVisibility(View.GONE);
-                    }
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    btLogin.setEnabled(true);
-                    Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                    prLogin.setVisibility(View.GONE);
-                }
-            });
-
-        }
     }
 
     private void loadRoadName(){

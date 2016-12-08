@@ -13,7 +13,9 @@ import com.example.macos.activities.MainScreen;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.PositionData;
 import com.example.macos.duan.R;
+import com.example.macos.interfaces.iRequestNetwork;
 import com.example.macos.libraries.Logger;
+import com.example.macos.network.NetworkHelper;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.SharedPreferenceManager;
@@ -36,7 +38,6 @@ import java.util.List;
  */
 public class AlarmSetReceiver extends BroadcastReceiver
 {
-    private String USER_TOKEN = "";
     SharedPreferenceManager pref;
     @Override
     public void onReceive(final Context context, Intent intent)
@@ -84,36 +85,27 @@ public class AlarmSetReceiver extends BroadcastReceiver
             notificationManager.notify(GlobalParams.NOTIFICATION_ID, n);
         }
 
-        uploadPoitionsInSilent();
+        uploadPoitionsInSilent(context);
     }
 
-    private void uploadPoitionsInSilent(){
-        getToken();
+    private void uploadPoitionsInSilent(Context context){
+        Logger.error("uploadPoitionsInSilent");
+        getToken(context);
     }
 
-    private void getToken(){
-        HttpClient httpclient = new DefaultHttpClient();
-        HttpGet httpget = new HttpGet(GlobalParams.BASED_LOGIN_URL);
-        HttpResponse response;
-        try {
-            response = httpclient.execute(httpget);
-            HttpEntity entity = response.getEntity();
-            if (entity != null) {
-                InputStream instream = entity.getContent();
-                String result = FunctionUtils.convertStreamToString(instream).replace("\"","");
-                Logger.error("login token:" + result);
-                USER_TOKEN = result;
-
-                pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
-                instream.close();
-
+    private void getToken(Context context){
+        new NetworkHelper().getToken(context, new iRequestNetwork() {
+            @Override
+            public void onSuccess(Object result) {
                 new UploadUserPositionTrackingData().execute();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 
+            @Override
+            public void onFailRequest() {
+                Logger.error("get token fail!");
+            }
+        });
+    }
 
     /*
           UPLOAD POSITION DATA
@@ -126,6 +118,7 @@ public class AlarmSetReceiver extends BroadcastReceiver
 
         public UploadUserPositionTrackingData(){
             USER = pref.getString(GlobalParams.USERNAME, "dungdv");
+            String USER_TOKEN = pref.getString(GlobalParams.USER_TOKEN, "dungdv");
             result = "";
             gson = new Gson();
             url = FunctionUtils.encodeUrl(GlobalParams.BASED_UPLOAD_POSITION_URL + USER_TOKEN);
@@ -140,7 +133,7 @@ public class AlarmSetReceiver extends BroadcastReceiver
         @Override
         protected String doInBackground(Void... voids) {
             if(positionDatas.size() == 0){
-                return "error positionDatas.size() == 0";
+                return "wrong positionDatas.size() == 0";
             }
 
             HttpClient httpclient = new DefaultHttpClient();

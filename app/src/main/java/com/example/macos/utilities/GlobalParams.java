@@ -36,6 +36,7 @@ public class GlobalParams {
     public static final String IS_ACCEPT_NOTIFICATION = "is accept notification";
     public static final String BASED_URL = "http://khaosatdiachat.com:8887/api";
     public static final String USER_TOKEN = "";
+    public static final String GET_TOKEN_FAIL = "get token fail";
     public static final String BASED_LOGIN_URL = "http://khaosatdiachat.com:8887/api/users/login/dungdv/123456";
     public static final String BASED_POST_DATA_URL = "http://khaosatdiachat.com:8887/api/datas/savedatalist/dungdv/";
     public static final String BASED_GET_ROAD = "http://khaosatdiachat.com:8887/api/roads/getall/dungdv/";
