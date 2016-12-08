@@ -624,6 +624,7 @@ public class FragmentInputItem extends CustomFragment {
                     addNewContainer();
                     imgVoidRoadName.setVisibility(View.GONE);
                     imgCameraRoadName.setVisibility(View.GONE);
+                    imgVideo.setVisibility(View.GONE);
                     imgGaleryRoadName.setVisibility(View.GONE);
                     imgEditRoadName.setVisibility(View.VISIBLE);
                     imgDeleteRoadName.setVisibility(View.VISIBLE);
