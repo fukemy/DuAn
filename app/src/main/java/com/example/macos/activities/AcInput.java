@@ -438,14 +438,14 @@ public class AcInput extends FragmentActivity {
                 if (location != null) {
 
                     //TODO VERY IMPORTAIN, still now I only can get first fragment UUID, so hard.
-                    Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0);
+//                    Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(0);
 
                     PositionData positionData = new PositionData();
                     positionData.setId(UUID.randomUUID().toString());
                     positionData.setLattitude("" + location.getLatitude());
                     positionData.setLongitude("" + location.getLongitude());
                     positionData.setLogTime("" + System.currentTimeMillis());
-                    positionData.setUserName(pref.getString(GlobalParams.USERNAME, "User"));
+                    positionData.setUserName(pref.getString(GlobalParams.USERNAME, "dungdv"));
 
                     Logger.error("save position update: " + positionData);
 

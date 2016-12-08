@@ -614,7 +614,7 @@ public class SprashScreen extends Activity {
                 Logger.error("catalog: " + e.toString());
 
             pref.saveBoolean(GlobalParams.IS_LOGGED_ON, true);
-            pref.saveString(GlobalParams.USERNAME, edtUsername.getText().toString().trim());
+            pref.saveString(GlobalParams.USERNAME, "dungdv");
             pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
             pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
 

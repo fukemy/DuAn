@@ -324,6 +324,11 @@ public class FragmentReportStatus extends CustomFragment {
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
 
+        List<PositionData> positionDataList = DatabaseHelper.getPositionDataByUser(pref.getString(GlobalParams.USERNAME, "dungdv"));
+        for(PositionData pos : positionDataList){
+            Logger.error("found pos data: " + pos.toString());
+        }
+
         List<Data> listData = DatabaseHelper.getData();
         if(listData!= null) {
             if (listData.size() != 0) {
