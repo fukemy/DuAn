@@ -391,9 +391,23 @@ public class SprashScreen extends Activity {
             builder.setMessage("Xin vui lòng mở mạng để đăng nhập.");
             builder.setCancelable(true);
             builder.setPositiveButton("Ok", null);
-            builder.show();
 
-            prLogin.setVisibility(View.GONE);
+            ViewAnimator.animate(lnlLogin, btLogin)
+                    .shake()
+                    .interpolator(new LinearInterpolator())
+                    .duration(600)
+                    .onStart(new AnimationListener.Start() {
+                        @Override
+                        public void onStart() {
+                            builder.show();
+                            prLogin.setVisibility(View.GONE);
+                            btLogin.setEnabled(true);
+                            edtUsername.setEnabled(true);
+                            edtPassword.setEnabled(true);
+                            prLogin.setVisibility(View.GONE);
+                        }
+                    })
+                    .start();
             return;
         }
 
@@ -408,10 +422,20 @@ public class SprashScreen extends Activity {
             @Override
             public void onFailRequest() {
                 Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                prLogin.setVisibility(View.GONE);
-                btLogin.setEnabled(true);
-                edtUsername.setEnabled(true);
-                edtPassword.setEnabled(true);
+                ViewAnimator.animate(lnlLogin, btLogin)
+                        .shake()
+                        .interpolator(new LinearInterpolator())
+                        .duration(600)
+                        .onStop(new AnimationListener.Stop() {
+                            @Override
+                            public void onStop() {
+                                prLogin.setVisibility(View.GONE);
+                                btLogin.setEnabled(true);
+                                edtUsername.setEnabled(true);
+                                edtPassword.setEnabled(true);
+                            }
+                        })
+                        .start();
             }
         });
     }

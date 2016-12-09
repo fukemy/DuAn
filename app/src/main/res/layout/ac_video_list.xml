@@ -176,7 +176,7 @@
                         <ImageView
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:background="@mipmap/tranparent_bg_top_for_text_mapview"
+                            android:background="@mipmap/tranparent_bg_bottom_for_text_mapview"
                             android:rotation="180" />
 
                         <com.example.macos.libraries.AutoResizeTextView
