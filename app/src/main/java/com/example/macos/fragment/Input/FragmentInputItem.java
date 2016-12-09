@@ -1081,7 +1081,7 @@ public class FragmentInputItem extends CustomFragment {
                     case MotionEvent.ACTION_UP:
                         scroll.requestDisallowInterceptTouchEvent(false);
                         isRunningAnimation = false;
-                        if (img.getAlpha() < 0.1f || Math.abs(temp) > 200) {
+                        if (img.getAlpha() < 0.4f || Math.abs(temp) > 200) {
                             mExplosionField.explode(img);
                             ((ViewGroup) img.getParent()).removeView(img);
                         } else {
@@ -1122,7 +1122,7 @@ public class FragmentInputItem extends CustomFragment {
                         if (isRunningAnimation && ((ViewGroup) img.getParent()).getTag() != null &&
                                 ((ViewGroup) img.getParent()).getTag().toString().equals("fromCamera")) {
                             Logger.error("fromCamera");
-                            if (img.getAlpha() < 0.1f) {
+                            if (img.getAlpha() < 0.3f) {
                                 mExplosionField.explode(img);
                                 ((ViewGroup) img.getParent()).removeView(img);
                             } else {

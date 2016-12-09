@@ -82,7 +82,6 @@ public class SprashScreen extends Activity {
     long LAST_LOGIN = 0;
     int currentDiffheight = 0;
     String USER_TOKEN = "";
-    int CENTER_OF_SCREEN = 0;
     DisplayMetrics dm;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 11;
 
@@ -92,15 +91,17 @@ public class SprashScreen extends Activity {
         setContentView(R.layout.ac_sprash_screen);
         pref = new SharedPreferenceManager(SprashScreen.this);
 
+        dm = getResources().getDisplayMetrics();
         initLayout();
 
-        dm = getResources().getDisplayMetrics();
         imgLogo.requestLayout();
         imgLogo.getLayoutParams().height = dm.heightPixels / 4;
         imgLogo.getLayoutParams().width = dm.heightPixels / 4;
 
+        Logger.error("Build.VERSION.SDK_INT :" + Build.VERSION.SDK_INT + " - Build.VERSION_CODES.M: " + Build.VERSION_CODES.M);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+                Logger.error("request permision for Android M");
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("");
                 builder.setMessage("");
@@ -117,18 +118,6 @@ public class SprashScreen extends Activity {
         }
 
         showLogo();
-
-
-
-        imgLogo.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-            @Override
-            public void onGlobalLayout() {
-                imgLogo.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                DisplayMetrics dm = getResources().getDisplayMetrics();
-                CENTER_OF_SCREEN = dm.heightPixels / 2 - imgLogo.getMeasuredHeight();
-            }
-        });
 
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -160,6 +149,7 @@ public class SprashScreen extends Activity {
                 if (!IS_LOGGED_ON) {
                     Logger.error("IS_LOGGED_ON: " + IS_LOGGED_ON);
                     showLogin();
+//                    silentLogin();
                 } else {
                     LAST_LOGIN = pref.getLong(GlobalParams.LAST_LOGIN, 0);
                     Calendar now = Calendar.getInstance();
@@ -172,7 +162,7 @@ public class SprashScreen extends Activity {
                     if (Math.abs(now.get(Calendar.DAY_OF_MONTH) - last.get(Calendar.DAY_OF_MONTH)) > MAX_LOGIN_TIME) {
                         showLogin();
                     } else {
-                        final Intent in = new Intent(SprashScreen.this, MainScreen.class);
+                        Intent in = new Intent(SprashScreen.this, MainScreen.class);
                         startActivity(in);
                         finish();
                     }
@@ -222,6 +212,8 @@ public class SprashScreen extends Activity {
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btLogin.setEnabled(false);
+                FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
                 submitForm();
             }
         });
@@ -282,11 +274,12 @@ public class SprashScreen extends Activity {
         }
 
         prLogin.setVisibility(View.VISIBLE);
+        edtUsername.setEnabled(false);
+        edtPassword.setEnabled(false);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
                 login();
             }
         }, LOGIN_TIME);
@@ -324,7 +317,7 @@ public class SprashScreen extends Activity {
 
     private void showLogo(){
         ViewAnimator.animate(imgLogo)
-                .scale(0f, 1.4f)
+                .scale(0f, 1.5f)
                 .alpha(0f, 1f)
                 .duration(1000)
                 .accelerate()
@@ -333,38 +326,34 @@ public class SprashScreen extends Activity {
 
     private void showLogin(){
         ViewAnimator.animate(imgLogo)
-                .scale(1.4f, 1f)
+                .scale(1.5f, 1f)
                 .translationY(0 , - lnlLogin.getTop() - imgLogo.getHeight() - 40)
-                .duration(800)
+                .duration(600)
                 .accelerate()
                 .onStop(new AnimationListener.Stop() {
                     @Override
                     public void onStop() {
                         ViewAnimator.animate(lnlLogin)
-                                .scale(0f, 1.2f, 1f)
-                                .duration(500)
+//                                .scale(0f, 1.2f, 1f)
+                                .alpha(0f, 1f)
+                                .andAnimate(lnlRegister)
+                                .slideBottom()
+                                .alpha(0f, 1f)
                                 .accelerate()
+                                .duration(600)
                                 .onStart(new AnimationListener.Start() {
                                     @Override
                                     public void onStart() {
                                         lnlLogin.setVisibility(View.VISIBLE);
+                                        lnlRegister.setVisibility(View.VISIBLE);
                                     }
                                 })
+
                                 .start();
                     }
                 })
-                .thenAnimate(lnlRegister)
-                .waitForHeight()
-                .translationY(lnlRegister.getHeight(), 0)
-                .accelerate()
-                .duration(800)
-                .onStart(new AnimationListener.Start() {
-                    @Override
-                    public void onStart() {
-                        lnlRegister.setVisibility(View.VISIBLE);
-                    }
-                })
                 .start();
+
     }
 
     private class MyTextWatcher implements TextWatcher {
@@ -402,13 +391,26 @@ public class SprashScreen extends Activity {
             builder.setMessage("Xin vui lòng mở mạng để đăng nhập.");
             builder.setCancelable(true);
             builder.setPositiveButton("Ok", null);
-            builder.show();
 
-            prLogin.setVisibility(View.GONE);
+            ViewAnimator.animate(lnlLogin, btLogin)
+                    .shake()
+                    .interpolator(new LinearInterpolator())
+                    .duration(600)
+                    .onStart(new AnimationListener.Start() {
+                        @Override
+                        public void onStart() {
+                            builder.show();
+                            prLogin.setVisibility(View.GONE);
+                            btLogin.setEnabled(true);
+                            edtUsername.setEnabled(true);
+                            edtPassword.setEnabled(true);
+                            prLogin.setVisibility(View.GONE);
+                        }
+                    })
+                    .start();
             return;
         }
 
-        btLogin.setEnabled(false);
 
         new NetworkHelper().getToken(SprashScreen.this, new iRequestNetwork() {
             @Override
@@ -419,10 +421,21 @@ public class SprashScreen extends Activity {
 
             @Override
             public void onFailRequest() {
-                btLogin.setEnabled(true);
                 Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
-                prLogin.setVisibility(View.GONE);
-                return;
+                ViewAnimator.animate(lnlLogin, btLogin)
+                        .shake()
+                        .interpolator(new LinearInterpolator())
+                        .duration(600)
+                        .onStop(new AnimationListener.Stop() {
+                            @Override
+                            public void onStop() {
+                                prLogin.setVisibility(View.GONE);
+                                btLogin.setEnabled(true);
+                                edtUsername.setEnabled(true);
+                                edtPassword.setEnabled(true);
+                            }
+                        })
+                        .start();
             }
         });
     }
@@ -522,4 +535,20 @@ public class SprashScreen extends Activity {
             finish();
         }
     }
+
+    private void silentLogin(){
+        pref.saveBoolean(GlobalParams.IS_LOGGED_ON, true);
+        pref.saveString(GlobalParams.USERNAME, "dungdv");
+        pref.saveLong(GlobalParams.LAST_LOGIN, System.currentTimeMillis());
+        pref.saveString(GlobalParams.USER_TOKEN, USER_TOKEN);
+
+
+        FunctionUtils.setAlarm(SprashScreen.this);
+
+        Intent in = new Intent(SprashScreen.this, MainScreen.class);
+        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(in);
+        finish();
+    }
+
 }

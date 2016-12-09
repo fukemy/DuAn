@@ -12,6 +12,7 @@
         android:layout_margin="10dp"
         android:layout_marginBottom="20dp"
         android:clipChildren="false"
+        android:clipToPadding="false"
         android:orientation="vertical"
         android:paddingBottom="10dp">
 
@@ -29,11 +30,11 @@
             <TextView
                 android:id="@+id/tvGraphData"
                 android:layout_width="match_parent"
-                android:visibility="gone"
                 android:layout_height="80dp"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:paddingTop="10dp" />
+                android:paddingTop="10dp"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvRoadName"
@@ -52,6 +53,7 @@
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
                 android:background="@drawable/border_disable"
                 android:tag="promptCatalog" />
 
@@ -69,7 +71,6 @@
                 android:id="@+id/edtOtherStatus"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
                 android:background="@drawable/border_disable"
@@ -79,7 +80,8 @@
                 android:lines="2"
                 android:padding="10dp"
                 android:singleLine="true"
-                android:tag="otherStatus" />
+                android:tag="otherStatus"
+                android:visibility="gone" />
 
             <EditText
                 android:id="@+id/edtJusticeProcess"
@@ -125,6 +127,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
+                android:clipChildren="false"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 android:paddingBottom="10dp"
@@ -151,10 +154,10 @@
                     android:id="@+id/imgGaleryRoadName"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:visibility="gone"
                     android:layout_marginLeft="28dp"
                     android:layout_marginTop="2dp"
-                    android:background="@mipmap/galery" />
+                    android:background="@mipmap/galery"
+                    android:visibility="gone" />
 
                 <ImageView
                     android:id="@+id/imgVideoRoadName"
@@ -177,6 +180,8 @@
                         android:layout_height="24dp"
                         android:layout_marginLeft="24dp"
                         android:src="@android:color/black"
+                        android:tag="edit"
+                        android:visibility="gone"
                         app:allow_random_color="false"
                         app:big_shine_color="@color/mainColor"
                         app:btn_color="@android:color/black"
@@ -188,9 +193,7 @@
                         app:shine_distance_multiple="1.5"
                         app:shine_turn_angle="10"
                         app:siShape="@mipmap/edit_black"
-                        android:visibility="gone"
                         app:small_shine_color="#CC9999"
-                        android:tag="edit"
                         app:small_shine_offset_angle="20" />
 
                     <ImageView
@@ -219,22 +222,25 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
+                android:isScrollContainer="true"
                 android:layout_marginRight="10dp"
-                android:clipChildren="false"
-                android:clipToPadding="false">
+                android:clipToPadding="false"
+                android:clipChildren="false">
 
                 <LinearLayout
                     android:id="@+id/lnlImage"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     android:animateLayoutChanges="true"
-                    android:clipChildren="false"
-                    android:clipToPadding="false"
                     android:background="@drawable/image_ripple"
                     android:clickable="true"
-                    android:gravity="top|left"
-                    android:tag="fromCamera"
-                    android:orientation="horizontal" />
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:tag="fromCamera" />
             </HorizontalScrollView>
         </LinearLayout>
 

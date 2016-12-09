@@ -69,11 +69,15 @@
                     android:id="@+id/lnlAll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:clipChildren="false"
+                    android:clipToPadding="false"
                     android:animateLayoutChanges="true"
                     android:orientation="vertical">
 
                     <include
                         android:id="@+id/container"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
                         layout="@layout/road_surface_include" />
                 </LinearLayout>
 

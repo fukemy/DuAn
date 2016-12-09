@@ -5,8 +5,10 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Rect;
+import android.os.Handler;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -18,10 +20,14 @@ import android.view.animation.ScaleAnimation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 
+import com.example.macos.activities.MainScreen;
 import com.example.macos.duan.R;
 import com.example.macos.entities.EnMainCatalogItem;
 import com.example.macos.interfaces.iListWork;
 import com.example.macos.libraries.Logger;
+import com.example.macos.main.SprashScreen;
+
+import java.util.Calendar;
 
 /**
  * Created by macos on 6/13/16.
@@ -144,24 +150,15 @@ public class AnimationControl {
                 mCurrentAnimatorEffect = null;
                 //expandedImageView.setVisibility(View.GONE);
                 parent.findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
-                Thread thread = new Thread(){
-                    public void run(){
-                        try{
-                            Thread.sleep(600);
-                        }catch(InterruptedException e){
-                            e.printStackTrace();
-                        }finally {
-                            {
-                                if(swap != null) {
-                                    swap.doListWork(en);
-                                }else{
-                                }
-                            }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(swap != null) {
+                            swap.doListWork(en);
+                        }else{
                         }
                     }
-                };
-                thread.start();;
-
+                }, 600);
             }
 
             @Override

@@ -20,6 +20,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 
 import java.io.InputStream;
@@ -55,6 +57,11 @@ public class NetworkHelper {
         @Override
         protected String doInBackground(Void... voids) {
             HttpClient httpclient = new DefaultHttpClient();
+
+            HttpParams params = httpclient.getParams();
+            HttpConnectionParams.setConnectionTimeout(params, 15000);
+            HttpConnectionParams.setSoTimeout(params, 15000);
+
             HttpGet httpget = new HttpGet(GlobalParams.BASED_LOGIN_URL);
             HttpResponse response;
             try {
