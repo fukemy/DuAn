@@ -50,6 +50,7 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackground"
+            android:gravity="center"
             android:clickable="true">
 
             <ImageView
