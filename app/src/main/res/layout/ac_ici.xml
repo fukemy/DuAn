@@ -65,6 +65,7 @@
                 android:gravity="center"
                 android:padding="10dp"
                 android:text="Tổng quan"
+                android:textAllCaps="true"
                 android:textStyle="bold" />
 
             <TextView
