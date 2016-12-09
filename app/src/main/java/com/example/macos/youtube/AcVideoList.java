@@ -107,6 +107,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 Logger.error("onmapReady");
                 googleMap = mMap;
                 //config google map
+                googleMap.getUiSettings().setMapToolbarEnabled(false);
                 googleMap.getUiSettings().setAllGesturesEnabled(false);
                 googleMap.setMyLocationEnabled(false);
 
@@ -236,17 +237,17 @@ public class AcVideoList extends YouTubeBaseActivity implements
                     public void updateLocation(EnLocationItem lo) {
                         final String address = lo.getAddress().trim().replace("\n", ", ");
                         ViewAnimator.animate(tvLocation)
-                                .scaleY(0f, 1.2f, 1f)
-                                .scaleX(0f, 1.4f, 1f)
-                                .alpha(0.5f,1f)
-                                .accelerate()
+                                .slideBottom()
+                                .alpha(0f,1f)
+                                .bounceIn()
+                                .descelerate()
                                 .onStart(new AnimationListener.Start() {
                                     @Override
                                     public void onStart() {
                                         tvLocation.setText(getResources().getString(R.string.vitri) + ": " + address + ".");
                                     }
                                 })
-                                .duration(600)
+                                .duration(800)
                                 .start();
 
                     }

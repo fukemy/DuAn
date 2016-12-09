@@ -225,7 +225,7 @@ public class DiaryReportContent extends AppCompatActivity {
                                 }
                             });
 
-                            drawRoadTestProgress();
+//                            drawRoadTestProgress();
                         }
                     }
                 });
@@ -272,7 +272,7 @@ public class DiaryReportContent extends AppCompatActivity {
         }
 
         lineOptions.addAll(latLngs);
-        if(lineOptions != null) {
+        if(lineOptions != null && latLngs.size() > 1) {
             gMap.addPolyline(lineOptions);
 
             /**
