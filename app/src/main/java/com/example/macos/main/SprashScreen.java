@@ -82,7 +82,6 @@ public class SprashScreen extends Activity {
     long LAST_LOGIN = 0;
     int currentDiffheight = 0;
     String USER_TOKEN = "";
-    int CENTER_OF_SCREEN = 0;
     DisplayMetrics dm;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 11;
 
@@ -99,7 +98,7 @@ public class SprashScreen extends Activity {
         imgLogo.getLayoutParams().height = dm.heightPixels / 4;
         imgLogo.getLayoutParams().width = dm.heightPixels / 4;
 
-        Logger.error("Build.VERSION.SDK_INT :" + Build.VERSION.SDK_INT);
+        Logger.error("Build.VERSION.SDK_INT :" + Build.VERSION.SDK_INT + " - Build.VERSION_CODES.M: " + Build.VERSION_CODES.M);
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M){
             if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
                 Logger.error("request permision for Android M");
@@ -119,17 +118,6 @@ public class SprashScreen extends Activity {
         }
 
         showLogo();
-
-
-
-        imgLogo.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-
-            @Override
-            public void onGlobalLayout() {
-                imgLogo.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                CENTER_OF_SCREEN = dm.heightPixels / 2 - imgLogo.getMeasuredHeight();
-            }
-        });
 
         rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -224,6 +212,8 @@ public class SprashScreen extends Activity {
         btLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                btLogin.setEnabled(false);
+                FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
                 submitForm();
             }
         });
@@ -284,11 +274,12 @@ public class SprashScreen extends Activity {
         }
 
         prLogin.setVisibility(View.VISIBLE);
+        edtUsername.setEnabled(false);
+        edtPassword.setEnabled(false);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                FunctionUtils.hideSoftInput(edtPassword, SprashScreen.this);
                 login();
             }
         }, LOGIN_TIME);
@@ -406,7 +397,6 @@ public class SprashScreen extends Activity {
             return;
         }
 
-        btLogin.setEnabled(false);
 
         new NetworkHelper().getToken(SprashScreen.this, new iRequestNetwork() {
             @Override
@@ -417,10 +407,11 @@ public class SprashScreen extends Activity {
 
             @Override
             public void onFailRequest() {
-                btLogin.setEnabled(true);
                 Toast.makeText(SprashScreen.this, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show();
                 prLogin.setVisibility(View.GONE);
-                return;
+                btLogin.setEnabled(true);
+                edtUsername.setEnabled(true);
+                edtPassword.setEnabled(true);
             }
         });
     }
