@@ -17,44 +17,45 @@
     <LinearLayout
         android:id="@+id/lnlAction"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:layout_gravity="bottom"
-        android:background="#AA000000"
+        android:background="@mipmap/tranparent_bg_bottom_for_text_mapview"
         android:orientation="horizontal"
         android:visibility="gone">
 
         <LinearLayout
             android:id="@+id/lnlBack"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackground"
             android:clickable="true"
             android:gravity="center">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="20dp"
+                android:layout_width="24dp"
+                android:layout_height="28dp"
                 android:background="@mipmap/back_button" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="1dp"
-            android:layout_height="36dp"
-            android:background="@color/grayColor" />
+            android:layout_height="48dp"
+            android:background="@color/grayColor"
+            android:visibility="gone" />
 
         <LinearLayout
             android:id="@+id/lnlDelete"
             android:layout_width="match_parent"
-            android:layout_height="36dp"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:background="?android:attr/selectableItemBackground"
-            android:clickable="true"
-            android:gravity="center">
+            android:clickable="true">
 
             <ImageView
-                android:layout_width="16dp"
-                android:layout_height="16dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
                 android:background="@mipmap/delete" />
         </LinearLayout>
     </LinearLayout>

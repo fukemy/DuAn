@@ -25,9 +25,10 @@ import android.widget.LinearLayout;
 import com.example.macos.duan.R;
 import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.TouchImageView;
-import com.example.macos.utilities.AnimationControl;
 import com.example.macos.utilities.AsyncTaskHelper;
+import com.github.florent37.viewanimator.ViewAnimator;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -72,7 +73,13 @@ public class AcImageInformation extends Activity {
                 public void onTransitionEnd(Transition transition) {
                     Logger.error("onTransitionEnd");
                     lnlAction.setVisibility(View.VISIBLE);
-                    AnimationControl.translateView(lnlAction, 0, 0, 200, 0 , true, 300);
+
+                    ViewAnimator.animate(lnlAction)
+                            .slideBottom()
+                            .duration(800)
+                            .accelerate()
+                            .start();
+//                    AnimationControl.translateView(lnlAction, 0, 0, 200, 0 , true, 300);
                 }
 
                 @Override
@@ -142,13 +149,19 @@ public class AcImageInformation extends Activity {
                     sharedElement.setBackground(null);
                     sharedElement.setImageAlpha(255);
 
-                    //setImage();
                     Logger.error("end element");
                 }
             });
         }else{
             lnlAction.setVisibility(View.VISIBLE);
-            AnimationControl.translateView(lnlAction, 0, 0, 200, 0 , true, 300);
+            ViewAnimator.animate(lnlAction)
+                    .slideBottom()
+                    .alpha(0f,1f)
+                    .bounceIn()
+                    .descelerate()
+                    .duration(800)
+                    .start();
+//            AnimationControl.translateView(lnlAction, 0, 0, 200, 0 , true, 300);
         }
 
     }
@@ -181,13 +194,11 @@ public class AcImageInformation extends Activity {
                         Intent data = new Intent();
                         data.putExtra("isDelete", true);
                         setResult(RESULT_OK, data);
-//                        onBackPressed();
                         finish();
                     }
                 });
                 builder.setNegativeButton("Cancel", null);
                 builder.show();
-
 
             }
         });
@@ -200,7 +211,14 @@ public class AcImageInformation extends Activity {
 
     private void setImage(){
         String imgRef = getIntent().getStringExtra("imgRef");
-        Uri selectedImage = Uri.parse("file://" + imgRef);
+        Uri selectedImage = Uri.parse(imgRef);
+//        DisplayMetrics dm = getResources().getDisplayMetrics();
+
+//        Picasso.with(this)
+//                .load(selectedImage)
+//                .resize(dm.widthPixels, dm.heightPixels)
+//                .into(img);
+
         AsyncTaskHelper helper = new AsyncTaskHelper();
         helper.applyImage(this, img, selectedImage);
     }
