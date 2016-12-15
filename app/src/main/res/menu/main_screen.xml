@@ -10,18 +10,6 @@
         android:title="@string/enter_road_name"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/select_road_type"
-        android:orderInCategory="5"
-        android:title="@string/multi_select"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/done"
-        android:orderInCategory="3"
-        android:title="Done"
-        app:showAsAction="ifRoom|collapseActionView|withText" />
-
     <!--<item-->
         <!--android:id="@+id/camera"-->
         <!--android:icon="@mipmap/camera"-->

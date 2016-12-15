@@ -6,6 +6,5 @@ import com.example.macos.entities.EnMainCatalogItem;
  * Created by macos on 6/14/16.
  */
 public interface iListWork {
-    public void doListWork(EnMainCatalogItem en);
-    public void doListWorks();
+    public void goToInputPage(EnMainCatalogItem en);
 }

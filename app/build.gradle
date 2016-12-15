@@ -28,30 +28,36 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'de.greenrobot:greendao:2.1.0'
+    compile 'com.android.support:design:23.4.0'
     compile ('com.android.support:support-v4:23.4.0'){
         force = true;
     }
-    compile 'com.android.support:design:23.4.0'
+
+    compile 'com.android.support:recyclerview-v7:23.3.+'
+    compile 'com.android.support:cardview-v7:23.3.+'
+
     compile 'com.google.android.gms:play-services-maps:10.0.1'
     compile 'com.google.android.gms:play-services-location:10.0.1'
+
+    compile files('libs/YouTubeAndroidPlayerApi.jar') //youtube player
+    compile 'com.google.apis:google-api-services-youtube:v3-rev176-1.22.0' //youtube client
+
     compile 'com.github.douglasjunior.BetterSpinner:library-material:bugfix-1.1.0-2'
-//    compile 'com.github.ParkSangGwon:TedPicker:v1.0.10' //for camera dialog
     compile 'com.mlsdev.rximagepicker:library:1.2.1'
     compile 'io.reactivex:rxjava:1.0.14'
     compile 'com.github.JakeWharton:ViewPagerIndicator:2.4.1@aar' //for viewpager indicator
     compile 'com.google.code.gson:gson:2.2.+'
-    //compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
     compile 'tyrantgit:explosionfield:1.0.1' //explosive view
     compile 'com.squareup.picasso:picasso:2.5.2' // picaso loadimage
     compile 'com.github.wooplr:Spotlight:1.2.2' // show case view
     compile 'com.sackcentury:shinebutton:0.1.5' //https://github.com/ChadCSong/ShineButton
     compile 'com.jjoe64:graphview:4.2.1' //graphview
-    compile files('libs/YouTubeAndroidPlayerApi.jar') //youtube player
-    compile 'com.google.apis:google-api-services-youtube:v3-rev176-1.22.0' //youtube client
     compile 'com.android.support:multidex:1.0.1'
     compile 'com.github.pedrovgs:draggablepanel:1.9' //dragpanel like youtube
     compile 'com.sothree.slidinguppanel:library:3.3.1' // sliding up layout
     compile 'com.truizlop.fabreveallayout:library:1.0.0' //https://github.com/truizlop/FABRevealLayout
     compile 'de.hdodenhof:circleimageview:2.1.0' //https://github.com/hdodenhof/CircleImageView
     compile 'com.github.florent37:viewanimator:1.0.4' //https://github.com/florent37/ViewAnimator
+//    compile 'com.github.ParkSangGwon:TedPicker:v1.0.10' //for camera dialog
+//    compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
 }

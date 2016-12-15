@@ -84,7 +84,6 @@ public class FunctionUtils {
             for (int i = 0; i < menu.size(); i++) {
                 menu.getItem(i).setVisible(hide);
             }
-            menu.findItem(R.id.done).setVisible(false);
         }
     }
 

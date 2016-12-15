@@ -283,15 +283,12 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             switch (position){
                 case 0 :
                     f = new FragmentReportDiary();
-                    ((CustomFragment) f).setInterface(swap);
                     break;
                 case 1 :
                     f = new FragmentReportStatus();
-                    ((CustomFragment) f).setInterface(swap);
                     break;
                 case 2:
                     f = new FragmentReportMap();
-                    ((CustomFragment) f).setInterface(swap);
                     break;
                 default:
                     return null;
@@ -326,11 +323,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
 
         // init data
         FragmentMainDataScreen mainDataScreen = new FragmentMainDataScreen();
-        mainDataScreen.setInterface(swap);
         adapter.addFragment(mainDataScreen, getResources().getString(R.string.road_test));
 
         final FragmentAccident accident = new FragmentAccident();
-        accident.setInterface(swap);
         adapter.addFragment(accident, "Lập báo cáo");
 
         // set data
@@ -345,7 +340,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
                 viewPager.setCurrentItem(tab.getPosition());
 
                 if((adapter.getmFragmentList().get(viewPager.getCurrentItem())) instanceof FragmentMainDataScreen) {
-                    ((FragmentMainDataScreen) adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(false);
                     FunctionUtils.hideMenu(menu, true);
                 }
 
@@ -450,38 +444,9 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         }
     };
 
-    public iListWork swap = new iListWork() {
-
-        //for single work
-        @Override
-        public void doListWork(EnMainCatalogItem en) {
-            Logger.error("choose item: " + en.getItem().toString());
-            final Intent in = new Intent(MainScreen.this, AcInput.class);
-            List<Item> itemList = new ArrayList<>();
-            itemList.add(en.getItem());
-            enWorkLists = new EnWorkList(itemList);
-            in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
-            in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
-            startActivity(in);
-        };
-
-        //for multi works
-        @Override
-        public void doListWorks() {
-            Logger.error("choose items: " + enWorkLists.toString());
-            final Intent in = new Intent(MainScreen.this, AcInput.class);
-            in.putExtra(GlobalParams.LIST_WORKING_NAME, enWorkLists);
-            in.putExtra(GlobalParams.ACTION_TYPE, getResources().getString(R.string.road_test));
-            startActivity(in);
-        }
-    };
-
     @Override
     protected void onResume() {
         super.onResume();
-        if(menu != null)
-            menu.findItem(R.id.select_road_type).setTitle(getResources().getString(R.string.multi_select));
-          //initLayoutAndData();
     }
 
     @Override
@@ -510,40 +475,8 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_screen, menu);
         this.menu = menu;
-        menu.findItem(R.id.done).setVisible(false);
         return true;
     }
-
-//    private void addMenuShowcase(){
-//        boolean isAddedShowcase = pref.getBoolean(GlobalParams.MULTI_SELECT_SHOWCASE, false);
-//        if(!isAddedShowcase) {
-//            try {
-//                new SpotlightView.Builder(this)
-//                        .introAnimationDuration(400)
-//                        .enableRevalAnimation(true)
-//                        .performClick(true)
-//                        .fadeinTextDuration(400)
-//                        .headingTvColor(Color.parseColor("#eb273f"))
-//                        .headingTvSize(32)
-//                        .headingTvText("Chọn nhiều mục cùng lúc!")
-//                        .subHeadingTvColor(Color.parseColor("#ffffff"))
-//                        .subHeadingTvSize(16)
-//                        .subHeadingTvText("Thuận tiện hơn khi bạn muốn nhập nhiều dữ liệu cho 1 lần tuần đường, tuy nhiên phải nhập ít nhất 1 lần cho mỗi loại dữ liệu, "
-//                                + "nhấn \"DONE\" để tiếp tục!")
-//                        .maskColor(Color.parseColor("#dc000000"))
-//                        .target(menu.getItem(1).getActionView())
-//                        .lineAnimDuration(400)
-//                        .lineAndArcColor(Color.parseColor("#eb273f"))
-//                        .dismissOnTouch(false)
-//                        .enableDismissAfterShown(true)
-//                        .usageId(GlobalParams.MULTI_SELECT_SHOWCASE)
-//                        .show();
-//                pref.saveBoolean(GlobalParams.MULTI_SELECT_SHOWCASE, true);
-//            }catch (Exception e){
-//
-//            }
-//        }
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -553,48 +486,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
             showDialog();
             return true;
         }
-        if (id == R.id.select_road_type){
-
-            if(pref.getString(GlobalParams.ROAD_CHOOSEN,"").equals("")){
-                FunctionUtils.showErrorDialog(getResources().getString(R.string.bancanchontenduongtruoctien), MainScreen.this, dialogInterface);
-            }
-
-            if(menu.findItem(R.id.select_road_type).getTitle().equals(getResources().getString(R.string.multi_select))){
-                ((FragmentMainDataScreen)adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(true);
-                menu.findItem(R.id.done).setVisible(true);
-                menu.findItem(R.id.select_road_type).setTitle(getResources().getString(R.string.single_select));
-//                addMenuShowcase();
-                return false;
-            }
-            if(menu.findItem(R.id.select_road_type).getTitle().equals(getResources().getString(R.string.single_select))) {
-                ((FragmentMainDataScreen) adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(false);
-                menu.findItem(R.id.select_road_type).setTitle(getResources().getString(R.string.multi_select));
-                menu.findItem(R.id.done).setVisible(false);
-                return false;
-            }
-
-        }
-
-        if (id == R.id.done ) {
-            if(menu.findItem(R.id.done).isVisible()){
-                menu.findItem(R.id.done).setVisible(false);
-                // collec checked item first
-                List<EnMainCatalogItem> listMainData =  ((FragmentMainDataScreen)adapter.getmFragmentList().get(viewPager.getCurrentItem())).collectSelectedItem();
-                if(listMainData.size() != 0) {
-                    List<Item> itemList = new ArrayList<>();
-                    for(EnMainCatalogItem str : listMainData){
-                        itemList.add(str.getItem());
-                    }
-                    enWorkLists = new EnWorkList(itemList);
-                    swap.doListWorks();
-                }else{
-                    ((FragmentMainDataScreen) adapter.getmFragmentList().get(viewPager.getCurrentItem())).setMultiSelect(false);
-                    menu.findItem(R.id.select_road_type).setTitle(getResources().getString(R.string.multi_select));
-                }
-            }
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 

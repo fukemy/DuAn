@@ -21,7 +21,8 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                android:background="@color/mainColor" />
+                android:background="@color/mainColor"
+                app:layout_scrollFlags="scroll|enterAlways" />
 
 
             <android.support.design.widget.TabLayout
@@ -51,6 +52,5 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:headerLayout="@layout/nav_header_main_screen"
-        app:menu="@menu/main_screen_drawer">
-    </android.support.design.widget.NavigationView>
+        app:menu="@menu/main_screen_drawer" />
 </android.support.v4.widget.DrawerLayout>

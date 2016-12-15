@@ -154,7 +154,7 @@ public class AnimationControl {
                     @Override
                     public void run() {
                         if(swap != null) {
-                            swap.doListWork(en);
+                            swap.goToInputPage(en);
                         }else{
                         }
                     }
@@ -169,47 +169,47 @@ public class AnimationControl {
         set.start();
         mCurrentAnimatorEffect = set;
 
-        final float startScaleFinal = startScale;
-        expandedImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mCurrentAnimatorEffect != null) {
-                    mCurrentAnimatorEffect.cancel();
-                }
-
-                // back to their original values.
-                AnimatorSet set = new AnimatorSet();
-                set.play(ObjectAnimator
-                        .ofFloat(expandedImageView, View.X, startBounds.left))
-                        .with(ObjectAnimator
-                                .ofFloat(expandedImageView,
-                                        View.Y,startBounds.top))
-                        .with(ObjectAnimator
-                                .ofFloat(expandedImageView,
-                                        View.SCALE_X, startScaleFinal))
-                        .with(ObjectAnimator
-                                .ofFloat(expandedImageView,
-                                        View.SCALE_Y, startScaleFinal));
-                set.setDuration(mShortAnimationDurationEffect);
-                set.setInterpolator(new DecelerateInterpolator());
-                set.addListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        thumbView.setAlpha(1f);
-                        expandedImageView.setVisibility(View.GONE);
-                        mCurrentAnimatorEffect = null;
-                    }
-
-                    @Override
-                    public void onAnimationCancel(Animator animation) {
-                        thumbView.setAlpha(1f);
-                        expandedImageView.setVisibility(View.GONE);
-                        mCurrentAnimatorEffect = null;
-                    }
-                });
-                set.start();
-                mCurrentAnimatorEffect = set;
-            }
-        });
+//        final float startScaleFinal = startScale;
+//        expandedImageView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if (mCurrentAnimatorEffect != null) {
+//                    mCurrentAnimatorEffect.cancel();
+//                }
+//
+//                // back to their original values.
+//                AnimatorSet set = new AnimatorSet();
+//                set.play(ObjectAnimator
+//                        .ofFloat(expandedImageView, View.X, startBounds.left))
+//                        .with(ObjectAnimator
+//                                .ofFloat(expandedImageView,
+//                                        View.Y,startBounds.top))
+//                        .with(ObjectAnimator
+//                                .ofFloat(expandedImageView,
+//                                        View.SCALE_X, startScaleFinal))
+//                        .with(ObjectAnimator
+//                                .ofFloat(expandedImageView,
+//                                        View.SCALE_Y, startScaleFinal));
+//                set.setDuration(mShortAnimationDurationEffect);
+//                set.setInterpolator(new DecelerateInterpolator());
+//                set.addListener(new AnimatorListenerAdapter() {
+//                    @Override
+//                    public void onAnimationEnd(Animator animation) {
+//                        thumbView.setAlpha(1f);
+//                        expandedImageView.setVisibility(View.GONE);
+//                        mCurrentAnimatorEffect = null;
+//                    }
+//
+//                    @Override
+//                    public void onAnimationCancel(Animator animation) {
+//                        thumbView.setAlpha(1f);
+//                        expandedImageView.setVisibility(View.GONE);
+//                        mCurrentAnimatorEffect = null;
+//                    }
+//                });
+//                set.start();
+//                mCurrentAnimatorEffect = set;
+//            }
+//        });
     }
 }
