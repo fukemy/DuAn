@@ -35,6 +35,7 @@ import com.example.macos.libraries.AutoResizeTextView;
 import com.example.macos.libraries.Logger;
 import com.example.macos.libraries.SlidingUpPaneLayout;
 import com.example.macos.utilities.AnimationControl;
+import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.LocationHelper;
 import com.example.macos.utilities.NetworkUtil;
@@ -112,17 +113,7 @@ public class AcVideoList extends YouTubeBaseActivity implements
                 googleMap.setMyLocationEnabled(false);
 
                 //config style only when network is accessable
-                try {
-                    boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(AcVideoList.this, R.raw.style_json));
-
-                    if (!success) {
-                        Logger.error("Style parsing failed.");
-                    } else {
-                        Logger.error("Style parsing success.");
-                    }
-                } catch (Resources.NotFoundException e) {
-                    Logger.error("Can't find style. Error: ");
-                }
+                FunctionUtils.modifyMapLayout(googleMap, AcVideoList.this);
             }
 
         });

@@ -8,17 +8,19 @@
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="216dp"
+        android:layout_height="160dp"
         android:fitsSystemWindows="true">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="false"
+            app:collapsedTitleTextAppearance="@style/collapsedappbar"
+            app:contentScrim="?attr/colorPrimary"
             app:expandedTitleMarginEnd="64dp"
             app:expandedTitleMarginStart="48dp"
-            app:layout_scrollFlags="scroll|enterAlways">
+            app:expandedTitleTextAppearance="@style/expandedappbar"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
 
             <FrameLayout
@@ -26,34 +28,20 @@
                 android:name="com.google.android.gms.maps.SupportMapFragment"
                 android:layout_width="match_parent"
                 android:layout_height="160dp"
-                android:layout_gravity="top"
-                android:layout_marginTop="56dp"
-                android:fitsSystemWindows="true"
                 app:layout_collapseMode="parallax" />
 
-            <FrameLayout
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:orientation="horizontal">
+                android:layout_height="48dp"
+                android:background="@mipmap/tranparent_bg_top_for_text_mapview"
+                android:elevation="4dp"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                app:contentInsetLeft="0dp"
+                app:contentInsetStart="0dp"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-                <ImageView
-                    android:id="@+id/backButton"
-                    android:layout_width="36dp"
-                    android:layout_marginLeft="10dp"
-                    android:padding="8dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical|left"
-                    android:src="@mipmap/back_button" />
-
-                <com.viewpagerindicator.TitlePageIndicator
-                    android:id="@+id/titles"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:textSize="18sp"
-                    app:layout_collapseMode="none"
-                    app:selectedBold="true"
-                    app:tabIndicatorColor="@color/grayColor" />
-            </FrameLayout>
         </android.support.design.widget.CollapsingToolbarLayout>
     </android.support.design.widget.AppBarLayout>
 

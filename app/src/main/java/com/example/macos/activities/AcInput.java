@@ -10,6 +10,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -23,8 +24,11 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -52,6 +56,7 @@ import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.LocationHelper;
 import com.example.macos.utilities.SharedPreferenceManager;
+import com.example.macos.youtube.AcVideoList;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -68,7 +73,7 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.UUID;
 
-public class AcInput extends FragmentActivity {
+public class AcInput extends AppCompatActivity {
     private final int ENABLE_LOCATION = 1234;
     private GoogleMap gMap;
     private ViewPager viewPager;
@@ -217,55 +222,58 @@ public class AcInput extends FragmentActivity {
             startActivity(in);
         }
         else
-            FunctionUtils.showConfirmDialog(getResources().getString(R.string.bancochacchanmuonhuy), AcInput.this, dialogAction);
+            FunctionUtils.showConfirmDialog(getResources().getString(R.string.bancochacchanmuonhuy), AcInput.this, new iDialogAction() {
+                @Override
+                public void showRoadNameInputDialog() {
+
+                }
+
+                @Override
+                public void refreshViewonly() {
+
+                }
+
+                @Override
+                public void isAcceptWarning(boolean b) {
+                    if(b) {
+                        isBack = true;
+                        onBackPressed();
+                    }
+                }
+            });
     }
-
-    iDialogAction dialogAction = new iDialogAction() {
-        @Override
-        public void showRoadNameInputDialog() {
-
-        }
-
-        @Override
-        public void refreshViewonly() {
-
-        }
-
-        @Override
-        public void isAcceptWarning(boolean b) {
-            if(b) {
-                isBack = true;
-                onBackPressed();
-            }
-        }
-    };
 
     private void initLayout() {
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         appBarLayout = (AppBarLayout) findViewById(R.id.appBarLayout);
-        backButton = (ImageView) findViewById(R.id.backButton);
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
-                builder.setTitle("Warning");
-                builder.setMessage(getResources().getString(R.string.bancochacchanmuonthoat));
 
-                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Intent in = new Intent(AcInput.this, MainScreen.class);
-                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        finish();
-                        startActivity(in);
-                    }
-                });
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-                builder.setNegativeButton("Cancel", null);
-                builder.show();
-            }
-        });
+//        backButton = (ImageView) findViewById(R.id.backButton);
+//        backButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
+//                builder.setTitle("Warning");
+//                builder.setMessage(getResources().getString(R.string.bancochacchanmuonthoat));
+//
+//                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Intent in = new Intent(AcInput.this, MainScreen.class);
+//                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//                        finish();
+//                        startActivity(in);
+//                    }
+//                });
+//
+//                builder.setNegativeButton("Cancel", null);
+//                builder.show();
+//            }
+//        });
 
         mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp);
         if (mSupportMapFragment == null) {
@@ -282,6 +290,8 @@ public class AcInput extends FragmentActivity {
                         gMap = googleMap;
                         gMap.setMyLocationEnabled(true);
                         gMap.setOnMyLocationChangeListener(myLocationChangeListener);
+
+                        FunctionUtils.modifyMapLayout(googleMap, AcInput.this);
 
                         gMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                             @Override
@@ -300,12 +310,12 @@ public class AcInput extends FragmentActivity {
 
         }
 
-        findViewById(R.id.backButton).bringToFront();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             viewPager.setNestedScrollingEnabled(true);
         }
 
         List<Item> list = dataViewList.getDataList();
+        toolbar.setTitle(list.get(0).getItemName());
         final MainScreenAdapter adapter = new MainScreenAdapter(getSupportFragmentManager());
 
         // init data
@@ -323,27 +333,6 @@ public class AcInput extends FragmentActivity {
         // set data
         viewPager.setAdapter(adapter);
         viewPager.setOffscreenPageLimit(list.size() - 1);
-        title = (TitlePageIndicator) findViewById(R.id.titles);
-        title.setViewPager(viewPager);
-
-        title.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                if(locationItem != null){
-                    ((FragmentInputItem)adapter.getmFragmentList().get(position)).setCurrentLocation(locationItem);
-                }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 
     private void addGoogleMapShowcase(){
@@ -387,9 +376,7 @@ public class AcInput extends FragmentActivity {
         public void onMyLocationChange(final Location location) {
             if(!IS_FOUND_LOCATION) {
                 Logger.error("found location :" + location.toString());
-                title.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
 
-//                locationItem = FunctionUtils.getDataAboutLocation(location, AcInput.this);
                 LocationHelper lh = new LocationHelper();
                 lh.getLocationDetail(AcInput.this, location, new iLocationUpdate() {
                     @Override
@@ -535,14 +522,14 @@ public class AcInput extends FragmentActivity {
     }
 
     public void collectAllData() {
-//        if(locationItem.getLocation() == null){
-//            AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
-//            builder.setTitle("Lưu dữ liệu thất bại!");
-//            builder.setMessage("Hệ thống không định vị được vị trí của bạn, hãy nhấn vị trí của tôi trên bản đồ để dò lại!");
-//            builder.setNegativeButton("OK", null);
-//            builder.show();
-//            return;
-//        }
+        if(locationItem.getLocation() == null){
+            AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
+            builder.setTitle("Lưu dữ liệu thất bại!");
+            builder.setMessage("Hệ thống không định vị được vị trí của bạn, hãy nhấn vị trí của tôi trên bản đồ để dò lại!");
+            builder.setNegativeButton("OK", null);
+            builder.show();
+            return;
+        }
 
         for(int k = 0; k < ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().size(); k++){
             Fragment f = ((MainScreenAdapter) viewPager.getAdapter()).getmFragmentList().get(k);
@@ -578,6 +565,7 @@ public class AcInput extends FragmentActivity {
                     builder.show();
                     return;
                 }
+
                 EnDataModel enDataModel = new EnDataModel();
                 enDataModel.setDaValue(dataTypeItem);
                 enDataModel.setListImageData(imgModalList);
@@ -587,8 +575,6 @@ public class AcInput extends FragmentActivity {
 
             }
 
-            List<BlueToothData> blueToothData = DatabaseHelper.getBlueToothDataByID(((FragmentInputItem) f).getUUID());
-            Logger.error("bluetooth data to upload: " + gson.toJson(blueToothData));
             pref.saveBoolean(GlobalParams.IS_WORKED_TODAY, true);
 
             Intent in = new Intent(AcInput.this, MainScreen.class);

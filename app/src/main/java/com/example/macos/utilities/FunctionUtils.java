@@ -48,6 +48,9 @@ import com.example.macos.duan.R;
 import com.example.macos.entities.EnLocationItem;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.libraries.Logger;
+import com.example.macos.youtube.AcVideoList;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.MapStyleOptions;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -1211,6 +1214,21 @@ public class FunctionUtils {
             return true;
         }else{
             return false;
+        }
+    }
+
+    public static void modifyMapLayout(GoogleMap googleMap, Context context){
+        //config style only when network is accessable
+        try {
+            boolean success = googleMap.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.style_json));
+
+            if (!success) {
+                Logger.error("Style parsing failed.");
+            } else {
+                Logger.error("Style parsing success.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Logger.error("Can't find style. Error: ");
         }
     }
 }

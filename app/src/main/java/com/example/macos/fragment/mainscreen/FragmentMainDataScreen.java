@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.example.macos.activities.AcInput;
 import com.example.macos.activities.MainScreen;
@@ -59,7 +60,7 @@ public class FragmentMainDataScreen extends CustomFragment {
         list = new ArrayList<>();
         List<Item> catalogList = DatabaseHelper.getItemList();
         if(catalogList == null || catalogList.size() == 0){
-
+            Toast.makeText(getActivity(), "Chưa có dữ liệu đường", Toast.LENGTH_SHORT).show();
         }else {
 
             list.add(new EnMainCatalogItem(catalogList.get(0), false, R.mipmap.roads, new FragmentInputItem()));
