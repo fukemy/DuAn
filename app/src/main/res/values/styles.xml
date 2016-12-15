@@ -37,15 +37,14 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="expandedappbar" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">20sp </item>
-        <item name="android:padding">20dp </item>
-        <item name="android:gravity">bottom </item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:gravity">bottom</item>
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textStyle">bold</item>
     </style>
 
-    <style name="collapsedappbar" parent="@android:style/TextAppearance.Medium">
-        <item name="android:textSize">16sp</item>
+    <style name="collapsedappbar" parent="@android:style/TextAppearance.DeviceDefault.Small">
+        <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
