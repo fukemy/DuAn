@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 23
-    buildToolsVersion "23.0.3"
+    buildToolsVersion '25.0.0'
     useLibrary 'org.apache.http.legacy'
     defaultConfig {
         applicationId "com.example.macos.duan"
@@ -58,6 +58,7 @@ dependencies {
     compile 'com.truizlop.fabreveallayout:library:1.0.0' //https://github.com/truizlop/FABRevealLayout
     compile 'de.hdodenhof:circleimageview:2.1.0' //https://github.com/hdodenhof/CircleImageView
     compile 'com.github.florent37:viewanimator:1.0.4' //https://github.com/florent37/ViewAnimator
+    compile 'com.github.rafakob:DrawMe:0.1.6' //https://github.com/rafakob/DrawMe
 //    compile 'com.github.ParkSangGwon:TedPicker:v1.0.10' //for camera dialog
 //    compile 'com.afollestad.material-dialogs:commons:0.9.0.1'
 }

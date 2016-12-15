@@ -32,6 +32,7 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -44,6 +45,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -451,30 +453,6 @@ public class FragmentInputItem extends CustomFragment {
         listData.add(container);
         container.setTag(listData.size());
 
-//        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener(){
-//            @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-//            public void onGlobalLayout(){
-//                Rect r = new Rect();
-//                rootView.getWindowVisibleDisplayFrame(r);
-//                int screenHeight = rootView.getRootView().getHeight();
-//                final int heightDifference = screenHeight - (r.bottom - r.top);
-//                if(heightDifference != currentDiffheight) {
-//                    if (heightDifference > 150) {
-//                        rootView.setPadding(0, 0, 0, heightDifference);
-//                    } else {
-//                        rootView.setPadding(0, 0, 0, 0);
-//                        scroll.postDelayed(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                scroll.fullScroll(ScrollView.FOCUS_DOWN);
-//                            }
-//                        }, 200);
-//                    }
-//                }
-//                currentDiffheight = heightDifference;
-//            }
-//        });
-
         scroll.getChildAt(0).setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -571,13 +549,6 @@ public class FragmentInputItem extends CustomFragment {
         spinPromtCatalog.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                    if (isExpand) {
-                        isExpand = !isExpand;
-//                        ((AcInput) getActivity()).closeToolbar(false);
-                    }
-                }
-
                 String selectedData = spinPromtCatalog.getText().toString();
                 spinStatus.setText("");
                 if ((selectedData.charAt(selectedData.length() - 1)) != ' ') {
@@ -629,12 +600,6 @@ public class FragmentInputItem extends CustomFragment {
                     imgEditRoadName.setVisibility(View.VISIBLE);
                     imgDeleteRoadName.setVisibility(View.VISIBLE);
                     imgAddRoadName.setVisibility(View.GONE);
-
-                    if (listData.size() == 2) {
-                        LinearLayout.LayoutParams btmParams = (LinearLayout.LayoutParams) bottomView.getLayoutParams();
-                        btmParams.bottomMargin = 0;
-                        bottomView.setLayoutParams(btmParams);
-                    }
                 }
             }
         });
@@ -773,13 +738,9 @@ public class FragmentInputItem extends CustomFragment {
                 uri = Uri.parse("file://" + FunctionUtils.getRealPathFromUri(getActivity(), uri));
                 Logger.error("uri realpath: " + uri.getPath());
                 try {
-                    Bitmap b = FunctionUtils.decodeSampledBitmap(getActivity(), uri);
                     int size = rootView.findViewById(R.id.viewNull).getWidth();
-//                    Bitmap decodedBitmap = Bitmap.createScaledBitmap(b, size /3, size / 3, true);
-//                    Bitmap decodedBitmap = FunctionUtils.decodeSampledBitmapFromFile(uri.getPath(),  size / 3, size / 3);
                     final ImageView img = new ImageView(getActivity());
                     img.setLayoutParams(new ViewGroup.LayoutParams(size / 3, size / 3));
-//                    img.setImageBitmap(decodedBitmap);
                     img.setTag(uri.toString());
                     img.setScaleType(ImageView.ScaleType.FIT_XY);
                     LinearLayout lnlFirstPlan = (LinearLayout) listData.get(ORDER_CAMERA_POSITION).findViewById(R.id.lnlFirstPlan);
@@ -1203,8 +1164,11 @@ public class FragmentInputItem extends CustomFragment {
                         spin.setError("Bạn cần chọn tình trạng cho mục cần nhập");
                         break;
                     }
-
                 }
+            }
+
+            if (lnl.getChildAt(j) instanceof CardView && ((CardView) lnl.getChildAt(j)).getChildCount() > 0) {
+                checkContainerInput((LinearLayout) ((CardView) lnl.getChildAt(j)).getChildAt(0));
             }
 
             if (lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
@@ -1214,13 +1178,6 @@ public class FragmentInputItem extends CustomFragment {
     }
 
     private void disableNestedData(LinearLayout lnl, boolean b) {
-
-        if (lnl.getId() == R.id.lnlFirstPlan) {
-//            if (!b)
-//                lnl.setBackground(getResources().getDrawable(R.drawable.border_disable));
-//            else
-//                lnl.setBackground(getResources().getDrawable(R.drawable.border));
-        }
 
         for (int j = 0; j < lnl.getChildCount(); j++) {
             if (lnl.getChildAt(j) instanceof EditText) {
@@ -1245,14 +1202,6 @@ public class FragmentInputItem extends CustomFragment {
                 }
             }
 
-//            if(lnl.getChildAt(j) instanceof RelativeLayout) {
-//                RelativeLayout fr = (RelativeLayout) lnl.getChildAt(j);
-//                EditText edt = (EditText) fr.getChildAt(1);
-//                edt.setEnabled(b);
-//                LinearLayout lnlInputIcon = (LinearLayout) fr.findViewById(R.id.lnlInputIcon);
-//                disableNestedData(lnlInputIcon, b);
-//            }
-
             if (lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
                 disableNestedData((LinearLayout) lnl.getChildAt(j), b);
             }
@@ -1264,57 +1213,4 @@ public class FragmentInputItem extends CustomFragment {
             }
         }
     }
-
-    /*
-    EnInputItem en;
-    List<String> imgData;
-    private void collectNestedData(LinearLayout lnl){
-        for (int j = 0; j < lnl.getChildCount(); j++) {
-
-            if(lnl.getChildAt(j) instanceof EditText){
-                String tag = ((EditText) lnl.getChildAt(j)).getTag().toString();
-                String text = ((EditText) lnl.getChildAt(j)).getText().toString();
-                if(tag.equals("promptCatalog")) {   // for catalog spin
-                    System.out.println("" + ((EditText) lnl.getChildAt(j)).getText());
-                    en.setPromptItem(text);
-                }
-                if(tag.equals("status")) {        // for statuc spin
-                    System.out.println("" + ((EditText) lnl.getChildAt(j)).getText());
-                    en.setStatus(text);
-                }
-                if(tag.equals("information")) {     // for edittext
-                    System.out.println("" + ((EditText) lnl.getChildAt(j)).getText());
-                    en.setInformation(text);
-                }
-            }
-
-            if(lnl.getChildAt(j) instanceof ImageView){
-                if(lnl.getChildAt(j).getTag() != null) {
-                    System.out.println("" + lnl.getChildAt(j).getTag());
-                    imgData.add(lnl.getChildAt(j).getTag().toString());
-                }
-            }
-
-            if(lnl.getChildAt(j) instanceof LinearLayout && ((LinearLayout) lnl.getChildAt(j)).getChildCount() > 0) {
-                collectNestedData((LinearLayout)lnl.getChildAt(j));
-            }
-        }
-    }
-
-    private List<EnInputItem> collectAllData() {
-        List<EnInputItem> finalData = new ArrayList<>();
-        for (int i = 0; i < lnlAll.getChildCount(); i++) {
-            imgData = new ArrayList<>();
-            en = new EnInputItem();
-
-            LinearLayout lnl = (LinearLayout) lnlAll.getChildAt(i);
-            collectNestedData(lnl);
-
-            en.setImgUri(imgData);
-            finalData.add(en);
-        }
-
-        return finalData;
-    }
-    */
 }

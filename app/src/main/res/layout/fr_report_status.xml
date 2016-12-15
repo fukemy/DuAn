@@ -6,11 +6,17 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <com.example.macos.libraries.AnimatedExpandableListview
-        android:id="@+id/lvExp"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipeToRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="5dp" />
+        android:layout_height="match_parent">
+
+        <com.example.macos.libraries.AnimatedExpandableListview
+            android:id="@+id/lvExp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="5dp" />
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -22,61 +28,4 @@
         android:src="@mipmap/upload"
         app:layout_anchorGravity="bottom|right|end" />
 
-    <LinearLayout
-        android:id="@+id/lnlOption"
-        android:layout_gravity="bottom"
-        android:visibility="invisible"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/fab_margin"
-                android:clickable="true"
-                android:src="@mipmap/upload"
-                app:layout_anchorGravity="center" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/fab_margin"
-                android:clickable="true"
-                android:src="@mipmap/upload" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/fab3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="@dimen/fab_margin"
-                android:clickable="true"
-                android:src="@mipmap/upload" />
-        </LinearLayout>
-    </LinearLayout>
 </FrameLayout>

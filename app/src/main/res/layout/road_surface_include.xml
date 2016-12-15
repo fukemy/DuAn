@@ -5,244 +5,253 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/lnlContainerData"
+    <android.support.v7.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:layout_marginBottom="20dp"
-        android:clipChildren="false"
-        android:clipToPadding="false"
+        android:elevation="3dp"
         android:orientation="vertical"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10dp"
+        card_view:cardCornerRadius="8dp"
+        card_view:cardUseCompatPadding="true">
 
         <LinearLayout
-            android:id="@+id/lnlFirstPlan"
+            android:id="@+id/lnlContainerData"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            android:background="@color/grayColor30"
             android:clipChildren="false"
             android:clipToPadding="false"
-            android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvGraphData"
-                android:layout_width="match_parent"
-                android:layout_height="80dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="10dp"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/tvRoadName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:paddingTop="10dp"
-                android:text="Bản ghi "
-                android:textStyle="bold" />
-
-            <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
-                android:id="@+id/spinPromtCatalog"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/border_disable"
-                android:tag="promptCatalog" />
-
-            <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
-                android:id="@+id/spinStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/border_disable"
-                android:tag="status" />
-
-            <EditText
-                android:id="@+id/edtOtherStatus"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:background="@drawable/border_disable"
-                android:gravity="left|top"
-                android:hint="Nhập tình trạng"
-                android:imeOptions="actionDone"
-                android:lines="2"
-                android:padding="10dp"
-                android:singleLine="true"
-                android:tag="otherStatus"
-                android:visibility="gone" />
-
-            <EditText
-                android:id="@+id/edtJusticeProcess"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
-                android:background="@drawable/border_disable"
-                android:gravity="left|top"
-                android:hint="Nhập lý trình..."
-                android:imeOptions="actionDone"
-                android:lines="2"
-                android:padding="10dp"
-                android:singleLine="true"
-                android:tag="justiceProcess" />
-
             <LinearLayout
-                android:id="@+id/lnlInputInformation"
+                android:id="@+id/lnlFirstPlan"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="10dp">
+                android:animateLayoutChanges="true"
+                android:background="@color/grayColor30"
+                android:clipChildren="false"
+                android:clipToPadding="false"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
 
-                <EditText
-                    android:id="@+id/edtInformation"
+                <TextView
+                    android:id="@+id/tvGraphData"
+                    android:layout_width="match_parent"
+                    android:layout_height="80dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/tvRoadName"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="top"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:text="Bản ghi "
+                    android:textStyle="bold" />
+
+                <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
+                    android:id="@+id/spinPromtCatalog"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/border_disable"
+                    android:tag="promptCatalog" />
+
+                <com.weiwangcn.betterspinner.library.material.MaterialBetterSpinner
+                    android:id="@+id/spinStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/border_disable"
+                    android:tag="status" />
+
+                <EditText
+                    android:id="@+id/edtOtherStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:background="@drawable/border_disable"
                     android:gravity="left|top"
-                    android:hint="@string/motachitet"
+                    android:hint="Nhập tình trạng"
                     android:imeOptions="actionDone"
                     android:lines="2"
                     android:padding="10dp"
                     android:singleLine="true"
-                    android:tag="information" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/lnlInputIcon"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:clipChildren="false"
-                android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:paddingBottom="10dp"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:paddingTop="10dp">
-
-
-                <ImageView
-                    android:id="@+id/imgVoidRoadName"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginLeft="10dp"
-                    android:background="@mipmap/record_black" />
-
-                <ImageView
-                    android:id="@+id/imgCameraRoadName"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginLeft="20dp"
-                    android:background="@mipmap/camera_black" />
-
-                <ImageView
-                    android:id="@+id/imgGaleryRoadName"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginLeft="28dp"
-                    android:layout_marginTop="2dp"
-                    android:background="@mipmap/galery"
+                    android:tag="otherStatus"
                     android:visibility="gone" />
 
-                <ImageView
-                    android:id="@+id/imgVideoRoadName"
-                    android:layout_width="28dp"
-                    android:layout_height="32dp"
-                    android:layout_marginLeft="28dp"
-                    android:background="@mipmap/video" />
-
-                <LinearLayout
+                <EditText
+                    android:id="@+id/edtJusticeProcess"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_weight="1"
-                    android:gravity="right"
-                    android:orientation="horizontal">
+                    android:layout_gravity="top"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/border_disable"
+                    android:gravity="left|top"
+                    android:hint="Nhập lý trình..."
+                    android:imeOptions="actionDone"
+                    android:lines="2"
+                    android:padding="10dp"
+                    android:singleLine="true"
+                    android:tag="justiceProcess" />
 
-                    <com.sackcentury.shinebuttonlib.ShineButton
-                        android:id="@+id/imgEditRoadName"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginLeft="24dp"
-                        android:src="@android:color/black"
-                        android:tag="edit"
-                        android:visibility="gone"
-                        app:allow_random_color="false"
-                        app:big_shine_color="@color/mainColor"
-                        app:btn_color="@android:color/black"
-                        app:btn_fill_color="@color/mainColor"
-                        app:click_animation_duration="200"
-                        app:enable_flashing="false"
-                        app:shine_animation_duration="1500"
-                        app:shine_count="8"
-                        app:shine_distance_multiple="1.5"
-                        app:shine_turn_angle="10"
-                        app:siShape="@mipmap/edit_black"
-                        app:small_shine_color="#CC9999"
-                        app:small_shine_offset_angle="20" />
+                <LinearLayout
+                    android:id="@+id/lnlInputInformation"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="10dp">
+
+                    <EditText
+                        android:id="@+id/edtInformation"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top"
+                        android:background="@drawable/border_disable"
+                        android:gravity="left|top"
+                        android:hint="@string/motachitet"
+                        android:imeOptions="actionDone"
+                        android:lines="2"
+                        android:padding="10dp"
+                        android:singleLine="true"
+                        android:tag="information" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/lnlInputIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:clipChildren="false"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingLeft="5dp"
+                    android:paddingRight="5dp"
+                    android:paddingTop="10dp">
+
 
                     <ImageView
-                        android:id="@+id/imgDeleteRoadName"
+                        android:id="@+id/imgVoidRoadName"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:layout_marginLeft="24dp"
-                        android:background="@mipmap/delete_black"
-                        android:tag="delete"
-                        android:visibility="gone" />
+                        android:layout_marginLeft="10dp"
+                        android:background="@mipmap/record_black" />
 
                     <ImageView
-                        android:id="@+id/imgAddRoadName"
+                        android:id="@+id/imgCameraRoadName"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:layout_marginLeft="20dp"
-                        android:layout_marginRight="5dp"
-                        android:background="@mipmap/plus_green"
-                        android:tag="add" />
+                        android:background="@mipmap/camera_black" />
 
+                    <ImageView
+                        android:id="@+id/imgGaleryRoadName"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="28dp"
+                        android:layout_marginTop="2dp"
+                        android:background="@mipmap/galery"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/imgVideoRoadName"
+                        android:layout_width="28dp"
+                        android:layout_height="32dp"
+                        android:layout_marginLeft="28dp"
+                        android:background="@mipmap/video" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right|center_vertical"
+                        android:layout_weight="1"
+                        android:gravity="right"
+                        android:orientation="horizontal">
+
+                        <com.sackcentury.shinebuttonlib.ShineButton
+                            android:id="@+id/imgEditRoadName"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginLeft="24dp"
+                            android:src="@android:color/black"
+                            android:tag="edit"
+                            android:visibility="gone"
+                            app:allow_random_color="false"
+                            app:big_shine_color="@color/mainColor"
+                            app:btn_color="@android:color/black"
+                            app:btn_fill_color="@color/mainColor"
+                            app:click_animation_duration="200"
+                            app:enable_flashing="false"
+                            app:shine_animation_duration="1500"
+                            app:shine_count="8"
+                            app:shine_distance_multiple="1.5"
+                            app:shine_turn_angle="10"
+                            app:siShape="@mipmap/edit_black"
+                            app:small_shine_color="#CC9999"
+                            app:small_shine_offset_angle="20" />
+
+                        <ImageView
+                            android:id="@+id/imgDeleteRoadName"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginLeft="24dp"
+                            android:background="@mipmap/delete_black"
+                            android:tag="delete"
+                            android:visibility="gone" />
+
+                        <ImageView
+                            android:id="@+id/imgAddRoadName"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginLeft="20dp"
+                            android:layout_marginRight="5dp"
+                            android:background="@mipmap/plus_green"
+                            android:tag="add" />
+
+                    </LinearLayout>
                 </LinearLayout>
-            </LinearLayout>
 
-            <HorizontalScrollView
-                android:id="@+id/scrImage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:isScrollContainer="true"
-                android:layout_marginRight="10dp"
-                android:clipToPadding="false"
-                android:clipChildren="false">
-
-                <LinearLayout
-                    android:id="@+id/lnlImage"
+                <HorizontalScrollView
+                    android:id="@+id/scrImage"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:animateLayoutChanges="true"
-                    android:background="@drawable/image_ripple"
-                    android:clickable="true"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:tag="fromCamera" />
-            </HorizontalScrollView>
-        </LinearLayout>
+                    android:isScrollContainer="true">
 
-    </LinearLayout>
+                    <LinearLayout
+                        android:id="@+id/lnlImage"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginTop="10dp"
+                        android:animateLayoutChanges="true"
+                        android:background="@drawable/image_ripple"
+                        android:clickable="true"
+                        android:clipChildren="false"
+                        android:clipToPadding="false"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:tag="fromCamera" />
+                </HorizontalScrollView>
+            </LinearLayout>
+
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
 </LinearLayout>

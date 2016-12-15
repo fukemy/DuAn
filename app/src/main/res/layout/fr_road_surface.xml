@@ -39,13 +39,13 @@
                     android:visibility="gone" />
 
                 <com.jjoe64.graphview.GraphView
+                    android:id="@+id/graph"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
-                    android:visibility="gone"
-                    app:seriesType="line"
                     android:layout_marginLeft="10dp"
+                    android:visibility="gone"
                     app:seriesColor="#ee0000"
-                    android:id="@+id/graph" />
+                    app:seriesType="line" />
 
                 <TextView
                     android:id="@+id/tvCurrentLocation"
@@ -69,16 +69,16 @@
                     android:id="@+id/lnlAll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:animateLayoutChanges="true"
                     android:clipChildren="false"
                     android:clipToPadding="false"
-                    android:animateLayoutChanges="true"
                     android:orientation="vertical">
 
                     <include
                         android:id="@+id/container"
+                        layout="@layout/road_surface_include"
                         android:clipChildren="false"
-                        android:clipToPadding="false"
-                        layout="@layout/road_surface_include" />
+                        android:clipToPadding="false" />
                 </LinearLayout>
 
                 <View
@@ -90,37 +90,28 @@
 
             </LinearLayout>
 
-            <FrameLayout
+            <com.rafakob.drawme.DrawMeFrameLayout xmlns:drawme="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/lnlDone"
                 android:layout_width="match_parent"
-                android:clickable="true"
                 android:layout_height="wrap_content"
-                android:background="@drawable/login_riple_effect_bg"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_margin="10dp"
+                android:clickable="true"
                 android:gravity="center"
-                android:orientation="vertical">
+                drawme:dm_backColor="@color/mainColor"
+                drawme:dm_backColorPressed="@color/mainColor60"
+                drawme:dm_shapeRadiusHalfHeight="true">
 
                 <TextView
                     android:id="@+id/imgDone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="center"
                     android:gravity="center"
                     android:padding="10dp"
+                    android:text="Hoàn thành"
                     android:textAllCaps="true"
-                    android:textColor="@android:color/white"
-                    android:layout_gravity="center"
-                    android:text="Lưu"/>
-
-                <ImageView
-                    android:layout_width="20dp"
-                    android:layout_marginRight="10dp"
-                    android:scaleType="fitCenter"
-                    android:layout_gravity="right|center_vertical"
-                    android:layout_height="20dp"
-                    android:src="@mipmap/check_done_green"/>
-
-            </FrameLayout>
+                    android:textColor="@android:color/white" />
+            </com.rafakob.drawme.DrawMeFrameLayout>
 
             <View
                 android:id="@+id/keyBoardView"

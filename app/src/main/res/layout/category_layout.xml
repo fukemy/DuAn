@@ -6,14 +6,12 @@
     android:layout_height="match_parent"
     android:layout_margin="@dimen/card_margin"
     android:elevation="3dp"
-    card_view:cardCornerRadius="4dp"
-    card_view:cardUseCompatPadding="true">
+    card_view:cardCornerRadius="4dp">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/grayColor"
-        android:foreground="?android:attr/selectableItemBackground">
+        android:background="@color/grayColor30"
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/imgCategory"

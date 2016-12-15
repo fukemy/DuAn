@@ -28,7 +28,9 @@ import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -52,6 +54,7 @@ import com.example.macos.fragment.Input.FragmentInputItem;
 import com.example.macos.interfaces.iDialogAction;
 import com.example.macos.interfaces.iLocationUpdate;
 import com.example.macos.libraries.Logger;
+import com.example.macos.libraries.WorkaroundMapFragment;
 import com.example.macos.utilities.FunctionUtils;
 import com.example.macos.utilities.GlobalParams;
 import com.example.macos.utilities.LocationHelper;
@@ -251,30 +254,6 @@ public class AcInput extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-//        backButton = (ImageView) findViewById(R.id.backButton);
-//        backButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
-//                builder.setTitle("Warning");
-//                builder.setMessage(getResources().getString(R.string.bancochacchanmuonthoat));
-//
-//                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        Intent in = new Intent(AcInput.this, MainScreen.class);
-//                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-//                        finish();
-//                        startActivity(in);
-//                    }
-//                });
-//
-//                builder.setNegativeButton("Cancel", null);
-//                builder.show();
-//            }
-//        });
-
         mSupportMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp);
         if (mSupportMapFragment == null) {
             mSupportMapFragment = SupportMapFragment.newInstance();
@@ -286,7 +265,13 @@ public class AcInput extends AppCompatActivity {
                 @Override
                 public void onMapReady(GoogleMap googleMap) {
                     if (googleMap != null) {
-                        Logger.error("get googlemap");
+                        ((WorkaroundMapFragment) getSupportFragmentManager().findFragmentById(R.id.mapp)).setListener(new WorkaroundMapFragment.OnTouchListener() {
+                            @Override
+                            public void onTouch() {
+                                viewPager.requestDisallowInterceptTouchEvent(true);
+                            }
+                        });
+
                         gMap = googleMap;
                         gMap.setMyLocationEnabled(true);
                         gMap.setOnMyLocationChangeListener(myLocationChangeListener);
@@ -299,7 +284,6 @@ public class AcInput extends AppCompatActivity {
                                 if(dialog != null && !dialog.isShowing())
                                     dialog.show();
                                 IS_FOUND_LOCATION = false;
-//                                gMap.setOnMyLocationChangeListener(myLocationChangeListener);
                                 return false;
                             }
                         });
@@ -315,17 +299,11 @@ public class AcInput extends AppCompatActivity {
         }
 
         List<Item> list = dataViewList.getDataList();
-        toolbar.setTitle(list.get(0).getItemName());
+        getSupportActionBar().setTitle("" + list.get(0).getItemName().toUpperCase());
         final MainScreenAdapter adapter = new MainScreenAdapter(getSupportFragmentManager());
-
-        // init data
 
         for(int i = 0; i< list.size() ; i++){
             FragmentInputItem f = new FragmentInputItem();
-            if(i == list.size() - 1)
-                f.setActionDone("Done");
-            else
-                f.setActionDone("Next");
             f.setCatalog(list.get(i).getItemName());
             adapter.addFragment(f, list.get(i).getItemName());
         }
@@ -340,8 +318,7 @@ public class AcInput extends AppCompatActivity {
         if(!addedShowcase){
             try {
                 View mapView = mSupportMapFragment.getView();
-                if (mapView != null &&
-                        mapView.findViewById(Integer.parseInt("1")) != null) {
+                if (mapView != null && mapView.findViewById(Integer.parseInt("1")) != null) {
                     View mapButton = ((View) mapView.findViewById(Integer.parseInt("1")).getParent()).findViewById(Integer.parseInt("2"));
                     new SpotlightView.Builder(this)
                             .introAnimationDuration(400)
@@ -369,6 +346,30 @@ public class AcInput extends AppCompatActivity {
 
             }
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem menuItem) {
+        if (menuItem.getItemId() == android.R.id.home) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(AcInput.this);
+                builder.setTitle("Warning");
+                builder.setMessage(getResources().getString(R.string.bancochacchanmuonthoat));
+
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent in = new Intent(AcInput.this, MainScreen.class);
+                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        in.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        finish();
+                        startActivity(in);
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", null);
+                builder.show();
+        }
+        return super.onOptionsItemSelected(menuItem);
     }
 
     private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
@@ -404,11 +405,6 @@ public class AcInput extends AppCompatActivity {
                         try {
                             if (dialog != null && dialog.isShowing())
                                 dialog.dismiss();
-                            //gMap.setOnMyLocationChangeListener(null);
-//                                Marker nowPosition = gMap.addMarker(new MarkerOptions()
-//                                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-//                                        .snippet("Vị trí hiện tại")
-//                                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.engineer)));
                         } catch (Exception e) {
                         }
                     }
@@ -419,7 +415,6 @@ public class AcInput extends AppCompatActivity {
                             dialog.dismiss();
                     }
                 });
-                //gMap.setOnMyLocationChangeListener(null);
             }else {
 
                 if (location != null) {
@@ -510,6 +505,10 @@ public class AcInput extends AppCompatActivity {
                     collectNestedData((LinearLayout) lnl.getChildAt(j));
                 }
 
+                if (lnl.getChildAt(j) instanceof CardView && ((CardView) lnl.getChildAt(j)).getChildCount() > 0) {
+                    collectNestedData((LinearLayout) ((CardView) lnl.getChildAt(j)).getChildAt(0));
+                }
+
                 if(lnl.getChildAt(j) instanceof HorizontalScrollView) {
                     HorizontalScrollView scroll = (HorizontalScrollView) lnl.getChildAt(j);
                     collectNestedData((LinearLayout) scroll.getChildAt(0));
@@ -586,7 +585,5 @@ public class AcInput extends AppCompatActivity {
         }
 
     }
-
-
 
 }

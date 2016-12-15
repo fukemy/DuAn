@@ -13,10 +13,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
+import android.util.TypedValue;
 import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -29,6 +33,7 @@ import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ExpandableListView;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -73,6 +78,7 @@ public class FragmentReportStatus extends CustomFragment {
 
     private View rootView;
     private AnimatedExpandableListview lv;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private List<EnDataModel> syncData;
     HashMap<String, List<EnDataModel>> hashMap;
     List<String> listHeader ;
@@ -82,8 +88,6 @@ public class FragmentReportStatus extends CustomFragment {
     List<String> failBlueToothData;
     List<String> failPositonData;
     List<Uri> failImageData;
-    private LinearLayout lnlOptions;
-    boolean isShowFab = true;
     ProgressDialog dialog;
     Gson gson;
     String USER_TOKEN = "";
@@ -101,8 +105,16 @@ public class FragmentReportStatus extends CustomFragment {
 
         initLayout();
         initData();
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          //  lv.setNestedScrollingEnabled(true);
+            lv.setNestedScrollingEnabled(true);
+        }else {
+            FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) swipeRefreshLayout.getLayoutParams();
+            TypedValue tv = new TypedValue();
+            getActivity().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true);
+            int heightOfAppBarCompat = getResources().getDimensionPixelSize(tv.resourceId);
+            params.bottomMargin = heightOfAppBarCompat;
+            swipeRefreshLayout.setLayoutParams(params);
         }
 
         lv.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
@@ -130,86 +142,17 @@ public class FragmentReportStatus extends CustomFragment {
         return rootView;
     }
 
-    iRippleControl rippleInterface = new iRippleControl() {
-        @Override
-        public void disableView(View v) {
-            v.setEnabled(false);
-        }
-    };
-
-    private void showFabButton(final boolean isShow){
-        TranslateAnimation tran;
-        if(isShow)
-            tran = new TranslateAnimation(0, 0, lnlOptions.getHeight() * 2, 0);
-        else
-            tran = new TranslateAnimation(0, 0, 0, lnlOptions.getHeight() * 2);
-        tran.setDuration(400);
-        tran.setInterpolator(new LinearInterpolator());
-        tran.setStartOffset(150);
-        tran.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                if(isShow)
-                    fab.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if(!isShow)
-                    fab.setVisibility(View.GONE);
-                showOption(isShow);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        fab.startAnimation(tran);
-    }
-    private void showOption(final boolean isShow){
-        TranslateAnimation tran;
-        if(!isShow)
-            tran = new TranslateAnimation(0, 0, lnlOptions.getHeight(), 0);
-        else
-            tran = new TranslateAnimation(0, 0, 0, lnlOptions.getHeight());
-        tran.setDuration(400);
-        tran.setInterpolator(new LinearInterpolator());
-        tran.setStartOffset(150);
-        tran.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                if(!isShow)
-                    lnlOptions.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                if(isShow)
-                    lnlOptions.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        });
-
-        lnlOptions.startAnimation(tran);
-    }
-
     private void initLayout() {
-        lnlOptions = (LinearLayout) rootView.findViewById(R.id.lnlOption);
         lv = (AnimatedExpandableListview) rootView.findViewById(R.id.lvExp);
+        swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeToRefresh);
+        swipeRefreshLayout.setEnabled(false);
+
         fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.bringToFront();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                isShowFab = !isShowFab;
-//                showFabButton(isShowFab);
                 uploadData();
             }
         });
@@ -231,7 +174,6 @@ public class FragmentReportStatus extends CustomFragment {
                             en.getDaValue().getAction().toLowerCase().equals(getResources().getString(R.string.lastday).toLowerCase())) {
                     }else {
                         syncData.add(en);
-//                            Logger.error("add en:  " + en.getDaValue().getAction());
                     }
                 }
 

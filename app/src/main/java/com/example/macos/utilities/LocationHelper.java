@@ -55,7 +55,7 @@ public class LocationHelper {
                     Address returnedAddress = addresses.get(0);
                     StringBuilder strReturnedAddress = new StringBuilder();
                     for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
-                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append("\n");
+                        strReturnedAddress.append(returnedAddress.getAddressLine(i)).append(".");
                     }
                     en.setAddress(strReturnedAddress.toString());
                 }
