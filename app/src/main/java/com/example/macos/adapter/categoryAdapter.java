@@ -50,7 +50,7 @@ public class categoryAdapter extends RecyclerView.Adapter<categoryAdapter.ViewHo
             itemView.requestLayout();
             itemView.getLayoutParams().height = height;
 
-            itemView.setOnClickListener(this);
+            itemView.findViewById(R.id.rippleView).setOnClickListener(this);
         }
 
         @Override

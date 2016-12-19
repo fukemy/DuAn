@@ -62,5 +62,8 @@ dependencies {
     compile 'com.github.florent37:viewanimator:1.0.4' //https://github.com/florent37/ViewAnimator
     compile 'com.github.rafakob:DrawMe:0.1.6' //https://github.com/rafakob/DrawMe
     compile 'com.balysv:material-ripple:1.0.2' //https://github.com/balysv/material-ripple
+    compile ('com.github.ozodrukh:CircularReveal:2.0.1@aar') { //https://github.com/ozodrukh/CircularReveal
+        transitive = true;
+    }
 
 }
