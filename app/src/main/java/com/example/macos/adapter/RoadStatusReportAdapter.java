@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import com.example.macos.interfaces.iRippleControl;
 import com.example.macos.libraries.AnimatedExpandableListview;
 import com.example.macos.libraries.Logger;
 import com.example.macos.report.DiaryReportContent;
+import com.example.macos.utilities.FunctionUtils;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -78,62 +80,67 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
 
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-        if(convertView == null)
-            convertView = inflater.inflate(R.layout.expandable_list_group, parent, false);
+        HeaderHolder holder;
+        if(convertView == null) {
+            convertView = inflater.inflate(R.layout.header_report_status, parent, false);
+            holder = new HeaderHolder();
+            holder.tvHeaderName= (TextView) convertView.findViewById(R.id.tvHeaderName);
+            holder.tvItemCount = (TextView) convertView.findViewById(R.id.tvItemCount);
+            holder.imgTitleHeader= (ImageView) convertView.findViewById(R.id.imgTitleHeader);
 
-        TextView tvCatalog= (TextView) convertView.findViewById(R.id.tvCatalog);
+            convertView.setTag(holder);
+        }else{
+            holder = (HeaderHolder) convertView.getTag();
+        }
 
-        tvCatalog.setText((getGroup(groupPosition) == null || getGroup(groupPosition).equals(""))
+        holder.tvItemCount.setText("" + listChild.get(listHeader.get(groupPosition)).size());
+        holder.tvHeaderName.setText((getGroup(groupPosition) == null || getGroup(groupPosition).equals(""))
                 ? "Chưa có dữ liệu!" : getGroup(groupPosition));
+
+        holder.imgTitleHeader.setImageResource(0);
+        FunctionUtils.setImageForResource(mContext, holder.imgTitleHeader, getGroup(groupPosition));
         return convertView;
     }
 
 
     @Override
     public View getRealChildView(final int groupPosition, final int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-        if(convertView == null)
+        MainHolder holder;
+        if(convertView == null) {
             convertView = inflater.inflate(R.layout.expandable_list_item, parent, false);
+            holder = new MainHolder();
+            holder.tvPromptitem = (TextView) convertView.findViewById(R.id.tvPromptItem);
+            holder.tvStatus = (TextView) convertView.findViewById(R.id.tvStatus);
+            holder.tvRoadName = (TextView) convertView.findViewById(R.id.tvRoadName);
 
-        LinearLayout lnlHeader = (LinearLayout) convertView.findViewById(R.id.lnlHeader);
-        TextView tvPromptitem = (TextView) convertView.findViewById(R.id.tvPromptItem);
-        TextView tvStatus = (TextView) convertView.findViewById(R.id.tvStatus);
-        TextView tvInformation = (TextView) convertView.findViewById(R.id.tvInformation);
-        TextView tvRoadName = (TextView) convertView.findViewById(R.id.tvRoadName);
+            convertView.setTag(holder);
+        }else{
+            holder = (MainHolder) convertView.getTag();
+        }
 
-        if(childPosition == 0)
-            lnlHeader.setVisibility(View.VISIBLE);
-        else
-            lnlHeader.setVisibility(View.GONE);
 
         try {
-            tvPromptitem.setText((getChild(groupPosition, childPosition).getDaValue().getDataTypeName().equals("")?
+            holder.tvPromptitem.setText((getChild(groupPosition, childPosition).getDaValue().getDataTypeName().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getDataTypeName()));
         }catch(Exception e){
-            tvPromptitem.setText("Chưa có dữ liệu!");
+            holder.tvPromptitem.setText("Chưa có dữ liệu!");
         }
 
         try {
-            tvStatus.setText((getChild(groupPosition, childPosition).getDaValue().getDanhGia().equals("")?
+            holder.tvStatus.setText((getChild(groupPosition, childPosition).getDaValue().getDanhGia().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getDanhGia()));
         }catch(Exception e){
-            tvStatus.setText("Chưa có dữ liệu!");
+            holder.tvStatus.setText("Chưa có dữ liệu!");
         }
 
         try {
-            tvInformation.setText((getChild(groupPosition, childPosition).getDaValue().getMoTaTinhTrang().equals("")?
-                    "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getMoTaTinhTrang()));
-        }catch(Exception e){
-            tvInformation.setText("Chưa có dữ liệu!");
-        }
-
-        try {
-            tvRoadName.setText((getChild(groupPosition, childPosition).getDaValue().getTenDuong().equals("")?
+            holder.tvRoadName.setText((getChild(groupPosition, childPosition).getDaValue().getTenDuong().equals("")?
                     "Chưa có dữ liệu!"  : getChild(groupPosition, childPosition).getDaValue().getTenDuong()));
         }catch(Exception e){
-            tvRoadName.setText("Chưa có dữ liệu!");
+            holder.tvRoadName.setText("Chưa có dữ liệu!");
         }
 
-        final LinearLayout animatedView = (LinearLayout) convertView.findViewById(R.id.lnlData);
+        final View animatedView = convertView;
         animatedView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,6 +173,20 @@ public class RoadStatusReportAdapter extends AnimatedExpandableListview.Animated
     @Override
     public boolean hasStableIds() {
         return true;
+    }
+
+    public class HeaderHolder{
+        TextView tvHeaderName, tvItemCount;
+        ImageView imgTitleHeader;
+        public HeaderHolder(){
+
+        }
+    }
+
+    public class MainHolder{
+        TextView tvPromptitem,tvStatus ,tvRoadName;
+        public MainHolder(){
+        }
     }
 
 }

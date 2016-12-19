@@ -38,6 +38,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -228,6 +229,47 @@ public class FunctionUtils {
 //        return dp;
     }
 
+    public static void setImageForResource(Context mContext, ImageView img, String catalog){
+        if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.road_surface).toLowerCase()))
+            img.setImageResource(R.mipmap.roads);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.roadbed).toLowerCase()))
+            img.setImageResource(R.mipmap.nenduong);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.divider).toLowerCase()))
+            img.setImageResource(R.mipmap.daiphancach);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.underground_drain_people).toLowerCase()))
+            img.setImageResource(R.mipmap.cauchui);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.drainage_box_culvert).toLowerCase()))
+            img.setImageResource(R.mipmap.conghopbanthoatnuoc);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.culverts).toLowerCase()))
+            img.setImageResource(R.mipmap.congtron);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.slopes).toLowerCase()))
+            img.setImageResource(R.mipmap.maidoc);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.retaining_walls).toLowerCase()))
+            img.setImageResource(R.mipmap.tuongchan);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.protective_barrier).toLowerCase()))
+            img.setImageResource(R.mipmap.hangraobaove);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.lighting_Systems).toLowerCase()))
+            img.setImageResource(R.mipmap.hethongsang);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.notice_board).toLowerCase()))
+            img.setImageResource(R.mipmap.bienbao);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.road_markings).toLowerCase()))
+            img.setImageResource(R.mipmap.vachsonduong);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.column_Km).toLowerCase()))
+            img.setImageResource(R.mipmap.cot_km);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.bridge).toLowerCase()))
+            img.setImageResource(R.mipmap.cau);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.marker).toLowerCase()))
+            img.setImageResource(R.mipmap.coctieu);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.manhole_sumps).toLowerCase()))
+            img.setImageResource(R.mipmap.hogahothu);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.longitudinal_grooves_groove_Border).toLowerCase()))
+            img.setImageResource(R.mipmap.ranhdocranhbien);
+        else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.vertical_drain).toLowerCase()))
+            img.setImageResource(R.mipmap.congdoc);
+        else
+            img.setImageResource(0);
+    }
+
     public static int getResouceFromCatalog(Context mContext, String catalog){
         if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.road_surface).toLowerCase()))
             return  R.array.road_surface_list;
@@ -266,7 +308,7 @@ public class FunctionUtils {
         else if (catalog.toLowerCase().equals(mContext.getResources().getString(R.string.vertical_drain).toLowerCase()))
             return  R.array.congdoc;
         else
-                return R.array.nenduong;
+            return R.array.nenduong;
     }
 
     public static void revertCursoOfEditText(int heightDifference, ScrollView scroll, final LinearLayout lnl, Context mContext){

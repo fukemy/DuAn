@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:animateLayoutChanges="true"
-                android:background="@color/grayColor30"
+                android:background="@color/mainColor20"
                 android:clipChildren="false"
                 android:clipToPadding="false"
                 android:gravity="center_horizontal"

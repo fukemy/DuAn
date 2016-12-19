@@ -84,12 +84,12 @@ public class FragmentMainDataScreen extends CustomFragment {
 
             setData();
         }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            recyclerView.setNestedScrollingEnabled(true);
-        }
-
-
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     public void setData() {

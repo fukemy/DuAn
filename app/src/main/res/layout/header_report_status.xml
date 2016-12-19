@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|center_vertical"
+        android:orientation="horizontal">
+
+        <com.rafakob.drawme.DrawMeFrameLayout xmlns:drawme="http://schemas.android.com/apk/res-auto"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="20dp"
+            android:background="@mipmap/cau"
+            drawme:dm_backColor="@color/mainColor"
+            drawme:dm_radius="14dp">
+
+            <ImageView
+                android:id="@+id/imgTitleHeader"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@mipmap/bienbao" />
+        </com.rafakob.drawme.DrawMeFrameLayout>
+
+        <TextView
+            android:id="@+id/tvHeaderName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="2dp"
+            android:padding="10dp"
+            android:text="@string/app_name"
+            android:textAllCaps="true"
+            android:textColor="@color/mainColor"
+            android:textSize="18sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvItemCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center_vertical"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="4dp"
+        android:gravity="center"
+        android:text="4"
+        android:textColor="@color/mainColor"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:background="@color/mainColor" />
+</FrameLayout>

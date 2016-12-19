@@ -215,12 +215,6 @@ public class MainScreen extends AppCompatActivity implements NavigationView.OnNa
         viewPager.setAdapter(null);
         viewPager.setAdapter(adapter);
         tabLayout.setupWithViewPager(viewPager);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            viewPager.setNestedScrollingEnabled(true);
-        }else{
-        }
-
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {

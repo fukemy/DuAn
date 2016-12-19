@@ -10,7 +10,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:background="@color/grayColor30"
+        android:background="@color/grayColor"
         android:layout_height="match_parent">
 
         <ImageView
