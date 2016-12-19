@@ -61,5 +61,6 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.1.0' //https://github.com/hdodenhof/CircleImageView
     compile 'com.github.florent37:viewanimator:1.0.4' //https://github.com/florent37/ViewAnimator
     compile 'com.github.rafakob:DrawMe:0.1.6' //https://github.com/rafakob/DrawMe
+    compile 'com.balysv:material-ripple:1.0.2' //https://github.com/balysv/material-ripple
 
 }

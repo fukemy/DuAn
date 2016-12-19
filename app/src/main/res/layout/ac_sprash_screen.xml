@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:drawme="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/rootView"
     android:layout_width="match_parent"
@@ -50,7 +50,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/username"
                 android:imeOptions="actionDone"
-                android:singleLine="true"  />
+                android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -70,20 +70,22 @@
                 android:singleLine="true" />
         </android.support.design.widget.TextInputLayout>
 
-        <LinearLayout
+        <com.rafakob.drawme.DrawMeFrameLayout
             android:id="@+id/lnlLoginButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="30dp"
             android:layout_marginRight="30dp"
             android:layout_marginTop="30dp"
-            android:background="@color/mainColor"
-            android:clickable="true"
-            android:gravity="center">
+            android:gravity="center"
+            drawme:dm_backColor="@color/mainColor"
+            drawme:dm_rippleUseControlHighlight="true"
+            drawme:dm_shapeRadiusHalfHeight="true">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:background="@android:color/transparent"
                 android:padding="10dp"
                 android:text="Đăng nhập"
@@ -91,7 +93,7 @@
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 android:textStyle="bold" />
-        </LinearLayout>
+        </com.rafakob.drawme.DrawMeFrameLayout>
 
     </LinearLayout>
 
@@ -104,19 +106,21 @@
         android:layout_marginTop="20dp"
         android:visibility="gone" />
 
-    <LinearLayout
+    <com.rafakob.drawme.DrawMeFrameLayout
         android:id="@+id/lnlRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:clickable="true"
-        android:background="@color/mainColor"
         android:gravity="center"
-        android:visibility="gone">
+        android:visibility="gone"
+        drawme:dm_backColor="@color/mainColor"
+        drawme:dm_rippleUseControlHighlight="true"
+        drawme:dm_shapeRadiusHalfHeight="true">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:background="@android:color/transparent"
             android:gravity="center"
             android:padding="10dp"
@@ -125,5 +129,5 @@
             android:textColor="@android:color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
-    </LinearLayout>
+    </com.rafakob.drawme.DrawMeFrameLayout>
 </RelativeLayout>

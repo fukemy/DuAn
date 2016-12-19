@@ -8,6 +8,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -37,6 +38,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.balysv.materialripple.MaterialRippleLayout;
 import com.example.macos.activities.MainScreen;
 import com.example.macos.database.DatabaseHelper;
 import com.example.macos.database.Item;
@@ -54,6 +56,7 @@ import com.github.florent37.viewanimator.AnimationListener;
 import com.github.florent37.viewanimator.ViewAnimator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.rafakob.drawme.DrawMeFrameLayout;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -77,7 +80,7 @@ public class SprashScreen extends Activity {
     private EditText edtUsername,edtPassword;
     private SharedPreferenceManager pref;
     private RelativeLayout rootView;
-    private LinearLayout btLogin,lnlRegister;
+    private DrawMeFrameLayout btLogin,lnlRegister;
     boolean IS_LOGGED_ON = false;
     long LAST_LOGIN = 0;
     int currentDiffheight = 0;
@@ -202,8 +205,8 @@ public class SprashScreen extends Activity {
         rootView = (RelativeLayout) findViewById(R.id.rootView);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         prLogin = (ProgressBar) findViewById(R.id.prLogin);
-        btLogin = (LinearLayout) findViewById(R.id.lnlLoginButton);
-        lnlRegister = (LinearLayout) findViewById(R.id.lnlRegister);
+        btLogin = (DrawMeFrameLayout) findViewById(R.id.lnlLoginButton);
+        lnlRegister = (DrawMeFrameLayout) findViewById(R.id.lnlRegister);
         inputUsername = (TextInputLayout) findViewById(R.id.inputUsername);
         inputPassword = (TextInputLayout) findViewById(R.id.inputPassword);
         edtUsername = (EditText) findViewById(R.id.edtUsername);
@@ -266,10 +269,12 @@ public class SprashScreen extends Activity {
         edtUsername.clearFocus();
         edtPassword.clearFocus();
         if (!validateUserName()) {
+            btLogin.setEnabled(true);
             return;
         }
 
         if (!validatePassword()) {
+            btLogin.setEnabled(true);
             return;
         }
 
@@ -336,16 +341,16 @@ public class SprashScreen extends Activity {
                         ViewAnimator.animate(lnlLogin)
 //                                .scale(0f, 1.2f, 1f)
                                 .alpha(0f, 1f)
-                                .andAnimate(lnlRegister)
-                                .slideBottom()
-                                .alpha(0f, 1f)
+//                                .andAnimate(lnlRegister)
+//                                .slideBottom()
+//                                .alpha(0f, 1f)
                                 .accelerate()
                                 .duration(600)
                                 .onStart(new AnimationListener.Start() {
                                     @Override
                                     public void onStart() {
                                         lnlLogin.setVisibility(View.VISIBLE);
-                                        lnlRegister.setVisibility(View.VISIBLE);
+//                                        lnlRegister.setVisibility(View.VISIBLE);
                                     }
                                 })
 
